@@ -45,3 +45,13 @@ export const Disabled: Story = {
     <SwitchDemo checked={true} disabled description="Get a reminder when verses are due." />
   ),
 };
+
+export const WithError: Story = {
+  render: () => (
+    <SwitchDemo
+      checked={false}
+      description="Get a reminder when verses are due."
+      error="Choose whether to get reminders."
+    />
+  ),
+};

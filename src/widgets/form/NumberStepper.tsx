@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Input as TamaguiInput, styled } from "tamagui";
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
@@ -6,6 +6,7 @@ import { tokens } from "../../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
 import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledValueInput = styled(TamaguiInput, {
   name: "NumberStepperValue",
@@ -66,6 +67,14 @@ export type NumberStepperProps = {
   increaseAccessibilityLabel?: string;
   /** When true, the whole stepper is inert and dimmed: both buttons (and the editable field, when present) are disabled. */
   disabled?: boolean;
+  /**
+   * Validation error (#804): rendered below the stepper
+   * through the shared FieldError (an Alert); the controls
+   * group (and the editable input, when present) carries
+   * `aria-invalid` / `aria-describedby` pointing at it.
+   */
+  error?: string;
+  id?: string;
 };
 
 /**
@@ -94,7 +103,12 @@ export function NumberStepper({
   decreaseAccessibilityLabel,
   increaseAccessibilityLabel,
   disabled = false,
+  error,
+  id: idProp,
 }: NumberStepperProps) {
+  const autoId = useId();
+  const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
   // The editable field's uncommitted text; null while not editing, so
   // the field shows the (externally owned) value.
   const [draft, setDraft] = useState<string | null>(null);
@@ -143,6 +157,8 @@ export function NumberStepper({
       opacity={disabled ? 0.5 : 1}
       {...(label ? groupRoleProps : {})}
       {...platformAccessibilityProps({ accessibilityLabel: label })}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={error ? errorId : undefined}
     >
       <Button
         variant="secondary"
@@ -168,6 +184,8 @@ export function NumberStepper({
           keyboardType="numeric"
           inputMode="numeric"
           aria-live="polite"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           {...platformAccessibilityProps({
             accessibilityLabel: label ? `${label} value` : "Value",
           })}
@@ -206,18 +224,21 @@ export function NumberStepper({
 
   if (layout === "inline") {
     return (
-      <Row middle between gap="m">
-        {label ? (
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.medium}
-            color={tokens.colors.gray.gray8}
-          >
-            {label}
-          </Text>
-        ) : null}
-        {controls}
-      </Row>
+      <Col gap="xs">
+        <Row middle between gap="m">
+          {label ? (
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              fontWeight={tokens.typography.fontWeight.medium}
+              color={tokens.colors.gray.gray8}
+            >
+              {label}
+            </Text>
+          ) : null}
+          {controls}
+        </Row>
+        {error ? <FieldError error={error} id={errorId} /> : null}
+      </Col>
     );
   }
 
@@ -225,6 +246,7 @@ export function NumberStepper({
     <Col gap="xs">
       {label ? <Text variant="hint">{label}</Text> : null}
       {controls}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }

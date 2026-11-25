@@ -147,6 +147,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           value={search}
           onChangeText={setSearch}
           disabled={disabled}
+          {...(errors ? { error: "Enter a search term." } : {})}
         />
         <SelectField
           label="Recipe status"
@@ -161,7 +162,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           onSearchTextChange={setPickerSearch}
           searchResults={searchResults}
           isSearching={false}
-          {...(errors ? { searchError: "Search failed. Try again." } : {})}
+          {...(errors ? { error: "Pick at least one recipe." } : {})}
           onSelectResult={(id) => {
             const result = LIBRARY.find((item) => item.id === id);
             if (result) {
@@ -186,6 +187,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           items={TAG_ITEMS}
           selectedIds={selectedTagIds}
           disabled={disabled}
+          {...(errors ? { error: "Pick at least one tag." } : {})}
           onToggle={(id) => {
             setSelectedTagIds((previous) =>
               previous.includes(id) ? previous.filter((entry) => entry !== id) : [...previous, id],
@@ -209,6 +211,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           customAccessibilityLabel="Custom scale"
           formatCustomValue={(custom) => `${custom}×`}
           disabled={disabled}
+          {...(errors ? { error: "Choose a scale." } : {})}
         />
         <NumberStepper
           label="Servings"
@@ -217,6 +220,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           max={12}
           onChange={setServings}
           disabled={disabled}
+          {...(errors ? { error: "Servings must be at least 1." } : {})}
         />
         <Slider
           label="Spice level"
@@ -225,12 +229,14 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           value={spice}
           onValueChange={setSpice}
           disabled={disabled}
+          {...(errors ? { error: "Choose a spice level." } : {})}
         />
         <StarRatingInput
           label="Rate this recipe"
           value={rating}
           onChange={setRating}
           disabled={disabled}
+          {...(errors ? { error: "Please rate this recipe." } : {})}
         />
         <CheckboxField
           label="Email me new recipes"
@@ -238,6 +244,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           checked={notify}
           onCheckedChange={setNotify}
           disabled={disabled}
+          {...(errors ? { error: "Choose whether to get the digest." } : {})}
         />
         <Switch
           label="Pin to favorites"
@@ -245,6 +252,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           checked={pinned}
           onCheckedChange={setPinned}
           disabled={disabled}
+          {...(errors ? { error: "Choose whether to pin this recipe." } : {})}
         />
       </Col>
     </YStack>
@@ -261,7 +269,7 @@ export const Filled: Story = {
   render: () => <FullForm mode="filled" />,
 };
 
-/** Error text on the fields that support it, side by side. */
+/** Every control in its error form (#804): each renders its error through the shared Alert treatment. */
 export const WithErrors: Story = {
   render: () => <FullForm mode="errors" />,
 };

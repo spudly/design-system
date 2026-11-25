@@ -4,6 +4,7 @@ import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledTrack = styled(TamaguiSlider.Track, {
   name: "SliderTrack",
@@ -270,11 +271,7 @@ export function Slider({
           </View>
         ) : null}
       </Col>
-      {error ? (
-        <Text variant="error" id={errorId}>
-          {error}
-        </Text>
-      ) : null}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }

@@ -59,3 +59,20 @@ export const WithoutLabel: Story = {
     );
   },
 };
+
+export const WithError: Story = {
+  render: () => {
+    const [value, setValue] = useState("");
+    return (
+      <YStack maxWidth={360}>
+        <SearchField
+          label="Search recipes"
+          placeholder="Search recipes…"
+          value={value}
+          onChangeText={setValue}
+          error="Enter a search term."
+        />
+      </YStack>
+    );
+  },
+};

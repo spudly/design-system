@@ -7,6 +7,7 @@ import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 /**
  * The ✓ glyph must NOT get an explicit lineHeight: it previously
@@ -270,11 +271,7 @@ export function CheckboxField({
           </Text>
         </Row>
         {children}
-        {error ? (
-          <Text variant="error" id={errorId}>
-            {error}
-          </Text>
-        ) : null}
+        {error ? <FieldError error={error} id={errorId} /> : null}
       </Col>
     );
   }
@@ -291,11 +288,7 @@ export function CheckboxField({
         </Col>
       </Row>
       {children}
-      {error ? (
-        <Text variant="error" id={errorId}>
-          {error}
-        </Text>
-      ) : null}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }

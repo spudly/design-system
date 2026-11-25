@@ -61,3 +61,21 @@ export const LoadingOverlay: Story = {
     </YStack>
   ),
 };
+
+export const WithError: Story = {
+  render: () => {
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    return (
+      <CheckboxSelectList
+        items={ITEMS}
+        selectedIds={selectedIds}
+        onToggle={(id) => {
+          setSelectedIds((previous) =>
+            previous.includes(id) ? previous.filter((entry) => entry !== id) : [...previous, id],
+          );
+        }}
+        error="Pick at least one tag."
+      />
+    );
+  },
+};

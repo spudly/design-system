@@ -15,12 +15,16 @@
  *   Alert too;
  * - no in-scope file still renders its form-level error as plain
  *   error-variant Text;
- * - field-level errors are untouched: they keep their id wiring
- *   (LabeledField / the field components), which is a separate,
- *   already-announced path.
- * - exception (#472): ColorPickerField's field error renders
- *   through Alert instead, keeping its errorId on the Alert so the
+ * - field-level errors were originally untouched by #329: they
+ *   kept their id wiring (LabeledField / the field components).
+ * - exception (#472): ColorPickerField's field error rendered
+ *   through Alert, keeping its errorId on the Alert so the
  *   swatch group's aria-describedby wiring is unchanged.
+ * - #804 (Stephen, 2026-11-24) supersedes the field-level
+ *   exemption: EVERY field-level error now renders through the
+ *   shared FieldError (an Alert at error severity), keeping its
+ *   errorId wiring — the #472 treatment generalized to all
+ *   controls. The pins below record that contract.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -45,7 +49,16 @@ const VIEW_FORM_COMPONENTS = new Set([
 ]);
 // Form-category widgets live in src/widgets/form since #710;
 // TextAreaField joined them in #748.
-const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField", "TextField", "TextAreaField", "CheckboxField", "FieldShell", "NumberStepper", "RatingForm"]);
+const FORM_CATEGORY_COMPONENTS = new Set([
+  "SelectField",
+  "ColorPickerField",
+  "TextField",
+  "TextAreaField",
+  "CheckboxField",
+  "FieldShell",
+  "NumberStepper",
+  "RatingForm",
+]);
 const formSource = (name: string) =>
   read(
     `src/${VIEW_FORM_COMPONENTS.has(name) ? "views/eciperay" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,
@@ -135,30 +148,41 @@ test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
   );
 });
 
-test("field-level errors keep their id-wired plain Text rendering", () => {
+test("field-level errors render through the shared FieldError with their id wiring (#804)", () => {
   for (const name of ["TextField", "TextAreaField", "SelectField", "CheckboxField"]) {
     const source = formSource(name);
     assert.match(
       source,
+      /<FieldError error=\{error\} id=\{errorId\} \/>/,
+      `${name} renders its field error through FieldError with the errorId wiring`,
+    );
+    assert.doesNotMatch(
+      source,
       /<Text variant="error" id=\{errorId\}>/,
-      `${name} still renders its field error with the errorId wiring`,
+      `${name} no longer renders its field error as plain error Text`,
     );
   }
 });
 
-test("ColorPickerField renders its field error through Alert, keeping the errorId wiring (#472)", () => {
-  // Stephen's #472 directive overrides the field-level plain-Text
-  // treatment for ColorPickerField alone: the error renders inside
-  // an Alert (which announces it), and the Alert carries the
-  // errorId so the swatch group's aria-describedby still resolves.
+test("ColorPickerField renders its field error through FieldError, keeping the errorId wiring (#472, generalized by #804)", () => {
+  // Stephen's #472 directive first moved ColorPickerField's field
+  // error into an Alert (which announces it), with the errorId so
+  // the swatch group's aria-describedby still resolves; #804
+  // generalizes that treatment to every control through the
+  // shared FieldError, which is the Alert rendering.
   const source = formSource("ColorPickerField");
   assert.ok(
-    source.includes('<Alert severity="error" message={error} id={errorId} />'),
-    'ColorPickerField renders its error via Alert severity="error" with the errorId',
+    source.includes("<FieldError error={error} id={errorId} />"),
+    "ColorPickerField renders its error via FieldError (the Alert treatment) with the errorId",
   );
   assert.doesNotMatch(
     source,
     /<Text variant="error" id=\{errorId\}>/,
     "ColorPickerField no longer renders its field error as plain error Text",
+  );
+  const fieldError = read("src/widgets/form/FieldError.tsx");
+  assert.ok(
+    fieldError.includes('<Alert severity="error" message={error}'),
+    "FieldError is the Alert rendering the field errors share (#804)",
   );
 });

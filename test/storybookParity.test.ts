@@ -183,6 +183,11 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // the components barrel, no story of its own (joined widgets
   // from views in #698; it was a views parity exception before).
   "FieldShell.tsx",
+  // FieldError.tsx (#804): the shared field-error rendering every
+  // form control composes — internal, not exported from the
+  // components barrel, no story of its own (exercised through the
+  // controls' WithError stories, like FieldShell).
+  "FieldError.tsx",
 ]);
 
 test("every widget component has a story file titled Widgets/<Name>", () => {

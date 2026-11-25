@@ -8,6 +8,8 @@ import { EmptyState } from "../../views/shared/EmptyState.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
 import { useVoice } from "../../voice/index.js";
+import { useId } from "react";
+import { FieldError } from "./FieldError.js";
 
 type CheckboxSelectItem = {
   id: string;
@@ -24,6 +26,14 @@ export type CheckboxSelectListProps = {
   loading?: boolean;
   /** Shown through EmptyState when there are no items. */
   emptyMessage?: string;
+  /**
+   * Validation error for the selection as a whole (#804):
+   * rendered below the list through the shared FieldError (an
+   * Alert); the list group carries `aria-invalid` /
+   * `aria-describedby` pointing at it.
+   */
+  error?: string;
+  id?: string;
 };
 
 // The loading list's dummy rows (#278): exactly 3 placeholder
@@ -61,7 +71,12 @@ export function CheckboxSelectList({
   disabled = false,
   loading = false,
   emptyMessage,
+  error,
+  id: idProp,
 }: CheckboxSelectListProps) {
+  const autoId = useId();
+  const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
   const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
@@ -87,11 +102,20 @@ export function CheckboxSelectList({
     );
   }
   if (items.length === 0) {
-    return <EmptyState title={emptyMessage ?? voice.checkboxSelectList.emptyMessage} />;
+    return (
+      <Col gap="xs">
+        <EmptyState title={emptyMessage ?? voice.checkboxSelectList.emptyMessage} />
+        {error ? <FieldError error={error} id={errorId} /> : null}
+      </Col>
+    );
   }
   const selected = new Set(selectedIds);
   return (
-    <Col>
+    <Col
+      gap="xs"
+      aria-invalid={error ? true : undefined}
+      aria-describedby={error ? errorId : undefined}
+    >
       {items.map((item) => (
         <CheckboxField
           key={item.id}
@@ -103,6 +127,7 @@ export function CheckboxSelectList({
           disabled={disabled}
         />
       ))}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }

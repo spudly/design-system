@@ -160,7 +160,7 @@ test("FieldRow's field types fill the row height on their grow path (#476)", () 
   // SearchField: the bordered container fills its root when growing (no label).
   assert.match(
     searchFieldCode,
-    /<StyledContainer \{\.\.\.\(embedded \? \{ flex: 1, minWidth: 120, embedded: true \} : \{\}\)\} \{\.\.\.\(grow && !label \? \{ flex: 1 \} : \{\}\)\}>/,
+    /<StyledContainer\s+error=\{!!error\}\s+\{\.\.\.\(embedded \? \{ flex: 1, minWidth: 120, embedded: true \} : \{\}\)\}\s+\{\.\.\.\(grow && !label \? \{ flex: 1 \} : \{\}\)\}\s+>/,
   );
   // TextField: the styled input (the bordered box) fills its root when growing.
   // Scoped to the StyledInput block: the root YStack carries the same grow

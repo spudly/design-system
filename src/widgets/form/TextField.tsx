@@ -4,7 +4,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { FieldShell } from "./FieldShell.js";
 import { useFieldA11y } from "../../views/shared/useFieldA11y.js";
-import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledInput = styled(TamaguiInput, {
   name: "TextField",
@@ -204,11 +204,7 @@ export function TextField({
             />
             {trailing ?? null}
           </View>
-          {error ? (
-            <Text variant="error" id={errorId}>
-              {error}
-            </Text>
-          ) : null}
+          {error ? <FieldError error={error} id={errorId} /> : null}
         </>
       )}
     </FieldShell>

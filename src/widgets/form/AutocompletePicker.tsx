@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { XStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { Row } from "../layout/Row.js";
@@ -11,6 +11,7 @@ import { ListItem } from "../data/ListItem.js";
 import { SearchField } from "./SearchField.js";
 import { Spinner } from "../feedback/Spinner.js";
 import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 import { useVoice } from "../../voice/index.js";
 
 /**
@@ -109,6 +110,15 @@ export type AutocompletePickerProps = {
    * the caller when a search succeeds again.
    */
   searchError?: string | null | undefined;
+  /**
+   * Validation error for the picker's selection as a whole
+   * (#804) — distinct from `searchError` (a failed search):
+   * rendered below the picker through the shared FieldError
+   * (an Alert), wired to the search input with `aria-invalid`
+   * / `aria-describedby` at `${id}-error`.
+   */
+  error?: string | null | undefined;
+  id?: string;
   /** Disables the search field, the results, and removal. */
   disabled?: boolean;
 };
@@ -197,8 +207,13 @@ export function AutocompletePicker({
   searchAccessibilityLabel: searchAccessibilityLabelProp,
   noResultsMessage: noResultsMessageProp,
   searchError,
+  error,
+  id: idProp,
   disabled = false,
 }: AutocompletePickerProps) {
+  const autoId = useId();
+  const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
   const voice = useVoice();
   const placeholder = placeholderProp ?? voice.autocompletePicker.searchPlaceholder;
   const searchAccessibilityLabel =
@@ -272,6 +287,8 @@ export function AutocompletePicker({
           ref={searchFieldRef}
           embedded
           grow
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           value={searchText}
           onChangeText={onSearchTextChange}
           placeholder={placeholder}
@@ -333,6 +350,7 @@ export function AutocompletePicker({
           </Col>
         )
       ) : null}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }
