@@ -26,7 +26,8 @@
  * ButtonStack, FormStack, and the rest — and the alignment /
  * special family: BannerRow, CenteredRow, CompactRow, EndRow,
  * StartStack, PanelStack, HeroStack, ListHeaderStack,
- * SpacedTopStack, Grow): their consumers compose Row / Col
+ * SpacedTopStack, Grow, and the catalog columns/row):
+ * their consumers compose Row / Col
  * directly with the matching semantic props, and the export
  * pins below hold that the wrappers do not survive as API.
  * The pins hold each remaining component's treatment, its Omit of the
@@ -119,6 +120,9 @@ test("the layout components are exported from the built internal components barr
     "ListHeaderStack",
     "SpacedTopStack",
     "Grow",
+    "CatalogCardColumn",
+    "CatalogListColumn",
+    "CatalogRow",
   ]) {
     assert.equal(
       dist[name],

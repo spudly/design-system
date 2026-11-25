@@ -2,9 +2,6 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Fragment, useEffect, useRef } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { Alert } from "../../widgets/feedback/Alert.js";
-import { CatalogCardColumn } from "../../widgets/layout/CatalogCardColumn.js";
-import { CatalogListColumn } from "../../widgets/layout/CatalogListColumn.js";
-import { CatalogRow } from "../../widgets/data/CatalogRow.js";
 import { isWeb } from "../../widgets/platform.js";
 import {
   CatalogFiltersBar,
@@ -17,6 +14,7 @@ import {
   type DiscoveryCardAction,
 } from "../../widgets/content/DiscoveryCard.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
+import { Spacer } from "../../widgets/layout/Spacer.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import type { SelectOption } from "../../widgets/form/SelectField.js";
@@ -27,6 +25,7 @@ import { RatingForm } from "../../widgets/form/RatingForm.js";
 import { BoundedList } from "../shared/BoundedList.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
 import { useCatalogPagination } from "../shared/useCatalogPagination.js";
+import { Col } from "../../widgets/layout/Col.js";
 
 /**
  * RecipesPage (#49 pilot; unified in #415): Eciperay's single
@@ -1009,9 +1008,10 @@ export function RecipesPage(props: RecipesPageProps) {
     switch (row.kind) {
       case "ownHeading":
         return (
-          <CatalogRow>
+          <Col>
             <SectionHeading>{ownTitle}</SectionHeading>
-          </CatalogRow>
+            <Spacer y="m" />
+          </Col>
         );
       case "ownRecipe": {
         const item = row.item;
@@ -1053,14 +1053,15 @@ export function RecipesPage(props: RecipesPageProps) {
         );
       case "discoveryHeading":
         return (
-          <CatalogRow>
+          <Col>
             <SectionHeading>{row.title}</SectionHeading>
-          </CatalogRow>
+            <Spacer y="m" />
+          </Col>
         );
       case "discoveryRecipe": {
         const item = row.item;
         return (
-          <CatalogRow>
+          <Col>
             <DiscoveryCard
               title={item.title}
               {...(item.subtitle ? { subtitle: item.subtitle } : {})}
@@ -1068,7 +1069,8 @@ export function RecipesPage(props: RecipesPageProps) {
               href={item.href}
               {...(item.actions ? { actions: item.actions } : {})}
             />
-          </CatalogRow>
+            <Spacer y="m" />
+          </Col>
         );
       }
       case "discoveryLoadMoreError":
@@ -1116,14 +1118,23 @@ export function RecipesPage(props: RecipesPageProps) {
 
   // The signed-in catalog renders the bar bare (the public
   // variant wraps it in CatalogHeader, inside a gapped column):
-  // the bar's wrapper carries the $3 bottom separation every
-  // list row carries under itself (the rows' paddingBlockEnd
-  // rhythm), so the first section heading sits the list's
-  // 12px below the search bar instead of flush against it.
+  // the bar's Col carries a trailing Spacer for the $3 bottom
+  // separation every list row carries under itself (the rows'
+  // paddingBlockEnd rhythm), so the first section heading
+  // sits the list's 12px below the search bar instead of flush
+  // against it. (The Spacer is the sanctioned exception here:
+  // the catalog rows own their separation individually —
+  // MediaRow's paddingBlockEnd — so no parent gap can own
+  // this one; #746.)
   // Both signed-in layouts (the web column and the native
   // list's header) render this one composition, so the
   // separation holds in the loaded and loading states alike.
-  const filtersHeader = <CatalogRow>{filtersBar}</CatalogRow>;
+  const filtersHeader = (
+    <Col>
+      {filtersBar}
+      <Spacer y="m" />
+    </Col>
+  );
 
   if (variant === "public") {
     const publicItems: RecipesPageDiscoveryItem[] = publicLoading ? [] : (publicRecipes ?? []);
@@ -1134,7 +1145,7 @@ export function RecipesPage(props: RecipesPageProps) {
       return (
         <BigFooterShell footer={props.footer} scrollMode="content">
           <ScreenContainer variant="list">
-            <CatalogCardColumn>
+            <Col gap="m" px="l">
               <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
               {publicLoading ? (
                 <LoadingDiscoveryRows />
@@ -1164,7 +1175,7 @@ export function RecipesPage(props: RecipesPageProps) {
                   },
                 ]}
               />
-            </CatalogCardColumn>
+            </Col>
           </ScreenContainer>
         </BigFooterShell>
       );
@@ -1228,7 +1239,7 @@ export function RecipesPage(props: RecipesPageProps) {
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
-          <CatalogListColumn>
+          <Col px="l">
             {filtersHeader}
             {rows.map((row) => (
               <Fragment key={recipesPageRowKey(row)}>{renderRow(row)}</Fragment>
@@ -1248,7 +1259,7 @@ export function RecipesPage(props: RecipesPageProps) {
                 },
               ]}
             />
-          </CatalogListColumn>
+          </Col>
         </ScreenContainer>
       </BigFooterShell>
     );
@@ -1329,7 +1340,8 @@ function LoadingOwnRows() {
  * in their loading state (the widget's own skeleton — thumbnail
  * box and text bones in the card's geometry, no link). The
  * `section` variant is the unified list's form, where each card
- * sits in the discovery row's padded wrapper; the `standalone`
+ * sits in a Col with a trailing Spacer (its bottom separation);
+ * the `standalone`
  * variant is the public catalog's own layouts, where the cards
  * render bare in the column's gap rhythm.
  */
@@ -1338,9 +1350,10 @@ function LoadingDiscoveryRows({ variant = "standalone" }: { variant?: "section" 
     <>
       {LOADING_ROW_KEYS.map((key) =>
         variant === "section" ? (
-          <CatalogRow key={key}>
+          <Col key={key}>
             <DiscoveryCard title="Recipe" subtitle="Recipe details" href="/loading" loading />
-          </CatalogRow>
+            <Spacer y="m" />
+          </Col>
         ) : (
           <DiscoveryCard
             key={key}
