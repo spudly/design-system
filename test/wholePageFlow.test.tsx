@@ -1,7 +1,7 @@
 /**
  * Negative controls for the shared #547 whole-page-flow detector
  * (test/wholePageFlow.ts): the detector the ScrollRegion and
- * ScreenShell contract tests assert with must itself be proven
+ * page contract tests assert with must itself be proven
  * to catch a scroller by each mechanism it claims to cover —
  * inline-style overflow and class-based overflow from a rendered
  * `<style>` block — and to stay silent on ordinary markup.

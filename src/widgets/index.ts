@@ -139,7 +139,6 @@ export {
   type RatingsCardRatings,
   type RatingsCardViewerRating,
 } from "./data/RatingsCard.js";
-export { ScreenShell, type ScreenShellProps } from "./layout/ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./layout/ScrollShell.js";
 export { SectionHeading, type SectionHeadingProps } from "./content/SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./layout/SessionShell.js";

@@ -1,6 +1,6 @@
 /**
  * Shared SSR helpers for the #547 whole-page-flow contract tests
- * (ScrollRegion.test.ts, ScreenShell.test.ts).
+ * (ScrollRegion.test.tsx, the page contract tests).
  *
  * `renderToHtml` renders an element inside the Tamagui provider
  * using the calling test file's lazy runtime loader (each file
