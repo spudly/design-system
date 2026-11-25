@@ -88,7 +88,10 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   // (positioned itself, capped at 1200px and centered) renders
   // inside that region; the footer stays its full-width sibling.
   assert.match(bigFooter, /<Col grow shrink position="relative">\s*<PageContentColumn>/);
-  assert.match(bigFooter, /<PageContentColumn>\s*\{headerNode\}\s*\{children\}\s*<\/PageContentColumn>/);
+  assert.match(
+    bigFooter,
+    /<PageContentColumn>\s*\{headerNode\}\s*\{children\}\s*<\/PageContentColumn>/,
+  );
   assert.ok(!/flexBasis="auto"/.test(bigFooter), "the bounded content region is gone (#547)");
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
@@ -347,7 +350,7 @@ test("on native the shell renders one ScrollView and no BigFooter (#547)", () =>
   assert.match(bigFooter, /if \(!isWeb\) \{/);
   assert.match(
     bigFooter,
-    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<Col grow minHeight="100%" position="relative">\s*\{children\}/,
+    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<Col grow minHeight="100%" position="relative">\s*\{headerNode\}\s*\{children\}/,
   );
   assert.equal(
     (bigFooter.match(/<ScrollView/g) ?? []).length,
@@ -650,8 +653,10 @@ describe("bigFooterPrimary", () => {
       .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   }
   const footer = readCode("src/widgets/content/BigFooter.tsx");
-  test("the footer band fills with $primary and carries no top divider (#465)", () => {
-    assert.match(footer, /backgroundColor="\$primary"/);
+  test("the footer band fills with $footerBackground and carries no top divider (#465, #857)", () => {
+    // #857: the band's fill is the footerBackground semantic token,
+    // which each theme sets to its button (primary) color.
+    assert.match(footer, /backgroundColor="\$footerBackground"/);
     assert.ok(
       !/backgroundColor="\$surface"/.test(footer),
       "the band must not keep the surface fill",

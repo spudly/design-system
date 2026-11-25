@@ -66,7 +66,11 @@ test("BigFooter is the public pages' footer (#410)", () => {
   // BigFooter covers every page-frame use (every page renders it
   // through BigFooterShell), and it stays unexported from the
   // package root.
-  assert.match(footer, /backgroundColor="\$primary"/, "the primary band (#465)");
+  assert.match(
+    footer,
+    /backgroundColor="\$footerBackground"/,
+    "the footer band (#465, #857 token)",
+  );
   assert.match(footer, /<Row wrap/, "the columns wrap — the mobile collapse");
   assert.match(footer, /export type BigFooterData = \{/);
   assert.match(footer, /columns: BigFooterColumn\[\];/);
