@@ -21,8 +21,12 @@ const code = strip(source);
 // The recipe sections are the shared library panels (see the
 // header), so the section scans read the panel sources; the
 // page source hosts the wiring pins (render order).
-const overviewCode = strip(readFileSync(join(viewsDir, "eciperay", "RecipeOverviewPanel.tsx"), "utf8"));
-const ingredientsCode = strip(readFileSync(join(viewsDir, "eciperay", "RecipeIngredientsPanel.tsx"), "utf8"));
+const overviewCode = strip(
+  readFileSync(join(viewsDir, "eciperay", "RecipeOverviewPanel.tsx"), "utf8"),
+);
+const ingredientsCode = strip(
+  readFileSync(join(viewsDir, "eciperay", "RecipeIngredientsPanel.tsx"), "utf8"),
+);
 const ratingsCode = strip(ratingsSource);
 const scrollShellCode = strip(scrollShellSource);
 
@@ -64,8 +68,8 @@ test("error states live inside the props union, branched before the ready render
   }
   assert.match(
     code,
-    /<LoadingScope active>[\s\S]*?<StatBand loading>/,
-    "the loading state renders the skeleton composition in a LoadingScope (#278 tranche 4)",
+    /<LoadingScope active>[\s\S]*?<SkeletonBone/,
+    "the loading state renders the skeleton composition in a LoadingScope (#278 tranche 4) — the metadata badge's slot is a pill bone (#743)",
   );
   assert.ok(!code.includes("Spinner"), "the loading state renders skeletons, not a Spinner (#278)");
   assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
@@ -249,13 +253,13 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(overviewCode, /\{description \? \(/, "the description renders only when present");
   assert.match(
     overviewCode,
-    /\{prepTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/,
-    "the Prep stat needs a prep time",
+    /prepTimeLabel \? `\$\{voice\.recipeOverviewPanel\.prepLabel\} \$\{prepTimeLabel\}` : undefined/,
+    "the Prep badge part needs a prep time",
   );
   assert.match(
     overviewCode,
-    /\{cookTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/,
-    "the Cook stat needs a cook time",
+    /cookTimeLabel \? `\$\{voice\.recipeOverviewPanel\.cookLabel\} \$\{cookTimeLabel\}` : undefined/,
+    "the Cook badge part needs a cook time",
   );
   assert.match(overviewCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
   assert.match(code, /\{ratings \? \(/, "the ratings card renders only with ratings");
@@ -368,7 +372,11 @@ describe("publicRecipePageAdoption", () => {
       code.includes('import { StepList } from "../../widgets/data/StepList.js";'),
       "the page imports the library StepList for its instructions section (#747)",
     );
-    assert.match(code, /label: `Step \$\{step\.stepNumber\}`/, "the page composes each step's Step N label (#747)");
+    assert.match(
+      code,
+      /label: `Step \$\{step\.stepNumber\}`/,
+      "the page composes each step's Step N label (#747)",
+    );
   });
 
   test("stories exercise every union state and both CTA variants", () => {

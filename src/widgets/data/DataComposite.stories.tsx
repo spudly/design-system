@@ -14,9 +14,6 @@ import { MediaRow } from "./MediaRow.js";
 import { MetadataBadge } from "./MetadataBadge.js";
 import { NutritionPanel, type NutritionFacts } from "./NutritionPanel.js";
 import { RatingsCard } from "./RatingsCard.js";
-import { StatBand } from "./StatBand.js";
-import { StatCard } from "./StatCard.js";
-import { StatRow } from "./StatRow.js";
 import { StepDots } from "./StepDots.js";
 import { StepList } from "./StepList.js";
 import { TagList } from "./TagList.js";
@@ -28,7 +25,7 @@ import { Col } from "../layout/Col.js";
  * Composite story (#711): every data-display widget rendered
  * together in realistic list and detail arrangements, so
  * cross-widget inconsistencies — row heights and separators across
- * the row family, badge treatments, stat alignment — are visible
+ * the row family, badge treatments, badge alignment — are visible
  * at a glance instead of hidden by isolated stories.
  *
  * Stories only: no component behavior lives here. Any inconsistency
@@ -147,8 +144,9 @@ export const RowFamily: Story = {
 };
 
 /** Badges, tags, stats, and identity marks together: every tone,
- * the tag colors, a metadata badge, avatars at working sizes, a
- * row thumbnail, and step dots. */
+ * the tag colors, the metadata badges that carry the stats
+ * (#743 — the stat tiles' replacement), avatars at working
+ * sizes, a row thumbnail, and step dots. */
 export const BadgesAndStats: Story = {
   render: () => (
     <YStack maxWidth={430} gap={16}>
@@ -161,15 +159,8 @@ export const BadgesAndStats: Story = {
       </XStack>
       <TagList tags={[...TAGS]} />
       <MetadataBadge parts={["Weeknight", "45 min", "Serves 4"]} />
-      <StatRow>
-        <StatCard label="Servings" value="4" />
-        <StatCard label="Prep" value="15m" />
-        <StatCard label="Cook" value="30m" />
-      </StatRow>
-      <StatBand>
-        <StatCard label="Calories" value="520" />
-        <StatCard label="Protein" value="42g" />
-      </StatBand>
+      <MetadataBadge parts={["Servings 4", "Prep 15m", "Cook 30m"]} />
+      <MetadataBadge parts={["Calories 520", "Protein 42g"]} />
       <XStack gap={12} alignItems="center">
         <Avatar name="Stephen Sorensen" />
         <Avatar name="Maria" size={48} />

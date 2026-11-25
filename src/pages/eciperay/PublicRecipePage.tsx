@@ -5,8 +5,8 @@ import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { MainLandmark } from "../../widgets/layout/MainLandmark.js";
-import { StatBand } from "../../widgets/data/StatBand.js";
-import { StatCard } from "../../widgets/data/StatCard.js";
+import { SkeletonBone } from "../../widgets/feedback/SkeletonClock.js";
+import { tokens } from "../../tokens/index.js";
 import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { MessageCard } from "../../widgets/content/MessageCard.js";
 import { RatingsCard } from "../../widgets/data/RatingsCard.js";
@@ -101,7 +101,7 @@ import type {
  * the centered-Spinner pattern is deleted): the CTA card's
  * buttons as inert skeletons inside the loading scope, a hero
  * box bone where the overview's image sits, title and
- * description bones, the stat band in its loading state, and
+ * description bones, a pill bone for the metadata badge, and
  * text bones under the real Ingredients / Instructions
  * section headings. The CTA
  * bar's equal-width button treatment is ButtonRow's (`equal`) and
@@ -162,7 +162,7 @@ export type PublicRecipePageOverviewProps = {
   imageUrl?: string | null;
   title: string;
   description?: string | null;
-  /** Overview stat band values, app-formatted ("4", "15m", "30m"). */
+  /** Overview metadata values, app-formatted ("4", "15m", "30m"). */
   servingsLabel: string;
   prepTimeLabel?: string;
   cookTimeLabel?: string;
@@ -392,9 +392,11 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
               <BoxSkeleton aspectRatio={4 / 3} />
               <TextSkeleton size="2xl" lines={1} />
               <TextSkeleton size="md" lines={3} />
-              <StatBand loading>
-                <StatCard value="" label="" />
-              </StatBand>
+              <SkeletonBone
+                width={200}
+                height={14 + tokens.spacing[1] * 2 + 2}
+                borderRadius={tokens.radii.full}
+              />
               <SectionHeading>Ingredients</SectionHeading>
               <TextSkeleton size="md" lines={4} />
               <SectionHeading>Instructions</SectionHeading>

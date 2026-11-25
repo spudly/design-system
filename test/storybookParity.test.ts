@@ -136,8 +136,7 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches, s
 // shared row title/subtitle block CardRow / TextActionCardRow
 // compose (#587 phase 2), useVariantGlyphInk.ts is the shared
 // variant glyph ink hook Button / DropdownButton compose
-// (#587 phase 2), LoadingStatTiles.tsx is the shared loading
-// dummy-stat tiles StatBand / StatRow compose (#587 phase 2),
+// (#587 phase 2),
 // and PageFrame.tsx is
 // page-story scaffolding (the demo stories' phone-width frame,
 // relocated out of src/pages for #119) — none is a standalone
@@ -170,7 +169,6 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "linkOverlay.tsx",
   "LabelRow.tsx",
   "RowTextContent.tsx",
-  "LoadingStatTiles.tsx",
   "useVariantGlyphInk.ts",
   // MediaRow / RatingStars (#119 tranche 4): internal widgets
   // composed by recipeRow (the shared recipe-row adapter) — NOT
@@ -217,8 +215,7 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
         overlays: "Overlays & Disclosure",
       };
       const category =
-        CATEGORY_TITLES[entry.name] ??
-        entry.name.charAt(0).toUpperCase() + entry.name.slice(1);
+        CATEGORY_TITLES[entry.name] ?? entry.name.charAt(0).toUpperCase() + entry.name.slice(1);
       const subdir = join(dir, entry.name);
       for (const sub of readdirSync(subdir, { withFileTypes: true })) {
         assert.ok(

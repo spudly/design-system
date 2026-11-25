@@ -8,7 +8,7 @@ import { PrevNextNav } from "../../widgets/actions/PrevNextNav.js";
 import { ProgressBar } from "../../widgets/feedback/ProgressBar.js";
 import { SearchField } from "../../widgets/form/SearchField.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { StatCard } from "../../widgets/data/StatCard.js";
+import { MetadataBadge } from "../../widgets/data/MetadataBadge.js";
 import { StepDots } from "../../widgets/data/StepDots.js";
 import { Text } from "../../widgets/data/Text.js";
 import { VerseText } from "../../widgets/data/VerseText.js";
@@ -144,12 +144,7 @@ export const Progress: Story = {
       <Text variant="heading">Progress</Text>
       <XStack gap={tokens.spacing[3]} flexWrap="wrap">
         {progressFixtures.stats.map((stat) => (
-          <StatCard
-            key={stat.label}
-            value={stat.value}
-            label={stat.label}
-            sublabel={stat.sublabel}
-          />
+          <MetadataBadge key={stat.label} parts={[`${stat.value} ${stat.label}`, stat.sublabel]} />
         ))}
       </XStack>
       <SectionCard title="Passages in progress">

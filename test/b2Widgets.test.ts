@@ -5,10 +5,12 @@
  * CheckboxSelectList, CommentItem, FixedActionBanner, StatRow, TagPill,
  * TokenRow (see docs/b2-component-audit.md). TagPill was later merged
  * into Badge (#183): it is no longer exported, and Badge's `color`
- * form carries its tint contract.
+ * form carries its tint contract. StatRow was later retired in
+ * favor of the metadata badge (#743): it is no longer exported
+ * either, and its contract below is gone with it.
  *
  * The contracts pinned here:
- * 1. The six remaining widgets are exported from the internal components barrel
+ * 1. The five remaining widgets are exported from the internal components barrel
  *    (dist), next to the widgets they compose.
  * 2. Badge's colored-tag form (the former TagPill) tints from the data
  *    color: surface = color + "22" alpha, label = the color itself,
@@ -27,8 +29,6 @@
  *    marker's meaning in `staleHintLabel`.
  * 7. TokenRow renders no action for a revoked token and switches the
  *    action label on `revoking`.
- * 8. StatRow is the recessed band: gray step-1 fill, large radius,
- *    space-around distribution.
  *
  * Run against the built output: `npm run build` first (the `test`
  * script does both).
@@ -63,7 +63,7 @@ function source(name: string) {
   );
 }
 
-const MOVED = ["CheckboxSelectList", "FixedActionBanner", "StatRow", "TokenRow"];
+const MOVED = ["CheckboxSelectList", "FixedActionBanner", "TokenRow"];
 
 test("BulkSelectToolbar is exported from the internal barrel as a view, not a widget (#712)", () => {
   assert.equal(
@@ -205,11 +205,4 @@ test("TokenRow hides the action when revoked and relabels it while revoking", ()
   assert.ok(row.includes('"Revoking…"'), "the pending label missing");
   assert.ok(row.includes("(Revoked)"), "the revoked marker missing");
   assert.ok(row.includes("fontFamily.mono"), "the prefix line must be mono");
-});
-
-test("StatRow is the recessed space-around band", () => {
-  const row = source("StatRow");
-  assert.ok(row.includes("gray.gray1"), "band fill must be gray step 1");
-  assert.ok(row.includes("radii.lg"), "band must use the large radius token");
-  assert.ok(row.includes("around"), "stats must spread space-around (Row's around)");
 });
