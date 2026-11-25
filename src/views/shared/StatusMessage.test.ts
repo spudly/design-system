@@ -30,7 +30,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "views", "shared", "StatusMessage.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "views", "shared", "StatusMessage.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const pageSource = readFileSync(
   join(here, "../../..", "src", "pages", "eciperay", "RecipeDetailPage.tsx"),
@@ -69,18 +72,15 @@ test("StatusMessage is exported from the built internal components barrel", asyn
 
 test("the root is a polite live region via the codebase's translator props", () => {
   assert.match(code, /politeLiveRegionProps/);
-  assert.match(code, /<YStack\s+collapsable=\{false\}\s+\{\.\.\.politeLiveRegionProps\}/);
+  assert.match(code, /<Col\s+collapsable=\{false\}\s+\{\.\.\.politeLiveRegionProps\}/);
   assert.doesNotMatch(code, /accessibilityRole="text"/);
   assert.doesNotMatch(code, /accessibilityRole="status"/);
 });
 
 test("the root renders unconditionally; only the message line is conditional", () => {
   assert.doesNotMatch(code, /if \(!message\)/);
-  assert.doesNotMatch(code, /message \? \(\s*<YStack/);
-  assert.match(
-    code,
-    /return \(\s*<YStack\s+collapsable=\{false\}\s+\{\.\.\.politeLiveRegionProps\}/,
-  );
+  assert.doesNotMatch(code, /message \? \(\s*<Col/);
+  assert.match(code, /return \(\s*<Col\s+collapsable=\{false\}\s+\{\.\.\.politeLiveRegionProps\}/);
   assert.match(code, /\{message \? \(/);
 });
 
@@ -118,7 +118,10 @@ test("the old gray7 ink fails on the dark surface — the gap $textMuted closes"
 });
 
 test("RecipeDetailPage renders StatusMessage unconditionally for its action message", () => {
-  assert.match(pageCode, /import \{ StatusMessage \} from "\.\.\/\.\.\/views\/shared\/StatusMessage\.js"/);
+  assert.match(
+    pageCode,
+    /import \{ StatusMessage \} from "\.\.\/\.\.\/views\/shared\/StatusMessage\.js"/,
+  );
   assert.match(pageCode, /<StatusMessage message=\{actionMessage\} \/>/);
   assert.doesNotMatch(pageCode, /\{actionMessage \? \(/);
   assert.doesNotMatch(pageCode, /accessibilityRole="text"/);

@@ -1,4 +1,6 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../../widgets/layout/Row.js";
+import { Col } from "../../widgets/layout/Col.js";
+import { Spacer } from "../../widgets/layout/Spacer.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { tokens } from "../../tokens/index.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
@@ -75,7 +77,7 @@ export function BulkSelectToolbar({
   const selectedText = voice.bulkSelectToolbar.selectedLabel(selectedCount);
 
   return (
-    <YStack>
+    <Col>
       {showSkeleton ? (
         // The search field's bone (#278): the field's own box —
         // measured against the rendered field, its row is 46px:
@@ -92,7 +94,7 @@ export function BulkSelectToolbar({
           placeholder={resolvedSearchPlaceholder}
         />
       )}
-      <XStack flexWrap="wrap" alignItems="center" gap="$3" paddingBlockEnd="$3">
+      <Row wrap middle gap="m">
         <Button
           ghost
           size="sm"
@@ -127,7 +129,8 @@ export function BulkSelectToolbar({
             <Text variant="hint">{selectedText}</Text>
           )
         ) : null}
-      </XStack>
-    </YStack>
+      </Row>
+      <Spacer y="m" />
+    </Col>
   );
 }

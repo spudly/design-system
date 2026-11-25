@@ -160,7 +160,9 @@ test("BulkSelectToolbar disables selection at zero filtered and counts only when
   );
   assert.ok(toolbar.includes("disabled || busy"), "busy must disable the controls like disabled");
   assert.ok(
-    toolbar.includes('alignItems="center"'),
+    // #746: the actions row is a Row — centering is its `middle`
+    // alignment prop.
+    toolbar.includes('<Row wrap middle gap="m">'),
     "the actions row must center its children so the selected count aligns with the buttons (#175)",
   );
 });

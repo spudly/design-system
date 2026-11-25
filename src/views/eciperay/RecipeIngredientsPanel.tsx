@@ -1,11 +1,17 @@
-import { View, XStack, YStack, isWeb } from "tamagui";
+import { View, isWeb } from "tamagui";
+import { Row } from "../../widgets/layout/Row.js";
+import { Col } from "../../widgets/layout/Col.js";
+import { Spacer } from "../../widgets/layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { MarkableRow } from "../../widgets/data/MarkableRow.js";
 import { NumberStepper } from "../../widgets/form/NumberStepper.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "../../widgets/accessibility.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { PresetValueSelector, type PresetValueOption } from "../../widgets/form/PresetValueSelector.js";
+import {
+  PresetValueSelector,
+  type PresetValueOption,
+} from "../../widgets/form/PresetValueSelector.js";
 import { SuggestionPanel } from "../../widgets/form/SuggestionPanel.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
@@ -103,7 +109,6 @@ function formatScaleValue(value: string): string {
   return Number.isFinite(parsed) ? String(parsed) : value;
 }
 
-
 // The loading panel's dummy rows (#278): exactly 3 placeholder
 // ingredients when none are known, from a frozen module-level
 // constant — never generated per render. A loading panel over
@@ -123,19 +128,19 @@ const LOADING_INGREDIENTS: RecipeIngredientsPanelIngredient[] = [
 function SubstitutionsSkeleton({ entries }: { entries: number }) {
   const count = Math.max(1, entries);
   return (
-    <YStack borderRadius={tokens.radii.lg} backgroundColor="$primarySubtle" padding="$4">
-      <YStack paddingBlockEnd="$2">
-        <View width={110}>
-          <TextSkeleton size="sm" lines={1} />
-        </View>
-      </YStack>
+    <Col borderRadius={tokens.radii.lg} backgroundColor="$primarySubtle" p="l">
+      <View width={110}>
+        <TextSkeleton size="sm" lines={1} />
+      </View>
+      <Spacer y="s" />
       {Array.from({ length: count }, (_, index) => (
-        <YStack key={index} paddingBlockEnd="$2">
+        <Col key={index}>
           <TextSkeleton size="sm" lines={1} />
           <TextSkeleton size="sm" lines={1} />
-        </YStack>
+          <Spacer y="s" />
+        </Col>
       ))}
-    </YStack>
+    </Col>
   );
 }
 
@@ -163,13 +168,13 @@ export function RecipeIngredientsPanel({
     const rows = view.ingredients.length > 0 ? view.ingredients : LOADING_INGREDIENTS;
     return (
       <LoadingScope active>
-        <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
-          <YStack gap="$3" paddingBlockEnd="$4">
-            <XStack alignItems="center" justifyContent="space-between" gap={tokens.spacing[3]}>
+        <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+          <Col gap="m">
+            <Row middle between gap="m">
               <View width={70}>
                 <TextSkeleton size="sm" lines={1} />
               </View>
-              <XStack alignItems="center" gap={tokens.spacing[2]}>
+              <Row middle gap="s">
                 <Button
                   variant="secondary"
                   size="md"
@@ -193,15 +198,15 @@ export function RecipeIngredientsPanel({
                 >
                   +
                 </Button>
-              </XStack>
-            </XStack>
-            <XStack alignItems="center" gap="$2">
-              <XStack paddingInlineEnd="$1">
+              </Row>
+            </Row>
+            <Row middle gap="s">
+              <Row style={{ paddingInlineEnd: 4 }}>
                 <View width={36}>
                   <TextSkeleton size="sm" lines={1} />
                 </View>
-              </XStack>
-              <XStack flex={1} gap="$2">
+              </Row>
+              <Row grow shrink gap="s">
                 {SCALE_OPTIONS.map((option) => (
                   <Button
                     key={option.value}
@@ -218,8 +223,8 @@ export function RecipeIngredientsPanel({
                     {option.label}
                   </Button>
                 ))}
-              </XStack>
-              <XStack flex={0.35}>
+              </Row>
+              <Row grow={0.35}>
                 <Button
                   variant="secondary"
                   size="sm"
@@ -230,48 +235,51 @@ export function RecipeIngredientsPanel({
                 >
                   {panelVoice.customScaleLabel}
                 </Button>
-              </XStack>
-            </XStack>
-          </YStack>
+              </Row>
+            </Row>
+          </Col>
+          <Spacer y="l" />
           {rows.map((ingredient) => (
-            <XStack
+            <Row
               key={ingredient.id}
-              alignItems="center"
+              middle
               borderBottomWidth={1}
               borderBottomColor="transparent"
-              paddingVertical="$3"
+              py="m"
             >
-              <YStack flex={1}>
+              <Col grow shrink>
                 <TextSkeleton size="md" lines={1} />
-              </YStack>
+              </Col>
               {ingredient.isOptional ? (
-                <YStack paddingInlineStart="$2">
+                <Col style={{ paddingInlineStart: 8 }}>
                   <View width={44}>
                     <TextSkeleton size="xs" lines={1} />
                   </View>
-                </YStack>
+                </Col>
               ) : null}
-            </XStack>
+            </Row>
           ))}
           {hasMissing && view.onIngredientPress ? (
-            <YStack paddingBlockStart="$3">
+            <Col>
+              <Spacer y="m" />
               <View width="80%">
                 <TextSkeleton size="sm" lines={1} />
               </View>
-            </YStack>
+            </Col>
           ) : null}
           {view.loadingSubstitutions || (view.substitutions && view.substitutions.length > 0) ? (
-            <YStack paddingBlockStart="$4">
+            <Col>
+              <Spacer y="l" />
               <SubstitutionsSkeleton entries={view.substitutions?.length ?? 1} />
-            </YStack>
+            </Col>
           ) : null}
-        </YStack>
+        </Col>
       </LoadingScope>
     );
   }
 
   return (
-    <YStack>
+    <Col>
       {/* Servings + scale controls (#73, as on RecipeDetailPage):
           one compact block, two fixed rows, and every value
           directly enterable. Servings is an inline editable
@@ -280,7 +288,7 @@ export function RecipeIngredientsPanel({
           Custom button that turns into a number input when
           pressed and afterwards shows the applied custom value
           selected. */}
-      <YStack gap="$3" paddingBlockEnd="$4">
+      <Col gap="m">
         <NumberStepper
           label={panelVoice.servingsLabel}
           layout="inline"
@@ -300,7 +308,8 @@ export function RecipeIngredientsPanel({
           customAccessibilityLabel={panelVoice.customScaleAccessibilityLabel}
           formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
         />
-      </YStack>
+      </Col>
+      <Spacer y="l" />
       {view.ingredients.map((ingredient) => (
         <MarkableRow
           key={ingredient.id}
@@ -317,12 +326,14 @@ export function RecipeIngredientsPanel({
         />
       ))}
       {hasMissing && view.onIngredientPress ? (
-        <YStack paddingBlockStart="$3">
+        <Col>
+          <Spacer y="m" />
           <Text variant="hint">{panelVoice.missingIngredientsHint}</Text>
-        </YStack>
+        </Col>
       ) : null}
       {view.loadingSubstitutions ? (
-        <YStack paddingBlockStart="$4" position="relative">
+        <Col position="relative">
+          <Spacer y="l" />
           {/* Screen-reader-only progress status (the
               AutocompletePicker StatusMessage pattern): the
               skeleton bones are hidden from assistive tech, so
@@ -333,7 +344,7 @@ export function RecipeIngredientsPanel({
               aria-busy element, which would suppress the
               announcement; busy marks only the substitutions
               skeleton content. Nothing renders visibly. */}
-          <YStack
+          <Col
             collapsable={false}
             {...politeLiveRegionProps}
             position="absolute"
@@ -343,14 +354,15 @@ export function RecipeIngredientsPanel({
             {...(isWeb ? { opacity: 0 } : {})}
           >
             <Text>{panelVoice.findingSubstitutionsLabel}</Text>
-          </YStack>
-          <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+          </Col>
+          <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
             <SubstitutionsSkeleton entries={1} />
-          </YStack>
-        </YStack>
+          </Col>
+        </Col>
       ) : null}
       {view.substitutions && view.substitutions.length > 0 ? (
-        <YStack paddingBlockStart="$4">
+        <Col>
+          <Spacer y="l" />
           <SuggestionPanel
             title={panelVoice.substitutionsTitle}
             entries={view.substitutions.map((sub) => ({
@@ -359,8 +371,8 @@ export function RecipeIngredientsPanel({
               detail: sub.suggestions,
             }))}
           />
-        </YStack>
+        </Col>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

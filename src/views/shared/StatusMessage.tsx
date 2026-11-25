@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../../widgets/layout/Col.js";
+import { Spacer } from "../../widgets/layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../../widgets/accessibility.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -62,16 +63,15 @@ export type StatusMessageProps = {
  */
 export function StatusMessage({ message }: StatusMessageProps) {
   return (
-    <YStack
-      collapsable={false}
-      {...politeLiveRegionProps}
-      {...(message ? { paddingBlockEnd: "$4" } : {})}
-    >
+    <Col collapsable={false} {...politeLiveRegionProps}>
       {message ? (
-        <Text textAlign="center" fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-          {message}
-        </Text>
+        <>
+          <Text textAlign="center" fontSize={tokens.typography.fontSize.sm} color="$textMuted">
+            {message}
+          </Text>
+          <Spacer y="l" />
+        </>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

@@ -1,4 +1,6 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../../widgets/layout/Row.js";
+import { Col } from "../../widgets/layout/Col.js";
+import { Spacer } from "../../widgets/layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { platformAccessibilityProps } from "../../widgets/accessibility.js";
@@ -79,57 +81,60 @@ export function CommentItem({
   // text bone) instead of dropping out.
   const actionsRow =
     canEdit || canDelete ? (
-      <XStack paddingBlockStart="$2" gap="$3">
-        {canEdit ? (
-          isEditing ? (
-            <>
+      <Col>
+        <Spacer y="s" />
+        <Row gap="m">
+          {canEdit ? (
+            isEditing ? (
+              <>
+                <Button
+                  ghost
+                  size="sm"
+                  disabled={saveDisabled}
+                  onPress={() => {
+                    onSaveEdit?.();
+                  }}
+                >
+                  {voice.commentItem.saveLabel}
+                </Button>
+                <Button
+                  ghost
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => {
+                    onCancelEdit?.();
+                  }}
+                >
+                  {voice.commentItem.cancelLabel}
+                </Button>
+              </>
+            ) : (
               <Button
                 ghost
                 size="sm"
-                disabled={saveDisabled}
                 onPress={() => {
-                  onSaveEdit?.();
+                  onStartEdit?.();
                 }}
               >
-                {voice.commentItem.saveLabel}
+                {voice.commentItem.editLabel}
               </Button>
-              <Button
-                ghost
-                size="sm"
-                variant="secondary"
-                onPress={() => {
-                  onCancelEdit?.();
-                }}
-              >
-                {voice.commentItem.cancelLabel}
-              </Button>
-            </>
-          ) : (
+            )
+          ) : null}
+          {canDelete ? (
             <Button
               ghost
               size="sm"
+              variant="danger"
+              disabled={isDeletePending}
               onPress={() => {
-                onStartEdit?.();
+                onDelete?.();
               }}
             >
-              {voice.commentItem.editLabel}
+              {voice.commentItem.deleteLabel}
             </Button>
-          )
-        ) : null}
-        {canDelete ? (
-          <Button
-            ghost
-            size="sm"
-            variant="danger"
-            disabled={isDeletePending}
-            onPress={() => {
-              onDelete?.();
-            }}
-          >
-            {voice.commentItem.deleteLabel}
-          </Button>
-        ) : null}
-      </XStack>
+          ) : null}
+        </Row>
+      </Col>
     ) : null;
   if (showSkeleton) {
     // Loading (#278): the same framed item, with structured
@@ -137,17 +142,16 @@ export function CommentItem({
     // standing in for both — no editor, the actions row's ghost
     // buttons as text skeletons, and the region marked busy.
     return (
-      <YStack paddingBlockEnd="$3">
+      <Col>
         <LoadingScope active>
-          <YStack
+          <Col
             borderRadius={tokens.radii.md}
             backgroundColor={tokens.colors.gray.gray1}
-            padding="$3"
+            p="m"
             {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
           >
-            <YStack paddingBlockEnd="$1">
-              <TextSkeleton size="sm" lines={1} />
-            </YStack>
+            <TextSkeleton size="sm" lines={1} />
+            <Spacer y="xs" />
             {/* The body bone is ONE line: a fixed second line
                 made every item taller than its loaded form, and
                 the excess accumulated down the list, sliding
@@ -158,20 +162,17 @@ export function CommentItem({
                 body. */}
             <TextSkeleton size="sm" lines={1} />
             {actionsRow}
-          </YStack>
+          </Col>
         </LoadingScope>
-      </YStack>
+        <Spacer y="m" />
+      </Col>
     );
   }
 
   return (
-    <YStack paddingBlockEnd="$3">
-      <YStack
-        borderRadius={tokens.radii.md}
-        backgroundColor={tokens.colors.gray.gray1}
-        padding="$3"
-      >
-        <XStack paddingBlockEnd="$1" alignItems="center" gap="$2">
+    <Col>
+      <Col borderRadius={tokens.radii.md} backgroundColor={tokens.colors.gray.gray1} p="m">
+        <Row middle gap="s">
           <Text
             fontSize={tokens.typography.fontSize.sm}
             fontWeight={tokens.typography.fontWeight.medium}
@@ -188,23 +189,26 @@ export function CommentItem({
               ⚠
             </Text>
           ) : null}
-        </XStack>
+        </Row>
+        <Spacer y="xs" />
         {isEditing ? (
-          <YStack paddingBlockEnd="$2">
+          <Col>
             <TextAreaField
               value={editDraft}
               onChangeText={(value) => {
                 onEditDraftChange?.(value);
               }}
             />
-          </YStack>
+            <Spacer y="s" />
+          </Col>
         ) : (
           <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
             {body}
           </Text>
         )}
         {actionsRow}
-      </YStack>
-    </YStack>
+      </Col>
+      <Spacer y="m" />
+    </Col>
   );
 }

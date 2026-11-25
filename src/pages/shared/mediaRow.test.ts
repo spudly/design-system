@@ -142,8 +142,8 @@ test("the bar's inlined remove pairing pairs the field with its end-aligned ghos
     join(here, "../../..", "src", "views", "eciperay", "CatalogFiltersBar.tsx"),
     "utf8",
   );
-  assert.match(bar, /<YStack key=\{definition\.id\} gap=\{tokens\.spacing\[1\]\}>/);
-  assert.match(bar, /<XStack justifyContent="flex-end">/);
+  assert.match(bar, /<Col key=\{definition\.id\} gap="xs">/);
+  assert.match(bar, /<Row right>/);
   assert.match(bar, /ghost\s+size="sm"/);
   assert.match(bar, /accessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/);
 });
