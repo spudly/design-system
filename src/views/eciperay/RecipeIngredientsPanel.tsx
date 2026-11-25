@@ -20,12 +20,12 @@ import { useVoice } from "../../voice/index.js";
 /**
  * A recipe's ingredients panel: the servings stepper, the scale
  * selector, the pressable ingredient rows (missing ones dimmed,
- * optional ones noted), and the substitutions block. The two
- * recipe surfaces (RecipeDetailPage and PublicRecipePage) share
+ * optional ones noted), and the substitutions block. The merged
+ * RecipeDetailPage's two forms (owner and guest, #757) share
  * the ingredients view-model verbatim, so the interaction model
- * is the same on both; each page carried this panel inline
+ * is the same on both; the page carried this panel inline
  * before it moved here (#119), and the view-model shape is
- * declared here structurally so either page's object composes
+ * declared here structurally so either form's object composes
  * it without a second shape to drift. The panel carries no
  * outer padding or spacing — the page shell's column insets it,
  * and separation from the sections around it is the parent

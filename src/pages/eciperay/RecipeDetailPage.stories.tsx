@@ -489,3 +489,222 @@ export const LoadingOverlay: Story = {
     </View>
   ),
 };
+
+// ---------------------------------------------------------------------------
+// Guest mode (#757): the retired PublicRecipePage's stories,
+// ported onto the merged page. The guest form is the public
+// surface (the public column is max-w-3xl), so its stories pin
+// the desktop viewport (1024×900, via the wide dsViewport preset
+// plus the dsViewportHeight parameter) instead of the phone
+// frame the owner form uses.
+// ---------------------------------------------------------------------------
+
+const guestParameters = { dsViewport: "wide", dsViewportHeight: 900 };
+
+function RecipeDetailGuestDemo({
+  variant = "full",
+  signedIn = false,
+  clonePending = false,
+  initialMissing = [],
+  showCommentsData = false,
+}: {
+  variant?: "full" | "minimal";
+  signedIn?: boolean;
+  clonePending?: boolean;
+  initialMissing?: string[];
+  showCommentsData?: boolean;
+}) {
+  const isFull = variant === "full";
+  const baseServings = isFull ? 4 : 2;
+  const demoIngredients = isFull ? fullIngredients : minimalIngredients;
+
+  const [servings, setServings] = useState(baseServings);
+  const [missing, setMissing] = useState<ReadonlySet<string>>(() => new Set(initialMissing));
+  const [viewerRating, setViewerRating] = useState<number | null>(4);
+
+  const toggleMissing = (id: string) => {
+    setMissing((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const readyProps: RecipeDetailPageProps = {
+    state: "ready",
+    viewer: signedIn ? "signedIn" : "signedOut",
+    overview: {
+      title: isFull ? recipeDetailFixture.title : "Weeknight Tomato Pasta",
+      ...(isFull
+        ? {
+            description:
+              "A one-pan weeknight chicken in a garlicky cream sauce with sun-dried tomatoes and spinach.",
+            prepTimeLabel: "15m",
+            cookTimeLabel: "30m",
+          }
+        : {}),
+      servingsLabel: String(servings),
+      // Tag colors are names at the prop boundary (#207): stored
+      // hexes convert through `tagColorNameForHex`, as the host's
+      // data layer does — the two hex stand-ins below are legacy
+      // palette values mapping to orange and teal.
+      tags: isFull
+        ? [
+            { id: "dinner", name: "Dinner", color: tagColorNameForHex("#f97316") },
+            { id: "chicken", name: "Chicken", color: "indigo" },
+            { id: "one-pan", name: "One pan", color: tagColorNameForHex("#14b8a6") },
+          ]
+        : [],
+    },
+    ctas: signedIn
+      ? { variant: "signedIn", isClonePending: clonePending }
+      : { variant: "signedOut" },
+    onSignUpPress: () => undefined,
+    onClonePress: () => undefined,
+    onGetAppPress: () => undefined,
+    ingredients: {
+      servings,
+      onServingsChange: setServings,
+      scaleValue: scaleValueFor(baseServings, servings),
+      onScaleChange: (value) => {
+        setServings(Math.max(1, Math.round(baseServings * Number(value))));
+      },
+      ingredients: demoIngredients.map((ingredient) => {
+        const prefix =
+          ingredient.quantityByServings?.[servings] ??
+          ingredient.quantityByServings?.[baseServings];
+        return {
+          id: ingredient.id,
+          label: prefix ? `${prefix} ${ingredient.name}` : ingredient.name,
+          isOptional: ingredient.isOptional ?? false,
+          isMissing: missing.has(ingredient.id),
+        };
+      }),
+      onIngredientPress: toggleMissing,
+      substitutions:
+        isFull && missing.has("heavy-cream")
+          ? [
+              {
+                ingredient: "Heavy cream",
+                suggestions: "Half-and-half, evaporated milk, or coconut cream",
+              },
+            ]
+          : [],
+    },
+    instructions: {
+      instructions: isFull
+        ? recipeDetailFixture.steps.map((body, i) => ({
+            id: `step-${i + 1}`,
+            stepNumber: i + 1,
+            body,
+          }))
+        : [
+            {
+              id: "step-1",
+              stepNumber: 1,
+              body: "Boil the pasta, warm the tomatoes through, combine.",
+            },
+          ],
+    },
+    ...(isFull
+      ? {
+          ratings: {
+            community: { stars: "★★★★★", label: "4.6 (9)" },
+            // Signed out, the viewer is null and the star input
+            // hides — the anonymous audience sees the community
+            // rating only.
+            viewer: signedIn ? { value: viewerRating } : null,
+          },
+          onViewerRatingChange: setViewerRating,
+        }
+      : {}),
+    ...(showCommentsData
+      ? {
+          // The comments section as data (#130 T7): the page renders
+          // RecipeCommentsView from the view-model; signed out, no
+          // `onPost` is passed, so no composer renders.
+          comments: {
+            comments: [
+              {
+                id: "comment-1",
+                authorName: "Jamie",
+                body: "Made this last night — the sauce is excellent.",
+              },
+              {
+                id: "comment-2",
+                authorName: "Priya",
+                body: "Doubled the garlic and would do it again.",
+              },
+            ],
+          },
+        }
+      : {}),
+  };
+
+  return (
+    <>
+      <RecipeDetailPage footer={eciperayFooterFixture} {...readyProps} />
+    </>
+  );
+}
+
+export const SignedOut: Story = {
+  parameters: guestParameters,
+  render: () => <RecipeDetailGuestDemo showCommentsData />,
+};
+
+export const SignedInNonOwner: Story = {
+  parameters: guestParameters,
+  render: () => <RecipeDetailGuestDemo signedIn showCommentsData />,
+};
+
+export const SignedInClonePending: Story = {
+  // The signed-in CTA bar while the clone mutation is in flight:
+  // the primary button reads "Saving…" and disables.
+  parameters: guestParameters,
+  render: () => <RecipeDetailGuestDemo signedIn clonePending />,
+};
+
+export const CommentsAsData: Story = {
+  // The comments section supplied as data (#130 T7): the page
+  // renders RecipeCommentsView under the ratings card, signed
+  // out — the comment list with no composer.
+  parameters: guestParameters,
+  render: () => <RecipeDetailGuestDemo showCommentsData />,
+};
+
+export const SignedOutMinimal: Story = {
+  parameters: guestParameters,
+  render: () => <RecipeDetailGuestDemo variant="minimal" />,
+};
+
+// Section story: the full guest page with the ingredients
+// section's state exercised (missing ingredient +
+// substitutions). The screenshots pin the page as composed; the
+// contract test pins the section order.
+export const SignedOutIngredients: Story = {
+  parameters: guestParameters,
+  render: () => <RecipeDetailGuestDemo initialMissing={["heavy-cream"]} />,
+};
+
+export const NotFound: Story = {
+  parameters: guestParameters,
+  render: () => (
+    <>
+      <RecipeDetailPage footer={eciperayFooterFixture} state="notFound" />
+    </>
+  ),
+};
+
+export const Unavailable: Story = {
+  parameters: guestParameters,
+  render: () => (
+    <>
+      <RecipeDetailPage footer={eciperayFooterFixture} state="unavailable" />
+    </>
+  ),
+};

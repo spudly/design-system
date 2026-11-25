@@ -2,7 +2,7 @@
 component: RatingsCard
 run_when:
   - "src/widgets/data/RatingsCard.tsx, src/widgets/content/SectionHeading.tsx, their stories, or a changeset naming any of them. (namely: RatingsCard, SectionHeading)"
-  - "src/widgets/data/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
+  - "src/widgets/data/RatingsCard.tsx, its stories, RecipeDetailPage's engagement blocks, or a changeset naming RatingsCard."
 ---
 
 # RatingsCard — manual test steps
@@ -49,9 +49,9 @@ Open in `Widgets/RatingsCard`: Default, Stale, No Ratings Yet.
 2. Stale: the stale-ratings hint shows under the community
    average and under "Your rating". No Ratings Yet shows "No
    community ratings yet" with no "Your rating" block.
-   PublicRecipePage's Default story also exercises the signed-out
+   RecipeDetailPage's SignedOut story also exercises the signed-out
    form.
 
 **Run when:** `src/widgets/data/RatingsCard.tsx`, its stories,
-PublicRecipePage's engagement block, or a changeset naming
+RecipeDetailPage's engagement blocks, or a changeset naming
 RatingsCard.

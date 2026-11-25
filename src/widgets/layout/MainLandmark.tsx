@@ -20,10 +20,12 @@ export type MainLandmarkProps = {
  * (#119). Exactly one MainLandmark renders per surface — the
  * outermost frame owns it. LegalDocumentPage predates this
  * component and carries its own column's landmark inline; the
- * public recipe surface adopts this component because #473
+ * recipe page adopts this component because #473
  * retired the PublicPageFrame page whose layout owned the
  * landmark before: with no host-side frame, the page composes
- * MainLandmark around every state's content, and the footer
+ * MainLandmark around its public-treatment states' content
+ * (RecipeDetailPage's guest mode and its notFound / unavailable
+ * message states, since #757), and the footer
  * (BigFooterShell's `contentinfo`) stays outside it.
  *
  * Sizing follows the #547 page-scroll model, like ScreenShell
@@ -32,7 +34,7 @@ export type MainLandmarkProps = {
  * on web the document scrolls the whole page, so the column
  * grows with its content — `flex: 1`'s zero basis collapsed it
  * inside BigFooterShell's unbounded space-between column and
- * left PublicRecipePage's footer at the viewport's bottom edge
+ * left the recipe page's footer at the viewport's bottom edge
  * while its content overflowed past (the rendered-Storybook
  * audit on PR #556).
  */

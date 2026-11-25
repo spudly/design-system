@@ -23,8 +23,7 @@ export type ScrollShellProps = {
  * every section. ScreenContainer is the unpainted alternative for
  * pages whose host already paints the surface; this shell is for
  * pages that own their paint and their scroll, the shape
- * PublicRecipePage hand-rolled as a styled stack around its
- * ScrollView before adopting ScrollRegion for the scroll itself.
+ * RecipeDetailPage's guest mode (#757) renders inside.
  *
  * The shell is a composition, not a re-declared frame (#119
  * dedupe): ScreenShell supplies the surface frame and
@@ -37,8 +36,9 @@ export type ScrollShellProps = {
  * centered in the scroll region, so a public page's sections
  * keep the wide public column's measure on desktop instead of
  * stretching edge to edge (#473: the cap moved here from the
- * retired PublicFrameLayout, whose column this shell's sole
- * consumer, PublicRecipePage, rendered inside). The footer is
+ * retired PublicFrameLayout, whose column this shell's
+ * consumer — RecipeDetailPage's guest mode since #757 —
+ * renders inside). The footer is
  * not the shell's: BigFooterShell renders it outside this
  * column, uncapped.
  */

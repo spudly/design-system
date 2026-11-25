@@ -94,8 +94,8 @@ function loadRuntime() {
       await import("../../../dist/widgets/layout/ScrollRegion.js");
     const { BigFooterShell }: Record<string, any> =
       await import("../../../dist/widgets/content/BigFooter.js");
-    const { PublicRecipePage }: Record<string, any> =
-      await import("../../../dist/pages/eciperay/PublicRecipePage.js");
+    const { RecipeDetailPage }: Record<string, any> =
+      await import("../../../dist/pages/eciperay/RecipeDetailPage.js");
     const { eciperayFooterFixture }: Record<string, any> =
       await import("../../../dist/pages/shared/fixtures.js");
     return {
@@ -105,7 +105,7 @@ function loadRuntime() {
       ...dist,
       ScrollRegion,
       BigFooterShell,
-      PublicRecipePage,
+      RecipeDetailPage,
       eciperayFooterFixture,
     };
   })();
@@ -143,6 +143,7 @@ test("SSR: ScrollRegion inside the page shell renders no web scroller and the fo
 });
 const publicRecipeReadyFixture = {
   state: "ready",
+  viewer: "signedOut",
   overview: {
     title: "Landmark Soup",
     servingsLabel: "4",
@@ -180,15 +181,15 @@ const publicRecipeReadyFixture = {
     ],
   },
 };
-test("SSR: PublicRecipePage (ScrollShell → ScrollRegion) renders no web scroller (#547)", async () => {
-  const { PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+test("SSR: RecipeDetailPage guest mode (ScrollShell → ScrollRegion) renders no web scroller (#547)", async () => {
+  const { RecipeDetailPage, eciperayFooterFixture } = await loadRuntime();
   const html = await renderToHtml(
-    <PublicRecipePage {...publicRecipeReadyFixture} footer={eciperayFooterFixture} />,
+    <RecipeDetailPage {...publicRecipeReadyFixture} footer={eciperayFooterFixture} />,
   );
   assert.deepEqual(
     verticalScrollers(html),
     [],
-    "the public recipe page's rendered web markup contains no vertical scroller",
+    "the recipe page's guest-mode rendered web markup contains no vertical scroller",
   );
   assert.ok(html.includes("Landmark Soup"), "the page content renders");
   assert.ok(

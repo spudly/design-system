@@ -2,7 +2,7 @@
 component: ScrollShell
 run_when:
   - "any of the four shell components, their stories, or a changeset naming them. (namely: ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)"
-  - "src/widgets/layout/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
+  - "src/widgets/layout/ScrollShell.tsx, its stories, RecipeDetailPage's guest mode, or a changeset naming ScrollShell."
 ---
 
 # ScrollShell — manual test steps
@@ -55,4 +55,4 @@ Open in `Widgets/ScrollShell`: Default.
    one region when it overflows.
 
 **Run when:** `src/widgets/layout/ScrollShell.tsx`, its stories,
-PublicRecipePage, or a changeset naming ScrollShell.
+RecipeDetailPage's guest mode, or a changeset naming ScrollShell.

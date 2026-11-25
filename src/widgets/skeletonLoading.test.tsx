@@ -1295,7 +1295,6 @@ const T4_CONVERTED_PAGES = [
   "MealPlanDetailPage",
   "ShoppingListPage",
   "TagsPage",
-  "PublicRecipePage",
   "RecipeDetailPage",
   "RecipeFormPage",
   "RecipesPage",
@@ -1366,7 +1365,6 @@ function loadPages() {
       import("../../dist/pages/eciperay/MealPlanDetailPage.js"),
       import("../../dist/pages/eciperay/ShoppingListPage.js"),
       import("../../dist/pages/eciperay/TagsPage.js"),
-      import("../../dist/pages/eciperay/PublicRecipePage.js"),
       import("../../dist/pages/eciperay/RecipeDetailPage.js"),
     ]);
     return Object.assign({}, ...modules) as Record<string, any>;
@@ -1540,7 +1538,7 @@ test("T4 SSR: loading TagsPage renders skeleton rows, the create form stays live
 });
 test("T4 SSR: the union pages' loading states render their skeleton compositions", async () => {
   const {} = await loadRuntime();
-  const { MealPlanDetailPage, PublicRecipePage, RecipeDetailPage } = await loadPages();
+  const { MealPlanDetailPage, RecipeDetailPage } = await loadPages();
   const plan = await renderToHtml(<MealPlanDetailPage state="loading" />);
   assert.equal(
     hiddenBones(plan),
@@ -1549,14 +1547,6 @@ test("T4 SSR: the union pages' loading states render their skeleton compositions
   );
   assert.match(plan, /aria-busy/, "a loading MealPlanDetailPage marks its regions busy");
   assert.ok(plan.includes("Shopping list"), "the action row stays, as skeleton Buttons");
-  const pub = await renderToHtml(<PublicRecipePage state="loading" />);
-  assert.equal(
-    hiddenBones(pub),
-    12,
-    "hero (1) + title (1) + description (3) + metadata pill (1) + ingredients (4) + instructions (2)",
-  );
-  assert.ok(pub.includes("Ingredients"), "the section headings stay rendered while loading");
-  assert.ok(pub.includes("Instructions"), "the section headings stay rendered while loading");
   const detail = await renderToHtml(<RecipeDetailPage state="loading" />);
   assert.equal(
     hiddenBones(detail),

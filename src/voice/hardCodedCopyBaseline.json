@@ -82,8 +82,6 @@
   "pages/eciperay/ProfilePage.tsx|jsx|Manage Tags",
   "pages/eciperay/ProfilePage.tsx|jsx|Profile",
   "pages/eciperay/ProfilePage.tsx|jsx|Sign Out",
-  "pages/eciperay/PublicRecipePage.tsx|jsx|Ingredients",
-  "pages/eciperay/PublicRecipePage.tsx|jsx|Instructions",
   "pages/eciperay/RecipeDetailPage.tsx|attr|Cook",
   "pages/eciperay/RecipeDetailPage.tsx|attr|Prep",
   "pages/eciperay/RecipeDetailPage.tsx|attr|Print recipe",

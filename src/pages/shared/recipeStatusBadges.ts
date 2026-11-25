@@ -1,12 +1,13 @@
 import type { BadgeProps } from "../../widgets/data/Badge.js";
 
 /**
- * STATUS_BADGES (#587 phase 3 tranche 5): the status badge map both
- * recipe pages carry — labels and tones for the app's four statuses
+ * STATUS_BADGES (#587 phase 3 tranche 5): the status badge map the
+ * merged recipe page's owner form carries (#757) — labels and
+ * tones for the app's four statuses
  * (idea → neutral gray, evolving → info blue, perfected → success
  * green, abandoned → danger red, matching the app's badge tints).
- * RecipeDetailPage and PublicRecipePage each carried an identical
- * copy; the map now lives here, shared by both. The vocabulary stays
+ * The two pre-merge recipe pages each carried an identical
+ * copy; the map now lives here. The vocabulary stays
  * caller data at the pages layer — the shared Badge takes the tone
  * and the label as its child and owns only the rendering (Stephen's
  * #119 dedupe ruling: no DS-owned status vocabulary in shared

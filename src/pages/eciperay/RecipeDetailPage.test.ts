@@ -54,6 +54,15 @@
  * the page-level contract: composition, ordering, slots, and
  * pass-throughs.
  *
+ * #757 merged PublicRecipePage into this page: the props union
+ * gained the public surface's notFound/unavailable members, and
+ * the ready member split into owner and guest forms on the
+ * `viewer` discriminator. The retired page's contract test was
+ * deleted with it; its page-level invariants (error states and
+ * copy, the CTA bar, the guest scroll sequence, the shared-shape
+ * aliases, the shared-component treatments) are ported to the
+ * guest-mode block at the bottom of this file.
+ *
  * This is a source scan, not a render test, for the same reason as
  * the recipesPageAccessory block in src/pages/eciperay/RecipesPage.test.ts: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
@@ -103,8 +112,8 @@ test("the view imports no app package and runs no data hooks", () => {
 test("the loading state renders only the spinner shell", () => {
   assert.match(
     code,
-    /export type RecipeDetailPageProps =\s+\{ state: "loading"; footer\?: BigFooterData \} \| RecipeDetailPageReadyProps;/,
-    "the props must be the loading | ready union",
+    /export type RecipeDetailPageProps =\s*\| \{ state: "loading"; footer\?: BigFooterData \}\s*\| \{ state: "notFound"; footer\?: BigFooterData \}\s*\| \{ state: "unavailable"; footer\?: BigFooterData \}\s*\| RecipeDetailPageReadyProps;/,
+    "the props must be the loading | notFound | unavailable | ready union (#757)",
   );
   const loadingAt = code.indexOf('props.state === "loading"');
   const chromeAt = code.indexOf("<DetailsPanel");
@@ -438,6 +447,17 @@ test("stories exercise the states and the cook-log form slot", () => {
     "CookHistory",
     "CookLogFormOpen",
     "Nutrition",
+    // Guest mode (#757): the retired public page's story set,
+    // ported — both CTA variants, the message states, the
+    // minimal and ingredients-exercised guest treatments.
+    "SignedOut",
+    "SignedInNonOwner",
+    "SignedInClonePending",
+    "CommentsAsData",
+    "SignedOutMinimal",
+    "SignedOutIngredients",
+    "NotFound",
+    "Unavailable",
   ]) {
     assert.match(
       storiesCode,
@@ -445,6 +465,20 @@ test("stories exercise the states and the cook-log form slot", () => {
       `RecipeDetailPage.stories.tsx must export a ${name} story`,
     );
   }
+  for (const state of ["notFound", "unavailable"]) {
+    assert.match(
+      storiesCode,
+      new RegExp(`<RecipeDetailPage[^>]*state="${state}"[^>]*/>`),
+      `a story must render the ${state} union member (#757)`,
+    );
+  }
+  assert.match(storiesCode, /variant: "signedIn"/, "a story must exercise the signed-in CTA bar");
+  assert.match(
+    storiesCode,
+    /isClonePending: clonePending/,
+    "a story must exercise the pending clone",
+  );
+  assert.match(storiesCode, /comments: \{/, "a story must pass comments as data (#130 T7)");
   assert.match(
     storiesCode,
     /cookLogForm: \{/,
@@ -571,4 +605,206 @@ test("print/share name the icons module's Feather icons, not text glyphs (#187, 
   }
   assert.ok(!code.includes("🖨") && !code.includes("↗"), "no emoji/text glyph button labels");
   assert.ok(!code.includes("PrinterGlyph") && !code.includes("ShareGlyph"), "no hand-drawn glyphs");
+});
+
+// ---------------------------------------------------------------------------
+// Guest mode (#757): the invariants the retired PublicRecipePage's
+// contract test pinned, carried onto the merged page — the error
+// states and their verbatim copy, the CTA bar, the guest scroll
+// sequence, the shared-shape reuse, and the shared-component
+// treatments. The guest branch is excised from the owner tests
+// above by their loading-branch excision (it sits between the
+// loading branch and the owner destructure), so its pins scope
+// to the branch text itself.
+// ---------------------------------------------------------------------------
+
+const widgetsDir = join(pagesDir, "..", "..", "src", "widgets");
+const ratingsCardCode = readFileSync(join(widgetsDir, "data", "RatingsCard.tsx"), "utf8")
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const guestAt = code.indexOf("if (isGuestReadyProps(props))");
+const guestCode = code.slice(guestAt, code.indexOf("const { status, versions"));
+
+test("guest mode: the error states branch before both ready forms (#757)", () => {
+  const notFoundAt = code.indexOf('props.state === "notFound"');
+  const unavailableAt = code.indexOf('props.state === "unavailable"');
+  const loadingAt = code.indexOf('props.state === "loading"');
+  assert.ok(loadingAt !== -1 && notFoundAt > loadingAt, "notFound branches after loading");
+  assert.ok(unavailableAt > notFoundAt, "unavailable branches after notFound");
+  assert.ok(guestAt > unavailableAt, "the guest branch comes after the error states");
+  assert.match(
+    code,
+    /props\.viewer === "signedIn" \|\| props\.viewer === "signedOut"/,
+    "the guest guard discriminates on the two guest viewer values",
+  );
+  assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
+  assert.match(
+    code,
+    /<MessageCard title=\{UNAVAILABLE_TITLE\} message=\{UNAVAILABLE_MESSAGE\} \/>/,
+  );
+});
+
+test("guest mode: the error copy is the web surface's verbatim copy (#757)", () => {
+  for (const copy of [
+    'NOT_FOUND_TITLE = "Recipe not found"',
+    'NOT_FOUND_MESSAGE = "This recipe may be private or no longer available."',
+    'UNAVAILABLE_TITLE = "Recipe unavailable"',
+    'UNAVAILABLE_MESSAGE = "This recipe link is invalid or has expired."',
+  ]) {
+    assert.ok(code.includes(copy), `the page must carry ${copy}`);
+  }
+});
+
+test("guest mode: one ScrollShell inside the landmark, sections in the public tab order (#757)", () => {
+  assert.equal(
+    guestCode.split("<ScrollShell").length - 1,
+    1,
+    "exactly one ScrollShell: the guest page's single section scroll",
+  );
+  assert.match(
+    guestCode,
+    /<MainLandmark>[\s\S]*?<ScrollShell>/,
+    "the guest scroll renders inside the page's main landmark (#366/#473)",
+  );
+  const sequence = [
+    "<CtaBar",
+    "<OverviewSection",
+    "<SectionHeading>Ingredients</SectionHeading>",
+    "<IngredientsSection",
+    "<SectionHeading>Instructions</SectionHeading>",
+    "<InstructionsSection",
+    "<RatingsCard",
+    "{comments}",
+  ];
+  let lastAt = -1;
+  for (const marker of sequence) {
+    const at = guestCode.indexOf(marker);
+    assert.ok(at > lastAt, `guest sections must render in tab order: ${marker} after the previous`);
+    lastAt = at;
+  }
+  const scrollAt = guestCode.indexOf("<ScrollShell");
+  assert.ok(guestCode.indexOf("<CtaBar") > scrollAt, "the sections render inside the scroll shell");
+});
+
+test("guest mode: the CTA bar switches on the auth-state variant with verbatim labels (#757)", () => {
+  assert.match(
+    code,
+    /export type RecipeDetailPageCtas =\s*\{ variant: "signedOut" \} \| \{ variant: "signedIn"; isClonePending\?: boolean \};/,
+    "the CTAs are the signedOut | signedIn union, signed-in carrying the clone pending state",
+  );
+  for (const copy of [
+    'SIGN_UP_LABEL = "Sign up free"',
+    'CLONE_LABEL = "Clone this recipe"',
+    'SAVE_COPY_LABEL = "Save a copy"',
+    'SAVE_COPY_PENDING_LABEL = "Saving…"',
+    'GET_APP_LABEL = "Get the mobile app"',
+  ]) {
+    assert.ok(code.includes(copy), `the page must carry ${copy}`);
+  }
+  assert.match(code, /ctas\.variant === "signedOut" \? \(/, "the bar branches on the variant");
+  assert.match(
+    code,
+    /disabled=\{ctas\.isClonePending \?\? false\}/,
+    "the signed-in clone button disables while the clone is pending",
+  );
+  assert.match(
+    code,
+    /ctas\.isClonePending \? SAVE_COPY_PENDING_LABEL : SAVE_COPY_LABEL/,
+    "the signed-in clone button reads Saving… while pending",
+  );
+  for (const intent of ["onSignUpPress", "onClonePress", "onGetAppPress"]) {
+    assert.match(
+      code,
+      new RegExp(String.raw`${intent}: \(\) => void;`),
+      `the ${intent} intent is a plain callback out`,
+    );
+  }
+  for (const key of ['key="sign-up"', 'key="clone"', 'key="get-app"']) {
+    assert.match(
+      code,
+      new RegExp(key.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)),
+      `the CTA buttons carry stable per-action keys (${key})`,
+    );
+  }
+});
+
+test("guest mode: the shared shapes are reused, not re-declared (#757)", () => {
+  assert.match(
+    code,
+    /export type RecipeDetailPageRatings = RatingsCardRatings;/,
+    "the ratings view-model is RatingsCard's, aliased — both forms share it",
+  );
+  assert.match(
+    code,
+    /export type RecipeDetailPageComments = RecipeCommentsViewProps;/,
+    "the comments view-model is the view's props, aliased (#130 T7)",
+  );
+  assert.match(
+    code,
+    /viewer: "signedIn" \| "signedOut";/,
+    "the guest form's viewer names the two guest treatments",
+  );
+  assert.match(
+    code,
+    /overview: RecipeDetailPageGuestOverviewProps;/,
+    "the guest ready props carry the guest overview shape",
+  );
+  assert.match(code, /ingredients: RecipeDetailPageIngredientsProps;/);
+  assert.match(code, /instructions: RecipeDetailPageInstructionsProps;/);
+  assert.match(code, /comments\?: RecipeDetailPageComments \| null;/);
+  assert.match(
+    ratingsCardCode,
+    /\{ratings\.viewer \? \(/,
+    "the viewer star input renders only with a viewer (signed out hides it)",
+  );
+});
+
+test("guest mode: no status badge on the guest overview (#735, #757)", () => {
+  const sectionAt = code.indexOf("function OverviewSection");
+  const span = code.slice(sectionAt, code.indexOf("function IngredientsSection"));
+  assert.ok(!span.includes("STATUS_BADGES"), "the guest overview must not resolve a status badge");
+  assert.ok(!span.includes("status"), "the guest overview carries no status");
+});
+
+test("guest mode: the CTA sizing and message shell are the shared components' (#341, #757)", () => {
+  assert.ok(
+    code.includes('import { ButtonRow } from "../../widgets/actions/ButtonRow.js";'),
+    "the page imports the library ButtonRow",
+  );
+  assert.ok(
+    code.includes('import { MessageCard } from "../../widgets/content/MessageCard.js";'),
+    "the page imports the library MessageCard",
+  );
+  assert.match(
+    code,
+    /<ButtonRow equal>\{buttons\}<\/ButtonRow>/,
+    "the CTA bar passes its buttons to ButtonRow with `equal`, which owns their equal sizing",
+  );
+  assert.ok(
+    !code.includes("cloneElement"),
+    "the page must not size its own buttons (ButtonRow owns the cloneElement sizing)",
+  );
+  assert.ok(
+    !code.includes('from "tamagui"'),
+    "the page imports no tamagui primitives: every treatment it renders is a DS component's",
+  );
+});
+
+test("guest mode: the sections render through the shared library panels (#331, #757)", () => {
+  for (const panel of ["RecipeOverviewPanel", "RecipeIngredientsPanel"]) {
+    assert.ok(
+      code.includes(`import { ${panel} } from "../../views/eciperay/${panel}.js";`),
+      `the page imports the library ${panel}`,
+    );
+  }
+  assert.ok(
+    code.includes('import { StepList } from "../../widgets/data/StepList.js";'),
+    "the page imports the library StepList",
+  );
+  assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
+  assert.match(
+    code,
+    /label: `Step \$\{step\.stepNumber\}`/,
+    "the page composes each step's Step N label (#747)",
+  );
 });

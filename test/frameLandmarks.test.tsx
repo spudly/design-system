@@ -34,6 +34,16 @@
  * (ready, loading, not-found, unavailable) renders its content
  * inside exactly one `main`, with BigFooter (`contentinfo`)
  * outside it. The SSR tests below cover each state.
+ *
+ * #757 merged PublicRecipePage into RecipeDetailPage: the
+ * merged page owns `main` on the states that keep the public
+ * treatment — the guest ready form and the notFound /
+ * unavailable message states render inside MainLandmark, with
+ * the footer outside it (the SSR tests below). The unified
+ * loading state is the owner form's skeleton composition
+ * (ScreenShell carries no landmark — the signed-in app shell
+ * owns landmarks there), so the retired page's loading-state
+ * landmark test does not carry over.
  */
 import "./registerSvgStub.js";
 import { loadInternalDist } from "./internalDist.js";
@@ -130,8 +140,8 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const { LegalDocumentPage }: Record<string, any> =
       await import("../dist/pages/eciperay/LegalDocumentPage.js");
-    const { PublicRecipePage }: Record<string, any> =
-      await import("../dist/pages/eciperay/PublicRecipePage.js");
+    const { RecipeDetailPage }: Record<string, any> =
+      await import("../dist/pages/eciperay/RecipeDetailPage.js");
     const { eciperayFooterFixture }: Record<string, any> =
       await import("../dist/pages/shared/fixtures.js");
     // BigFooter is internal (not in the components barrel, #410/#298):
@@ -143,7 +153,7 @@ function loadRuntime() {
       TamaguiProvider,
       ...dist,
       LegalDocumentPage,
-      PublicRecipePage,
+      RecipeDetailPage,
       eciperayFooterFixture,
       BigFooter,
     };
@@ -154,7 +164,7 @@ async function renderToHtml(element: any) {
   const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } = await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   // #539: compositions under test can contain voice-reading widgets
-  // (PublicRecipePage's overview panel); supply the fixture voice
+  // (the recipe page's overview panel); supply the fixture voice
   // the same way the whole-page-flow helper does.
   const { VoiceProvider }: Record<string, any> = await import("../dist/voice/index.js");
   const { fixtureVoice }: Record<string, any> = await import("../dist/voice/fixtures.js");
@@ -266,16 +276,18 @@ const legalFixture = {
     },
   ],
 };
-const publicRecipePage = readCode("src/pages/eciperay/PublicRecipePage.tsx");
-test("PublicRecipePage carries its main landmark on every state (#473)", () => {
-  // One MainLandmark per state branch: loading, notFound,
-  // unavailable, and the ready ScrollShell branch. The role
-  // itself lives in the MainLandmark component — the page
-  // spreads no landmark props of its own.
-  const wraps = publicRecipePage.match(/<MainLandmark>/g) ?? [];
-  assert.equal(wraps.length, 4, "each of the four states renders its content inside main");
+const recipeDetailPage = readCode("src/pages/eciperay/RecipeDetailPage.tsx");
+test("RecipeDetailPage carries its main landmark on its public states (#473, #757)", () => {
+  // One MainLandmark per public-treatment branch: notFound,
+  // unavailable, and the guest ready form. The role itself
+  // lives in the MainLandmark component — the page spreads no
+  // landmark props of its own. (The owner form and the unified
+  // loading state compose ScreenShell, which carries no
+  // landmark — see the file header.)
+  const wraps = recipeDetailPage.match(/<MainLandmark>/g) ?? [];
+  assert.equal(wraps.length, 3, "each public-treatment state renders its content inside main");
   assert.ok(
-    !publicRecipePage.includes("mainRoleProps"),
+    !recipeDetailPage.includes("mainRoleProps"),
     "the landmark role is MainLandmark's, not the page's",
   );
 });
@@ -284,7 +296,7 @@ test("SSR: LegalDocumentPage renders exactly one banner, main, and contentinfo (
   const html = await renderToHtml(<LegalDocumentPage {...legalFixture} />);
   assertLandmarks(html, "Body text.");
 });
-function assertPublicRecipeLandmarks(html: string, insideMain?: string) {
+function assertGuestRecipeLandmarks(html: string, insideMain?: string) {
   assert.equal(countRole(html, "main"), 1, "exactly one main landmark");
   assert.equal(countRole(html, "contentinfo"), 1, "exactly one contentinfo landmark");
   assert.ok(
@@ -307,9 +319,9 @@ function assertPublicRecipeLandmarks(html: string, insideMain?: string) {
 }
 const publicRecipeReadyFixture = {
   state: "ready",
+  viewer: "signedOut",
   overview: {
     title: "Landmark Soup",
-    status: "idea",
     servingsLabel: "4",
     tags: [],
   },
@@ -345,31 +357,24 @@ const publicRecipeReadyFixture = {
     ],
   },
 };
-test("SSR: PublicRecipePage ready state renders its content inside exactly one main, footer outside (#473)", async () => {
-  const { PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+test("SSR: RecipeDetailPage guest state renders its content inside exactly one main, footer outside (#473)", async () => {
+  const { RecipeDetailPage, eciperayFooterFixture } = await loadRuntime();
   const html = await renderToHtml(
-    <PublicRecipePage {...publicRecipeReadyFixture} footer={eciperayFooterFixture} />,
+    <RecipeDetailPage {...publicRecipeReadyFixture} footer={eciperayFooterFixture} />,
   );
-  assertPublicRecipeLandmarks(html, "Landmark Soup");
+  assertGuestRecipeLandmarks(html, "Landmark Soup");
 });
-test("SSR: PublicRecipePage loading state renders inside exactly one main, footer outside (#473)", async () => {
-  const { PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+test("SSR: RecipeDetailPage not-found state renders its card inside exactly one main, footer outside (#473)", async () => {
+  const { RecipeDetailPage, eciperayFooterFixture } = await loadRuntime();
   const html = await renderToHtml(
-    <PublicRecipePage state="loading" footer={eciperayFooterFixture} />,
+    <RecipeDetailPage state="notFound" footer={eciperayFooterFixture} />,
   );
-  assertPublicRecipeLandmarks(html);
+  assertGuestRecipeLandmarks(html, "Recipe not found");
 });
-test("SSR: PublicRecipePage not-found state renders its card inside exactly one main, footer outside (#473)", async () => {
-  const { PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+test("SSR: RecipeDetailPage unavailable state renders its card inside exactly one main, footer outside (#473)", async () => {
+  const { RecipeDetailPage, eciperayFooterFixture } = await loadRuntime();
   const html = await renderToHtml(
-    <PublicRecipePage state="notFound" footer={eciperayFooterFixture} />,
+    <RecipeDetailPage state="unavailable" footer={eciperayFooterFixture} />,
   );
-  assertPublicRecipeLandmarks(html, "Recipe not found");
-});
-test("SSR: PublicRecipePage unavailable state renders its card inside exactly one main, footer outside (#473)", async () => {
-  const { PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
-  const html = await renderToHtml(
-    <PublicRecipePage state="unavailable" footer={eciperayFooterFixture} />,
-  );
-  assertPublicRecipeLandmarks(html, "Recipe unavailable");
+  assertGuestRecipeLandmarks(html, "Recipe unavailable");
 });
