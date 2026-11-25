@@ -15,7 +15,7 @@ const meta: Meta<typeof MasonryGrid> = {
     minColumnWidth: { control: { type: "number", min: 40, max: 400 } },
     minColumns: { control: { type: "number", min: 1, max: 6 } },
     maxColumns: { control: { type: "number", min: 1, max: 8 } },
-    gap: { control: { type: "number", min: 0, max: 32 } },
+    gap: { control: { type: "select" }, options: ["xs", "s", "m", "l", "xl", "xxl"] },
   },
 };
 
