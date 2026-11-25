@@ -267,7 +267,7 @@ over the theme global whenever it is set. Browse mode never sets it.
 
 Loading-state captures are taken with the skeleton pulse frozen
 (#648): the pulse behind every skeleton bone is JS-driven
-(`requestAnimationFrame` in `src/widgets/SkeletonClock.tsx`), so
+(`requestAnimationFrame` in `src/widgets/feedback/SkeletonClock.tsx`), so
 the emulator-level animation disabling cannot pin its phase, and
 shard captures and the merge-verify re-capture minutes later
 landed on different opacities — regenerated baselines for loading
@@ -325,7 +325,6 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-authconfirmationpage         | light_warmHarvest |       2 |         2 |
 | pages-eciperay-consentpreferencespage       | light_warmHarvest |       2 |         2 |
 | pages-eciperay-cookingmodepage              | light_warmHarvest |       4 |         3 |
-| pages-eciperay-discoverpage                 | light_warmHarvest |       9 |         9 |
 | pages-eciperay-editrecipepage               | light_warmHarvest |       1 |         1 |
 | pages-eciperay-editversionpage              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-feedbackpage                 | light_warmHarvest |       2 |         2 |
@@ -347,11 +346,10 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-mealshubpage                 | light_warmHarvest |       7 |         5 |
 | pages-eciperay-paypage                      | light_warmHarvest |       5 |         5 |
 | pages-eciperay-profilepage                  | light_warmHarvest |       2 |         2 |
-| pages-eciperay-publicrecipepage             | light_warmHarvest |      10 |        10 |
-| pages-eciperay-recipedetailpage             | light_warmHarvest |      12 |        12 |
+| pages-eciperay-recipedetailpage             | light_warmHarvest |      22 |        12 |
 | pages-eciperay-recipeformpage               | light_warmHarvest |       6 |         6 |
-| pages-eciperay-recipespage                  | light_warmHarvest |      14 |        14 |
-| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      14 |        14 |
+| pages-eciperay-recipespage                  | light_warmHarvest |      15 |        14 |
+| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      15 |        14 |
 | pages-eciperay-resetpasswordpage            | light_warmHarvest |       2 |         2 |
 | pages-eciperay-routeerrorpage               | light_warmHarvest |       3 |         2 |
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       4 |         4 |
@@ -365,7 +363,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |       8 |         6 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **206** |   **197** |
+| **Total**                                   |                   | **199** |   **178** |
 
 <!-- VR-COVERAGE-END -->
 

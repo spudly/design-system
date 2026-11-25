@@ -1,12 +1,17 @@
-import { useRef, useState } from "react";
-import type { ComponentProps } from "react";
-import { XStack, isWeb } from "tamagui";
+import { useId, useRef, useState } from "react";
+import type { ComponentProps, Ref } from "react";
+import { isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
-import { Button } from "../Button.js";
-import { Text } from "../Text.js";
+import { Button } from "../actions/Button.js";
+import { Text } from "../data/Text.js";
 import { TextField } from "./TextField.js";
+import { Col } from "../layout/Col.js";
+import { FieldError } from "./FieldError.js";
 
 export type PresetValueOption = {
   value: string;
@@ -44,6 +49,15 @@ export type PresetValueSelectorProps = {
    * suffix). Defaults to the value itself.
    */
   formatCustomValue?: (value: string) => string;
+  /** When true, the whole selector is inert and dimmed: presets and the custom slot cannot change the value. */
+  disabled?: boolean;
+  /**
+   * Validation error (#804): rendered below the selector
+   * through the shared FieldError (an Alert); the group
+   * carries `aria-invalid` / `aria-describedby` pointing at it.
+   */
+  error?: string;
+  id?: string;
 };
 
 /**
@@ -88,6 +102,17 @@ export type PresetValueSelectorProps = {
  * presets' `onPressIn` — which fires ahead of the input's
  * blur for a touch — stands in for it.
  */
+/**
+ * The group row with its ref attached (#746): the blur logic
+ * needs the group's element (containment checks), and Row's
+ * props type does not declare React 19's ref-as-prop — Row
+ * forwards it through its rest spread at runtime, so the ref
+ * rides the props object here.
+ */
+function GroupRow({ ref, ...props }: RowProps & { ref?: Ref<TamaguiElement> }) {
+  return <Row {...{ ...props, ref }} />;
+}
+
 export function PresetValueSelector({
   label,
   options,
@@ -96,7 +121,13 @@ export function PresetValueSelector({
   customLabel,
   customAccessibilityLabel,
   formatCustomValue,
+  disabled = false,
+  error,
+  id: idProp,
 }: PresetValueSelectorProps) {
+  const autoId = useId();
+  const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
   const [isCustomEditing, setCustomEditing] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
   const groupRef = useRef<TamaguiElement>(null);
@@ -111,12 +142,19 @@ export function PresetValueSelector({
   const formattedCustom = formatCustomValue ? formatCustomValue(value) : value;
 
   const startCustomEdit = () => {
+    if (disabled) {
+      return;
+    }
     presetPressPendingRef.current = false;
     setCustomDraft(isPreset ? "" : value);
     setCustomEditing(true);
   };
 
   const commitCustom = () => {
+    if (disabled) {
+      setCustomEditing(false);
+      return;
+    }
     const parsed = Number(customDraft.trim());
     setCustomEditing(false);
     if (Number.isFinite(parsed) && parsed > 0) {
@@ -157,131 +195,147 @@ export function PresetValueSelector({
   };
 
   return (
-    <XStack
-      ref={groupRef}
-      alignItems="center"
-      gap="$2"
-      {...groupRoleProps}
-      {...platformAccessibilityProps({ accessibilityLabel: label })}
-    >
-      <XStack paddingInlineEnd="$1">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.medium}
-          color={tokens.colors.gray.gray8}
-        >
-          {label}
-        </Text>
-      </XStack>
-      <XStack flex={1} gap="$2">
-        {options.map((option) => (
-          <Button
-            key={option.value}
-            variant="secondary"
-            size="sm"
-            grow
-            // Equal shares of a non-wrapping row need a zero
-            // basis: Button's `grow` default is a content-sized
-            // basis (the wrapping-row treatment), so this caller
-            // passes the zero basis and shrink back — a
-            // caller-passed flex wins over `grow` by Button's
-            // contract.
-            flexBasis={0}
-            flexShrink={1}
-            selected={value === option.value}
-            onPressIn={() => {
-              if (isCustomEditing) {
-                presetPressPendingRef.current = true;
-              }
-            }}
-            onPressOut={() => {
-              // #315 cancel path: a press that ends WITHOUT
-              // onPress (canceled by a scroll stealing the
-              // responder, or by releasing off the button) must
-              // not leave the pending flag set — a later genuine
-              // blur would read it and wrongly discard the draft
-              // instead of committing. The clear is deferred to
-              // a microtask: the blur a completed press causes
-              // fires during press-in (before press-out), and a
-              // completed press's onPress runs synchronously
-              // right after press-out and clears the flag itself,
-              // so this deferred clear only ever takes effect
-              // for a canceled press.
-              if (presetPressPendingRef.current) {
-                queueMicrotask(() => {
-                  presetPressPendingRef.current = false;
-                });
-              }
-            }}
-            onPointerCancel={() => {
-              // #315 web touch-cancel path: Tamagui's web event
-              // mapping (getWebEvents) wires onPressOut only to
-              // onMouseUp/onTouchEnd — a touch CANCELED by the
-              // browser (scroll gesture, gesture takeover) fires
-              // neither, so onPressOut never runs and the pending
-              // flag would stay set; a later genuine blur outside
-              // the group would then discard the draft instead of
-              // committing it. The pointer-cancel event is the
-              // web-supported cancellation signal: clear the flag
-              // here too, with the same deferred microtask (a
-              // canceled press produces no onPress, so the defer
-              // can only ever take effect for a canceled press).
-              if (presetPressPendingRef.current) {
-                queueMicrotask(() => {
-                  presetPressPendingRef.current = false;
-                });
-              }
-            }}
-            onPress={() => {
-              presetPressPendingRef.current = false;
-              setCustomEditing(false);
-              onChange(option.value);
-            }}
+    <Col gap="xs">
+      <GroupRow
+        ref={groupRef}
+        middle
+        gap="s"
+        opacity={disabled ? 0.5 : 1}
+        {...groupRoleProps}
+        {...platformAccessibilityProps({ accessibilityLabel: label })}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+      >
+        <Row>
+          <Text
+            fontSize={tokens.typography.fontSize.sm}
+            fontWeight={tokens.typography.fontWeight.medium}
+            color={tokens.colors.gray.gray8}
           >
-            {option.label}
-          </Button>
-        ))}
-      </XStack>
-      {/* #327: the custom slot's share must leave the small
+            {label}
+          </Text>
+          <Spacer x="xs" />
+        </Row>
+        <Row grow shrink gap="s">
+          {options.map((option) => (
+            <Button
+              key={option.value}
+              variant="secondary"
+              size="sm"
+              grow
+              // Equal shares of a non-wrapping row need a zero
+              // basis: Button's `grow` default is a content-sized
+              // basis (the wrapping-row treatment), so this caller
+              // passes the zero basis and shrink back — a
+              // caller-passed flex wins over `grow` by Button's
+              // contract.
+              flexBasis={0}
+              flexShrink={1}
+              selected={value === option.value}
+              disabled={disabled}
+              onPressIn={() => {
+                if (isCustomEditing) {
+                  presetPressPendingRef.current = true;
+                }
+              }}
+              onPressOut={() => {
+                // #315 cancel path: a press that ends WITHOUT
+                // onPress (canceled by a scroll stealing the
+                // responder, or by releasing off the button) must
+                // not leave the pending flag set — a later genuine
+                // blur would read it and wrongly discard the draft
+                // instead of committing. The clear is deferred to
+                // a microtask: the blur a completed press causes
+                // fires during press-in (before press-out), and a
+                // completed press's onPress runs synchronously
+                // right after press-out and clears the flag itself,
+                // so this deferred clear only ever takes effect
+                // for a canceled press.
+                if (presetPressPendingRef.current) {
+                  queueMicrotask(() => {
+                    presetPressPendingRef.current = false;
+                  });
+                }
+              }}
+              onPointerCancel={() => {
+                // #315 web touch-cancel path: Tamagui's web event
+                // mapping (getWebEvents) wires onPressOut only to
+                // onMouseUp/onTouchEnd — a touch CANCELED by the
+                // browser (scroll gesture, gesture takeover) fires
+                // neither, so onPressOut never runs and the pending
+                // flag would stay set; a later genuine blur outside
+                // the group would then discard the draft instead of
+                // committing it. The pointer-cancel event is the
+                // web-supported cancellation signal: clear the flag
+                // here too, with the same deferred microtask (a
+                // canceled press produces no onPress, so the defer
+                // can only ever take effect for a canceled press).
+                if (presetPressPendingRef.current) {
+                  queueMicrotask(() => {
+                    presetPressPendingRef.current = false;
+                  });
+                }
+              }}
+              onPress={() => {
+                if (disabled) {
+                  return;
+                }
+                presetPressPendingRef.current = false;
+                setCustomEditing(false);
+                onChange(option.value);
+              }}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </Row>
+        {/* #327: the custom slot's share must leave the small
           Button's label room to sit on one line at the Android
           VR capture width (~430px). At flex 0.25 the slot was
           ~68px and "Custom" wrapped mid-word ("Custo/m"),
           making the button taller than the preset row; the
           presets' labels are short (½×, 1×, …), so the custom
           slot takes the larger share while the presets stay
-          equal-width. */}
-      <XStack flex={0.35}>
-        {isCustomEditing ? (
-          <TextField
-            accessibilityLabel={customAccessibilityLabel}
-            keyboardType="decimal-pad"
-            inputMode="decimal"
-            type="number"
-            autoFocus
-            value={customDraft}
-            onChangeText={setCustomDraft}
-            onBlur={handleCustomBlur}
-            onSubmitEditing={commitCustom}
-          />
-        ) : (
-          <Button
-            variant="secondary"
-            size="sm"
-            grow
-            flexBasis={0}
-            flexShrink={1}
-            selected={isCustomSelected}
-            accessibilityLabel={
-              isCustomSelected
-                ? `${customAccessibilityLabel} ${formattedCustom}`
-                : customAccessibilityLabel
-            }
-            onPress={startCustomEdit}
-          >
-            {isCustomSelected ? formattedCustom : customLabel}
-          </Button>
-        )}
-      </XStack>
-    </XStack>
+          equal-width. #746: flex 0.35 is grow={0.35} in the
+          subset; the shorthand's zero basis — what makes the
+          share proportional rather than extra-space-only —
+          rides the style channel. */}
+        <Row grow={0.35} shrink style={{ flexBasis: 0 }}>
+          {isCustomEditing ? (
+            <TextField
+              disabled={disabled}
+              accessibilityLabel={customAccessibilityLabel}
+              keyboardType="decimal-pad"
+              inputMode="decimal"
+              type="number"
+              autoFocus
+              value={customDraft}
+              onChangeText={setCustomDraft}
+              onBlur={handleCustomBlur}
+              onSubmitEditing={commitCustom}
+            />
+          ) : (
+            <Button
+              variant="secondary"
+              size="sm"
+              grow
+              flexBasis={0}
+              flexShrink={1}
+              disabled={disabled}
+              selected={isCustomSelected}
+              accessibilityLabel={
+                isCustomSelected
+                  ? `${customAccessibilityLabel} ${formattedCustom}`
+                  : customAccessibilityLabel
+              }
+              onPress={startCustomEdit}
+            >
+              {isCustomSelected ? formattedCustom : customLabel}
+            </Button>
+          )}
+        </Row>
+      </GroupRow>
+      {error ? <FieldError error={error} id={errorId} /> : null}
+    </Col>
   );
 }

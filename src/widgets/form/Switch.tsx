@@ -1,7 +1,10 @@
 import { useId } from "react";
-import { Label, Switch as TamaguiSwitch, XStack, YStack, styled } from "tamagui";
+import { Label, Switch as TamaguiSwitch, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledSwitch = styled(TamaguiSwitch, {
   name: "Switch",
@@ -50,30 +53,58 @@ export type SwitchProps = {
   description?: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  /** When true, the switch is inert and dimmed; it cannot be toggled. */
+  disabled?: boolean;
+  /**
+   * Validation error (#804): rendered below the row through
+   * the shared FieldError (an Alert); the switch carries
+   * `aria-invalid` / `aria-describedby` pointing at it.
+   */
+  error?: string;
+  id?: string;
 };
 
 /**
  * Labeled switch row. The label is associated via `htmlFor` so it toggles
  * the switch; the row carries a 44px minimum height for the touch target.
  */
-export function Switch({ label, description, checked, onCheckedChange }: SwitchProps) {
-  const id = useId();
+export function Switch({
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  disabled = false,
+  error,
+  id: idProp,
+}: SwitchProps) {
+  const autoId = useId();
+  const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
   return (
-    <XStack
-      alignItems="center"
-      justifyContent="space-between"
-      gap={tokens.spacing[3]}
-      minHeight={44}
-      paddingVertical={tokens.spacing[2]}
-    >
-      <YStack flex={1} gap={tokens.spacing[1]}>
-        <Label htmlFor={id} fontSize={tokens.typography.fontSize.md}>
-          {label}
-        </Label>
-        {description ? <Text variant="hint">{description}</Text> : null}
-      </YStack>
-      <StyledSwitch id={id} checked={checked} onCheckedChange={onCheckedChange} on={checked}>
-        {/* transition="fast" is the shared spring from the Tamagui config —
+    <Col gap="xs">
+      <Row middle between gap="m" minHeight={44} py="s" opacity={disabled ? 0.5 : 1}>
+        <Col grow shrink gap="xs">
+          <Label htmlFor={id} fontSize={tokens.typography.fontSize.md}>
+            {label}
+          </Label>
+          {description ? <Text variant="hint">{description}</Text> : null}
+        </Col>
+        <StyledSwitch
+          id={id}
+          checked={checked}
+          onCheckedChange={(next) => {
+            if (disabled) {
+              return;
+            }
+            onCheckedChange(next);
+          }}
+          disabled={disabled}
+          aria-disabled={disabled || undefined}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
+          on={checked}
+        >
+          {/* transition="fast" is the shared spring from the Tamagui config —
             the mechanism the CSS animation driver turns into a real
             transition (the `animation` prop compiles to a 0s keyframe
             reference in this repo and never visibly animates; see
@@ -93,8 +124,10 @@ export function Switch({ label, description, checked, onCheckedChange }: SwitchP
             compensating x), so the offset's origin must be fixed here
             for the direct `x` to mean the same thing however the
             switch was mounted. */}
-        <StyledThumb alignSelf="flex-start" x={checked ? 20 : 0} transition="fast" />
-      </StyledSwitch>
-    </XStack>
+          <StyledThumb alignSelf="flex-start" x={checked ? 20 : 0} transition="fast" />
+        </StyledSwitch>
+      </Row>
+      {error ? <FieldError error={error} id={errorId} /> : null}
+    </Col>
   );
 }

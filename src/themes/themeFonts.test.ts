@@ -19,11 +19,7 @@
  * 3. The `serif` role is untouched: verse/reading text is the
  *    deliberate exception to the Raleway rule (Memorize verse
  *    text gets Alegreya in #66, not Raleway here).
- * 4. No source file outside the token/theme definitions hardcodes
- *    a UI font family — components and stories read the token.
- *    (The mono role in SecretRevealPanel and the serif verse
- *    role in Text/VerseText are token reads, not literals.)
- * 5. Both native platforms declare the static per-weight faces
+ * 4. Both native platforms declare the static per-weight faces
  *    (#326): apps register one static font per DS weight under
  *    the declared names, so no platform resolves a weight
  *    numerically against the variable font — Android's numeric
@@ -31,18 +27,22 @@
  *    across app launches.
  *
  * Run against the built output: `npm run build` first (the `test`
- * script does both). The hardcoded-family scan reads source.
+ * script does both). Converted in #733 tranche 3: the former source
+ * scan for hardcoded fontFamily literals was deleted — a literal in
+ * a component is not runtime-observable from the built themes, and
+ * the token values themselves are pinned by the tests above. The
+ * preview-head.html read below is a config-file read, not a JS/TS
+ * source read, and stays.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const srcDir = join(here, "../..", "src");
 
 const { tokens, baseTheme, eciperayTheme, memorizeTheme }: Record<string, any> =
   await loadInternalDist();
@@ -103,33 +103,6 @@ test("all themes resolve the sans role to the base Raleway values", () => {
 
 test("the serif verse role is unchanged by the Raleway adoption", () => {
   assert.equal(tokens.typography.fontFamily.serif, "Georgia, 'Times New Roman', serif");
-});
-
-test("no component, page, or story hardcodes a UI font family", () => {
-  const offenders: string[] = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const path = join(dir, entry.name);
-      if (entry.isDirectory()) walk(path);
-      else if (/\.tsx?$/.test(entry.name)) {
-        const text = readFileSync(path, "utf8");
-        // A fontFamily literal naming a family (quoted value) is a
-        // hardcode; token reads (`fontFamily: tokens...`,
-        // `fontFamily.sans`) and the type-level BrandFontFamily
-        // declarations carry no quoted family name on the value side.
-        // A `$`-prefixed value is a Tamagui font-token reference
-        // (`fontFamily: "$verse"`, #66), not a family literal — the
-        // family itself still comes from the theme's tokens.
-        for (const match of text.matchAll(/fontFamily:\s*"([^"]+)"/g)) {
-          if (match[1].startsWith("$")) continue;
-          offenders.push(`${path}: fontFamily: "${match[1]}"`);
-        }
-      }
-    }
-  };
-  walk(join(srcDir, "widgets"));
-  walk(join(srcDir, "pages"));
-  assert.deepEqual(offenders, [], "UI font families must come from the theme token (#65)");
 });
 
 test("Storybook loads Raleway so stories render the real typeface", () => {

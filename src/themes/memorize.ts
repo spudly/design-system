@@ -1,6 +1,6 @@
 import { baseTheme } from "./base.js";
 import { tokens } from "../tokens/index.js";
-import { quietDawnTagColors } from "./tagColors.js";
+import { quietDawnTagColors, quietDawnTagColorShades } from "./tagColors.js";
 
 /**
  * Memorize theme — "Quiet Dawn" visual direction (approved 2026-10-12).
@@ -14,6 +14,7 @@ export const memorizeTheme = {
   // Quiet Dawn tag colors (#207): cooler, muted shades of the twelve
   // tag color names, distinct from Warm Harvest's legacy palette.
   tagColors: quietDawnTagColors,
+  tagColorShades: quietDawnTagColorShades,
   semantic: {
     ...baseTheme.semantic,
     // Distinct from Warm Harvest's warm cream (#faf6f0) — the two

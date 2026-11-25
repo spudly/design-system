@@ -8,6 +8,7 @@ const meta: Meta<typeof RadioOptionGroup> = {
   argTypes: {
     label: { control: "text" },
     error: { control: "text" },
+    disabled: { control: "boolean" },
   },
 };
 
@@ -74,6 +75,21 @@ export const WithError: Story = {
         value={value}
         onValueChange={setValue}
         error="Please choose an import method."
+      />
+    );
+  },
+};
+
+export const Disabled: Story = {
+  render: () => {
+    const [value, setValue] = useState("url");
+    return (
+      <RadioOptionGroup
+        label="Add recipe"
+        options={importOptions}
+        value={value}
+        onValueChange={setValue}
+        disabled
       />
     );
   },

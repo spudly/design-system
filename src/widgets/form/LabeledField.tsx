@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
-import { LabelRow } from "../LabelRow.js";
-import { Text } from "../Text.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
+import { LabelRow } from "../data/LabelRow.js";
+import { FieldError } from "./FieldError.js";
 
 export type LabeledFieldProps = {
   /** The field's label, rendered in the FieldLabel treatment. */
@@ -41,16 +41,18 @@ export type LabeledFieldProps = {
  */
 export function LabeledField({ label, fieldId, action, error, children }: LabeledFieldProps) {
   return (
-    <YStack>
+    <Col>
       <LabelRow label={label} action={action} separation={1} htmlFor={fieldId} />
       {children}
       {error ? (
-        <YStack paddingBlockStart={tokens.spacing[2]}>
-          <Text variant="error" {...(fieldId ? { id: `${fieldId}-error` } : {})}>
-            {error}
-          </Text>
-        </YStack>
+        <Col>
+          {/* The form's 8px error separation: the inset sits
+            between the field and its error, so no parent gap
+            can own it — composed explicitly (#746). */}
+          <Spacer y="s" />
+          <FieldError error={error} {...(fieldId ? { id: `${fieldId}-error` } : {})} />
+        </Col>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

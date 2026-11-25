@@ -35,10 +35,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const pages = [
-  ["PublicRecipePage", "src/pages/PublicRecipePage.tsx"],
-  ["RecipeDetailPage", "src/pages/RecipeDetailPage.tsx"],
-];
+const pages = [["RecipeDetailPage", "src/pages/eciperay/RecipeDetailPage.tsx"]];
 
 for (const [name, rel] of pages) {
   const code = readCode(rel);

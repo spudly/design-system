@@ -1,6 +1,6 @@
 import { baseTheme } from "./base.js";
 import { tokens } from "../tokens/index.js";
-import { warmHarvestTagColors } from "./tagColors.js";
+import { warmHarvestTagColors, warmHarvestTagColorShades } from "./tagColors.js";
 
 /**
  * Eciperay theme — "Warm Harvest" visual direction (approved 2026-10-12).
@@ -15,14 +15,22 @@ export const eciperayTheme = {
   // (rather than inherited silently) because that identity is the
   // stored-data contract.
   tagColors: warmHarvestTagColors,
+  tagColorShades: warmHarvestTagColorShades,
   semantic: {
     ...baseTheme.semantic,
     background: "#faf6f0",
-    surface: "#fffdf8",
+    // Page surface is the visual direction's warm cream (#721
+    // fidelity round, Stephen 2026-11-20): the recipe-detail
+    // reference's dominant sampled color is #FBF4E8, replacing
+    // the paler #fffdf8 the page rendered before.
+    surface: "#FBF4E8",
     text: "#292019",
     textMuted: "#57534e",
     border: "#e9e2d5",
-    primary: tokens.colors.terracotta.terracotta7,
+    // Burnt orange sampled from the visual direction's Start
+    // Cooking pill (#721 fidelity round): #b13f13, replacing the
+    // terracotta7 step the primary rendered before.
+    primary: "#b13f13",
     primaryHover: tokens.colors.terracotta.terracotta8,
     primaryActive: tokens.colors.terracotta.terracotta9,
     onPrimary: tokens.colors.terracotta.terracotta1,

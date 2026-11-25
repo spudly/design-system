@@ -48,33 +48,33 @@
  * - src/widgets/useVariantGlyphInk.ts — the shared variant glyph
  *   ink hook (#587 phase 2); exercised through the Button/
  *   DropdownButton stories.
- * - src/widgets/PageFrame.tsx — internal page-story scaffolding
+ * - src/widgets/layout/PageFrame.tsx — internal page-story scaffolding
  *   shared by the page stories; NOT exported from either barrel, so
  *   it is not part of the @spudly/ui surface. It is exercised through
  *   every page story. If it is ever exported, this test fails and a
  *   story decision is required. (It lived in src/pages until #119's
  *   auth tranche moved it out of the no-page-styling rule's scope.)
- * - src/pages/BoundedList.tsx — internal page scaffolding (#119): the
+ * - src/pages/shared/BoundedList.tsx — internal page scaffolding (#119): the
  *   shared bounded FlatList the fixed-shell list pages render. It
  *   imports react-native, so it cannot be a root-exported component;
  *   NOT exported from src/pages/index.ts, exercised through the
  *   pages that use it (VerseSearchPage, MemorizeReviewPage,
  *   MyVersesPage). Same rule as PageFrame: export means a story
  *   decision is required.
- * - src/pages/StepNavControls.tsx — internal page scaffolding
+ * - src/pages/shared/StepNavControls.tsx — internal page scaffolding
  *   (#587 phase 3 tranche 5): the step-navigation composition both
  *   cooking-mode pages render inside their StepOverlay; NOT exported
  *   from src/pages/index.ts, exercised through the cooking pages'
  *   stories. Same rule as BoundedList: export means a story
  *   decision is required.
- * - src/pages/recipeStatusBadges.ts — the shared status-badge map
+ * - src/pages/shared/recipeStatusBadges.ts — the shared status-badge map
  *   both recipe pages read (#587 phase 3 tranche 5); data, not a
  *   component.
- * - src/pages/recipeRow.tsx — the shared recipe-row composition
+ * - src/pages/shared/recipeRow.tsx — the shared recipe-row composition
  *   (#657) RecipesPage and HomePage render; page-local scaffolding,
  *   NOT exported from src/pages/index.ts, exercised through both
  *   pages' stories. Same rule as BoundedList.
- * - src/pages/fixtures.ts — static story fixtures, not a component.
+ * - src/pages/shared/fixtures.ts — static story fixtures, not a component.
  *
  * Source scan, like the other story contract tests
  * (pagesStoryCategories.test.ts, pageStories.test.ts): the
@@ -136,8 +136,7 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches, s
 // shared row title/subtitle block CardRow / TextActionCardRow
 // compose (#587 phase 2), useVariantGlyphInk.ts is the shared
 // variant glyph ink hook Button / DropdownButton compose
-// (#587 phase 2), LoadingStatTiles.tsx is the shared loading
-// dummy-stat tiles StatBand / StatRow compose (#587 phase 2),
+// (#587 phase 2),
 // and PageFrame.tsx is
 // page-story scaffolding (the demo stories' phone-width frame,
 // relocated out of src/pages for #119) — none is a standalone
@@ -160,6 +159,9 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // flag for pages' web/native layout choice. Not a component.
   "platform.ts",
   "accessibility.ts",
+  // layout.ts (#746): the shared Row/Col/Spacer style resolver —
+  // not a component; exercised through the Row/Col/Spacer stories.
+  "layout.ts",
   "keyboardActivation.ts",
   "index.ts",
   "modalRegistry.ts",
@@ -167,7 +169,6 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "linkOverlay.tsx",
   "LabelRow.tsx",
   "RowTextContent.tsx",
-  "LoadingStatTiles.tsx",
   "useVariantGlyphInk.ts",
   // MediaRow / RatingStars (#119 tranche 4): internal widgets
   // composed by recipeRow (the shared recipe-row adapter) — NOT
@@ -182,6 +183,11 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // the components barrel, no story of its own (joined widgets
   // from views in #698; it was a views parity exception before).
   "FieldShell.tsx",
+  // FieldError.tsx (#804): the shared field-error rendering every
+  // form control composes — internal, not exported from the
+  // components barrel, no story of its own (exercised through the
+  // controls' WithError stories, like FieldShell).
+  "FieldError.tsx",
 ]);
 
 test("every widget component has a story file titled Widgets/<Name>", () => {
@@ -199,10 +205,22 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
     // Category subdirectories (#710): a category directory holds
     // its widgets one level down, with titles
     // Widgets/<Category>/<Name> and barrel specifiers
-    // ./<category>/<Name>.js. The directory name is the lowercase
-    // category; the title segment capitalizes it.
+    // ./<category>/<Name>.js. The directory name is a lowercase
+    // token; the title segment is the category's display name from
+    // the #710 plan's taxonomy (single-word categories just
+    // capitalize the directory name).
     if (entry.isDirectory()) {
-      const category = entry.name.charAt(0).toUpperCase() + entry.name.slice(1);
+      const CATEGORY_TITLES: Record<string, string> = {
+        actions: "Actions & Navigation",
+        content: "Content",
+        data: "Data Display",
+        feedback: "Feedback & Loading",
+        form: "Form",
+        layout: "Layout & Structure",
+        overlays: "Overlays & Disclosure",
+      };
+      const category =
+        CATEGORY_TITLES[entry.name] ?? entry.name.charAt(0).toUpperCase() + entry.name.slice(1);
       const subdir = join(dir, entry.name);
       for (const sub of readdirSync(subdir, { withFileTypes: true })) {
         assert.ok(
@@ -256,7 +274,7 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
   }
 });
 
-test("every view component has a story file titled Views/<Name>", () => {
+test("every view component has a story file titled Views/<App>/<Name>", () => {
   const dir = join(root, "src", "views");
   const index = read("src/views/index.ts");
   // useImeCompositionGuard.ts is an internal hook (the shared IME
@@ -285,31 +303,47 @@ test("every view component has a story file titled Views/<Name>", () => {
     "AuthFormSubmit.tsx",
     "SectionMutedText.tsx",
   ]);
+  // #710: views live in per-host-app subdirectories
+  // (src/views/<eciperay|memorize|shared>/), titled
+  // Views/<App>/<Name>; the parity scan walks each host directory
+  // in turn. The views root itself holds only the barrel and the
+  // aggregate voice/component tests.
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    assert.ok(
-      entry.isFile(),
-      `src/views/${entry.name}: unexpected directory — the parity scan is flat`,
-    );
-    if (
-      exceptions.has(entry.name) ||
-      entry.name.endsWith(".stories.tsx") ||
-      entry.name.endsWith(".test.ts") ||
-      entry.name.endsWith(".test.tsx") ||
-      entry.name.endsWith(".test.steps.md")
-    )
-      continue;
-    assert.ok(
-      entry.name.endsWith(".tsx"),
-      `src/views/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
-    );
-    const base = entry.name.replace(/\.tsx$/, "");
-    assertModuleStory({
-      dir,
-      index,
-      base,
-      titleDescription: `title "Views/${base}"`,
-      titleMatches: (t: any) => t === `Views/${base}`,
-    });
+    if (entry.isFile()) {
+      assert.ok(
+        entry.name === "index.ts" || entry.name.includes(".test."),
+        `src/views/${entry.name}: unexpected root file — views live in host-app subdirectories (#710)`,
+      );
+    }
+  }
+  for (const host of ["eciperay", "memorize", "shared"]) {
+    const hostDir = join(dir, host);
+    if (!existsSync(hostDir)) continue;
+    const hostTitle = host.charAt(0).toUpperCase() + host.slice(1);
+    for (const entry of readdirSync(hostDir, { withFileTypes: true })) {
+      assert.ok(entry.isFile(), `src/views/${host}/${entry.name}: unexpected directory`);
+      if (
+        exceptions.has(entry.name) ||
+        entry.name.endsWith(".stories.tsx") ||
+        entry.name.endsWith(".test.ts") ||
+        entry.name.endsWith(".test.tsx") ||
+        entry.name.endsWith(".test.steps.md")
+      )
+        continue;
+      assert.ok(
+        entry.name.endsWith(".tsx"),
+        `src/views/${host}/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
+      );
+      const base = entry.name.replace(/\.tsx$/, "");
+      assertModuleStory({
+        dir: hostDir,
+        index,
+        base,
+        specifier: `./${host}/${base}.js`,
+        titleDescription: `title "Views/${hostTitle}/${base}"`,
+        titleMatches: (t: any) => t === `Views/${hostTitle}/${base}`,
+      });
+    }
   }
 });
 
@@ -337,44 +371,57 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
     "PageFrame is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
   );
   assert.ok(
-    !index.includes('from "./BoundedList.js"'),
+    !index.includes('from "./shared/BoundedList.js"'),
     "BoundedList is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
   );
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    // The one expected directory: the colocated Android VR baselines
-    // (#530), pinned by test/visualRegressionScope.test.ts.
-    if (entry.name === "__snapshots__") continue;
-    assert.ok(
-      entry.isFile(),
-      `src/pages/${entry.name}: unexpected directory — the parity scan is flat`,
-    );
-    if (
-      exceptions.has(entry.name) ||
-      entry.name.endsWith(".stories.tsx") ||
-      entry.name.endsWith(".test.ts") ||
-      entry.name.endsWith(".test.tsx") ||
-      entry.name.endsWith(".test.steps.md")
-    )
-      continue;
-    assert.ok(
-      entry.name.endsWith(".tsx"),
-      `src/pages/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
-    );
-    const base = entry.name.replace(/\.tsx$/, "");
-    assertModuleStory({
-      dir,
-      index,
-      base,
-      titleDescription: `a Pages/<App>/${base} title (#70)`,
-      titleMatches: (t: any) => t === `Pages/Eciperay/${base}` || t === `Pages/Memorize/${base}`,
-    });
+  // #710: pages live in per-host-app subdirectories
+  // (src/pages/<eciperay|memorize|shared>/); the parity scan
+  // walks each host directory in turn.
+  for (const host of ["eciperay", "memorize", "shared"]) {
+    const hostDir = join(dir, host);
+    for (const entry of readdirSync(hostDir, { withFileTypes: true })) {
+      // The colocated Android VR baselines (#530), pinned by
+      // test/visualRegressionScope.test.ts.
+      if (entry.name === "__snapshots__") continue;
+      assert.ok(entry.isFile(), `src/pages/${host}/${entry.name}: unexpected directory`);
+      if (
+        exceptions.has(entry.name) ||
+        entry.name.endsWith(".stories.tsx") ||
+        entry.name.endsWith(".test.ts") ||
+        entry.name.endsWith(".test.tsx") ||
+        entry.name.endsWith(".test.steps.md")
+      )
+        continue;
+      assert.ok(
+        entry.name.endsWith(".tsx"),
+        `src/pages/${host}/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
+      );
+      const base = entry.name.replace(/\.tsx$/, "");
+      assertModuleStory({
+        dir: hostDir,
+        index,
+        base,
+        specifier: `./${host}/${base}.js`,
+        titleDescription: `a Pages/<App>/${base} title (#70)`,
+        titleMatches: (t: any) => t === `Pages/Eciperay/${base}` || t === `Pages/Memorize/${base}`,
+      });
+    }
   }
 });
 
 test("every story file is organized under Widgets/, Views/, or Pages/<App>/ and exports stories", () => {
   for (const area of ["widgets", "views", "pages"]) {
     const dir = join(root, "src", area);
-    for (const name of readdirSync(dir)) {
+    // #710: page stories live one level down, in the host-app dirs.
+    const names =
+      area === "pages" || area === "views"
+        ? ["eciperay", "memorize", "shared"].flatMap((host) =>
+            existsSync(join(dir, host))
+              ? readdirSync(join(dir, host)).map((name) => join(host, name))
+              : [],
+          )
+        : readdirSync(dir);
+    for (const name of names) {
       if (!name.endsWith(".stories.tsx")) continue;
       const story = readFileSync(join(dir, name), "utf8");
       const title = declaredTitle(story);

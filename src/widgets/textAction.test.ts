@@ -21,7 +21,7 @@
  *    callback.
  *
  * Source scan, like the other contract tests in this repo
- * (src/widgets/BackLink.test.ts): the invariant is a per-literal
+ * (src/widgets/actions/BackLink.test.ts): the invariant is a per-literal
  * property of the sources, and no JS renderer here performs the
  * web keyboard path. Comments are stripped before scanning so
  * prose cannot satisfy — or accidentally trip — the patterns.
@@ -40,12 +40,12 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const commentItem = readCode("src/widgets/CommentItem.tsx");
-const textActionCardRow = readCode("src/widgets/TextActionCardRow.tsx");
-const changedListBanner = readCode("src/widgets/ChangedListBanner.tsx");
-const revertAction = readCode("src/views/RevertAction.tsx");
-const aiSessionPage = readCode("src/pages/AiSessionPage.tsx");
-const tagsPage = readCode("src/pages/TagsPage.tsx");
+const commentItem = readCode("src/views/eciperay/CommentItem.tsx");
+const textActionCardRow = readCode("src/widgets/content/TextActionCardRow.tsx");
+const changedListBanner = readCode("src/widgets/feedback/ChangedListBanner.tsx");
+const revertAction = readCode("src/views/eciperay/RevertAction.tsx");
+const aiSessionPage = readCode("src/pages/eciperay/AiSessionPage.tsx");
+const tagsPage = readCode("src/pages/eciperay/TagsPage.tsx");
 const index = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
 
 test("TextAction is deleted: no file, no stories, no export (#464)", () => {
@@ -91,8 +91,14 @@ test("TagsPage's row actions render as ghost Buttons with their composed labels 
   // Since #709 the display row is inlined into TagsPage: its Edit
   // and Delete actions render directly as ghost Buttons, Delete
   // with the danger variant.
-  assert.match(tagsPage, /<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/);
-  assert.match(tagsPage, /<Button\s+ghost\s+size="sm"\s+variant="danger"\s+accessibilityLabel=\{`Delete tag \$\{tag\.name\}`\}/);
+  assert.match(
+    tagsPage,
+    /<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/,
+  );
+  assert.match(
+    tagsPage,
+    /<Button\s+ghost\s+size="sm"\s+variant="danger"\s+accessibilityLabel=\{`Delete tag \$\{tag\.name\}`\}/,
+  );
 });
 
 test("TagsPage's Edit and Delete row actions keep their composed labels (#709)", () => {

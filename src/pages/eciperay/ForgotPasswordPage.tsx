@@ -1,0 +1,77 @@
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { ForgotPasswordForm } from "../../views/eciperay/ForgotPasswordForm.js";
+import { Col } from "../../widgets/layout/Col.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
+import { Text } from "../../widgets/data/Text.js";
+import { useVoice } from "../../voice/index.js";
+
+/**
+ * ForgotPasswordPage (#126, B3c): the reset-request view —
+ * the split view half of Eciperay's `ForgotPasswordView` (the
+ * B2 audit's page-view disposition). The app screen keeps the
+ * reset-request mutation and navigation; this view renders
+ * the form and reports intents.
+ *
+ * The auth cluster's security rule (issue #126) applies: the
+ * email crosses as a controlled value + change callback,
+ * submission is a bare intent, and no credentials logic lives
+ * in the DS. The back link renders only when the host wires
+ * it, as in the app view.
+ *
+ * The form itself is ForgotPasswordForm (#119): the page
+ * composes the heading, the intro line, and the form as the
+ * screen's sections (the section Col's rhythm carries the
+ * separations the app view's title and intro spacing render),
+ * and the form owns the field, the submit handling, and the
+ * back link.
+ */
+
+export type ForgotPasswordPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
+  email: string;
+  onEmailChange: (value: string) => void;
+  loading?: boolean;
+  error?: string | null;
+  /** The host's field-level email validation error (#535):
+   * renders under the email field with the field's error
+   * styling, distinct from the form-level `error` alert. */
+  emailError?: string | null;
+  onSubmit: () => void;
+  /** The sign-in destination (#248: navigation crosses as an
+   * href, not a press callback); the "Back to sign in" link
+   * renders only when the href is provided. */
+  signInHref?: string;
+};
+
+export function ForgotPasswordPage({
+  email,
+  onEmailChange,
+  loading = false,
+  error,
+  emailError,
+  onSubmit,
+  signInHref,
+  footer,
+}: ForgotPasswordPageProps) {
+  const voice = useVoice();
+  return (
+    <BigFooterShell footer={footer}>
+      <ScreenContainer variant="auth">
+        <Col gap="xxl">
+          <Text variant="heading">{voice.forgotPasswordPage.heading}</Text>
+          <Text variant="muted">{voice.forgotPasswordPage.description}</Text>
+          <ForgotPasswordForm
+            email={email}
+            onEmailChange={onEmailChange}
+            loading={loading}
+            error={error}
+            emailError={emailError}
+            onSubmit={onSubmit}
+            signInHref={signInHref}
+          />
+        </Col>
+      </ScreenContainer>
+    </BigFooterShell>
+  );
+}

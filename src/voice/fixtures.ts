@@ -5,7 +5,7 @@ import type { Voice } from "./Voice.js";
  *
  * The DS ships no default strings; this complete fixture object
  * exists so stories can render, under the same determinism rules as
- * src/pages/fixtures.ts. Its type is Voice, so a missing slot is a
+ * src/pages/shared/fixtures.ts. Its type is Voice, so a missing slot is a
  * compile error — that is the parity gate for the fixture.
  *
  * The strings here are neutral placeholder copy for Storybook, not
@@ -426,5 +426,9 @@ function pseudoLocalizeVoice(voice: Voice): Voice {
  * The en-XA pseudo-locale fixture voice (#539): every slot of the
  * fixture voice pseudo-localized, so any string NOT supplied through
  * the voice object shows up untransformed in a Storybook pass.
+ *
+ * Consumed at runtime from the built dist by Voice.test.ts and
+ * PseudoLocale.test.tsx (dynamic dist imports knip cannot trace) —
+ * listed as a knip entry in knip.json for that reason.
  */
 export const fixtureVoicePseudoLocale: Voice = pseudoLocalizeVoice(fixtureVoice);

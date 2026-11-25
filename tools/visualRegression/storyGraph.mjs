@@ -117,7 +117,7 @@ function extractSpecifiers(text) {
 
 const RESOLVE_EXTS = [".ts", ".tsx", ".js", ".jsx", ".json"];
 
-// Resolve a relative specifier ("../widgets/Button.js") to a
+// Resolve a relative specifier ("../widgets/actions/Button.js") to a
 // graph node, mirroring the bundler: strip the source extension,
 // then try file extensions and directory indexes in order. Returns
 // null for external packages and unresolvable paths.

@@ -24,7 +24,7 @@
  *   Button; the page has no stack pressable left — pinned below.)
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
- *   generic CardRow / ListRow components; the routing moved with
+ *   generic CardRow / ListItem components; the routing moved with
  *   them and the rows test below pins it there. AiSessionPage's
  *   Cancel action was in this list until the #119 ai-import
  *   tranche composed it inline as a text action — since #464 it
@@ -165,11 +165,11 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 // Every page that once routed stack pressables through the
 // translator has been de-styled off this list by the #119
 // tranches: ShoppingListPage (its row is CheckboxField's list shape),
-// MealDetailPage (its rows are ListRow), MealsHubPage
+// MealDetailPage (its rows are ListItem), MealsHubPage
 // (TextActionCardRow), MealCookingModePage (its Done pill is
 // StepOverlay's), AiSessionPage (its Cancel control is a
 // ghost Button), RecipeFormPage and the plan pages
-// (CardRow / ListRow; RevertAction / ChangedListBanner), and
+// (CardRow / ListItem; RevertAction / ChangedListBanner), and
 // RecipeDetailPage (its rows/steps through MarkableRow /
 // StepList). The list is empty; the dedicated test below pins
 // all of them translator-free.
@@ -200,7 +200,7 @@ test("page-level stack pressables route through the translator, never raw RN JSX
   }
 });
 test("CheckboxField list shape (ShoppingListPage's row) composes its accessible name from label + detail (#713)", () => {
-  const code = readCode("src/widgets/CheckboxField.tsx");
+  const code = readCode("src/widgets/form/CheckboxField.tsx");
   assert.match(
     code,
     /const accessibleName = detail \? `\$\{label\}, \$\{detail\}` : label;/,
@@ -221,7 +221,7 @@ test("the de-styled pages have no stack pressable left to translate (#237, #248,
     "MealPlansPage,MealPlanDetailPage,AiSessionPage,RecipeFormPage,ShoppingListPage,MealDetailPage,MealsHubPage,MealCookingModePage,RecipeDetailPage".split(
       ",",
     );
-  for (const rel of PAGES.map((page) => `src/pages/${page}.tsx`)) {
+  for (const rel of PAGES.map((page) => `src/pages/eciperay/${page}.tsx`)) {
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
     assert.ok(
@@ -232,11 +232,11 @@ test("the de-styled pages have no stack pressable left to translate (#237, #248,
 });
 test("rows translate the disabled state; the generic rows keep the button role in their press form (#237, #248)", () => {
   // MealDetailPage's member rows are links since #248 and render
-  // through ListRow since the #119 meals tranche: the disabled
+  // through ListItem since the #119 meals tranche: the disabled
   // routing lives in the row, not the page. The plan pages' rows
-  // moved into the generic ListRow / CardRow components (#119
+  // moved into the generic ListItem / CardRow components (#119
   // tranche 2) and the routing moved with them: their press
-  // forms carry the button role, ListRow also translates its
+  // forms carry the button role, ListItem also translates its
   // disabled state, and CardRow has no disabled state.
   // RecipeFormPage's revert pressables (RevertAction /
   // ChangedListBanner, #119 forms tranche) carry no row here:
@@ -246,8 +246,8 @@ test("rows translate the disabled state; the generic rows keep the button role i
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases: [string, RegExp, RegExp | null][] = [
-    ["src/widgets/ListRow.tsx", ROLE, DISABLED],
-    ["src/widgets/CardRow.tsx", ROLE, null],
+    ["src/widgets/data/ListItem.tsx", ROLE, DISABLED],
+    ["src/widgets/layout/CardRow.tsx", ROLE, null],
   ];
   for (const [rel, role, disabled] of cases) {
     const code = readCode(rel);
@@ -261,16 +261,16 @@ test("rows translate the disabled state; the generic rows keep the button role i
       assert.match(code, disabled, `${rel}: the disabled state must go through the translator`);
   }
   assert.doesNotMatch(
-    readCode("src/pages/MealDetailPage.tsx"),
+    readCode("src/pages/eciperay/MealDetailPage.tsx"),
     ROLE,
     "MealDetailPage's rows are links (#248) — no button role may come back through the translator",
   );
 });
 test("ChecklistRow's Checkbox and ProgressBar's Progress route through the translator (#237)", () => {
-  const checklist = readCode("src/widgets/ChecklistRow.tsx");
+  const checklist = readCode("src/widgets/data/ChecklistRow.tsx");
   assert.match(checklist, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
   assert.ok(!/accessibility(Label|State|Role|Value)=/.test(checklist));
-  const progress = readCode("src/widgets/ProgressBar.tsx");
+  const progress = readCode("src/widgets/feedback/ProgressBar.tsx");
   assert.match(progress, /platformAccessibilityProps\(\{/);
   assert.match(progress, /accessibilityRole: accessibilityRole \?\? "progressbar"/);
   assert.match(progress, /accessibilityValue: accessibilityValue \?\? \{ min: 0, max: 100, now:/);
@@ -284,15 +284,16 @@ test("ChecklistRow's Checkbox and ProgressBar's Progress route through the trans
 test("field/primitive wrappers destructure caller RN props out of rest and translate them (#237)", () => {
   // Compact split form: this file sits at the max-lines cap.
   const wrappers =
-    "src/widgets/form/TextField.tsx,src/widgets/form/TextAreaField.tsx,src/widgets/CheckboxField.tsx,src/widgets/TextLink.tsx,src/widgets/OptionCard.tsx,src/widgets/Alert.tsx".split(
+    "src/widgets/form/TextField.tsx,src/widgets/form/TextAreaField.tsx,src/widgets/form/CheckboxField.tsx,src/widgets/actions/TextLink.tsx,src/widgets/content/OptionCard.tsx,src/widgets/feedback/Alert.tsx".split(
       ",",
     );
   for (const rel of wrappers) {
     // TextField/TextAreaField route through the shared
     // useFieldA11y hook since #587 phase 3 — the translator call
     // lives there, so scan the field and the hook together.
-    const isField = rel === "src/widgets/form/TextField.tsx" || rel === "src/widgets/form/TextAreaField.tsx";
-    const code = isField ? readCode(rel) + readCode("src/views/useFieldA11y.ts") : readCode(rel);
+    const isField =
+      rel === "src/widgets/form/TextField.tsx" || rel === "src/widgets/form/TextAreaField.tsx";
+    const code = isField ? readCode(rel) + readCode("src/views/shared/useFieldA11y.ts") : readCode(rel);
     // One needle per routing requirement: build a11yProps via the
     // translator, spread them onto the element, and destructure
     // the caller's accessibilityLabel out of rest. For the two
@@ -307,12 +308,12 @@ test("field/primitive wrappers destructure caller RN props out of rest and trans
       assert.ok(code.includes(needle), `${rel} must satisfy the translator routing (${needle})`);
   }
   assert.ok(
-    readCode("src/views/useFieldA11y.ts").includes("platformAccessibilityProps("),
+    readCode("src/views/shared/useFieldA11y.ts").includes("platformAccessibilityProps("),
     "useFieldA11y must build the fields' a11yProps via the translator",
   );
-  const backLink = readCode("src/widgets/BackLink.tsx");
+  const backLink = readCode("src/widgets/actions/BackLink.tsx");
   assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
-  const alert = readCode("src/widgets/Alert.tsx");
+  const alert = readCode("src/widgets/feedback/Alert.tsx");
   assert.match(alert, /platformAccessibilityProps\(\{ accessibilityRole: "alert" \}\)/);
 });
 

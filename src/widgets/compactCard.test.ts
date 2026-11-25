@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
-const source = readFileSync(join(root, "src", "widgets", "Card.tsx"), "utf8");
+const source = readFileSync(join(root, "src", "widgets", "layout", "Card.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("CompactCard is gone — the treatment lives on Card as a variant", async () => {
@@ -45,16 +45,24 @@ test("CompactCard is gone — the treatment lives on Card as a variant", async (
 });
 
 test("the compact variant: surface, medium radius, 12px padding, small shadow, no border", () => {
+  // #746 (Option B): the variant treatments are style props the
+  // Card's Col root receives — the compact entry carries the
+  // border, radius, and shadow; the 12px padding is Col's p "m",
+  // applied at the render site.
   assert.match(
     code,
-    /compact: \{\s+borderWidth: 0,\s+borderRadius: tokens\.radii\.md,\s+padding: tokens\.spacing\[3\],\s+shadowColor: tokens\.shadows\.sm\.shadowColor,/,
+    /compact: \{\s+borderWidth: 0,\s+borderRadius: tokens\.radii\.md,\s+shadowColor: tokens\.shadows\.sm\.shadowColor,/,
   );
   assert.match(code, /shadowRadius: tokens\.shadows\.sm\.shadowRadius,/);
-  assert.match(code, /variant\?: "default" \| "bordered" \| "muted" \| "elevated" \| "compact";/);
+  assert.match(code, /p=\{resolvedVariant === "compact" \? "m" : "l"\}/);
+  assert.match(
+    code,
+    /type CardVariant = "default" \| "bordered" \| "muted" \| "elevated" \| "compact";/,
+  );
 });
 
 test("the treatment's consumers compose Card's compact variant", () => {
-  const tagsPage = readFileSync(join(root, "src", "pages", "TagsPage.tsx"), "utf8");
+  const tagsPage = readFileSync(join(root, "src", "pages", "eciperay", "TagsPage.tsx"), "utf8");
   // Editor and display rows both render a compact Card keyed by
   // the tag; scope this pin to the display branch (the compact
   // Card whose TrailingActionsRow leads with the tag's Badge) so

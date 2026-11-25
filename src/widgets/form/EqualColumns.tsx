@@ -1,7 +1,7 @@
 import { Children } from "react";
 import type { ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 
 export type EqualColumnsProps = {
   /** The children, one per column — any content: fields, cards, stats, actions. */
@@ -22,10 +22,14 @@ export type EqualColumnsProps = {
  */
 export function EqualColumns({ children }: EqualColumnsProps) {
   return (
-    <XStack gap={tokens.spacing[3]}>
+    <Row gap="m">
       {Children.map(children, (child) =>
-        child == null || typeof child === "boolean" ? null : <YStack flex={1}>{child}</YStack>,
+        child == null || typeof child === "boolean" ? null : (
+          <Col grow shrink>
+            {child}
+          </Col>
+        ),
       )}
-    </XStack>
+    </Row>
   );
 }

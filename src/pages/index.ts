@@ -17,18 +17,20 @@ export {
   type RecipesPageProps,
   type RecipesPageCookLogForm,
   type RecipesPageCookLogFormValues,
-} from "./RecipesPage.js";
+} from "./eciperay/RecipesPage.js";
 export {
-  DiscoverPage,
-  type DiscoverPageFilterId,
-  type DiscoverPageItem,
-  type DiscoverPageProps,
-} from "./DiscoverPage.js";
-export { MealPlansPage, type MealPlansPageItem, type MealPlansPageProps } from "./MealPlansPage.js";
+  MealPlansPage,
+  type MealPlansPageItem,
+  type MealPlansPageProps,
+} from "./eciperay/MealPlansPage.js";
 export {
   RecipeDetailPage,
   type RecipeDetailPageProps,
   type RecipeDetailPageReadyProps,
+  type RecipeDetailPageOwnerReadyProps,
+  type RecipeDetailPageGuestReadyProps,
+  type RecipeDetailPageGuestOverviewProps,
+  type RecipeDetailPageCtas,
   type RecipeDetailPageVersion,
   type RecipeDetailPageTag,
   type RecipeDetailPageLifecycle,
@@ -52,7 +54,7 @@ export {
   type RecipeDetailPageConfirmation,
   type RecipeDetailPageCookLogForm,
   type RecipeDetailPageCookLogFormValues,
-} from "./RecipeDetailPage.js";
+} from "./eciperay/RecipeDetailPage.js";
 export {
   MealPlanDetailPage,
   type MealPlanDetailPageDay,
@@ -62,73 +64,59 @@ export {
   type MealPlanDetailPageWeekView,
   type MealPlanDetailPageWeeklyTotals,
   type MealPlanDetailPageWeeklyTotalsRow,
-} from "./MealPlanDetailPage.js";
-export {
-  PublicRecipePage,
-  type PublicRecipePageProps,
-  type PublicRecipePageReadyProps,
-  type PublicRecipePageOverviewProps,
-  type PublicRecipePageCtas,
-  type PublicRecipePageTag,
-  type PublicRecipePageRatings,
-  type PublicRecipePageCommunityRating,
-  type PublicRecipePageViewerRating,
-  type PublicRecipePageIngredientsProps,
-  type PublicRecipePageIngredient,
-  type PublicRecipePageSubstitution,
-  type PublicRecipePageInstructionsProps,
-  type PublicRecipePageInstruction,
-  type PublicRecipePageComments,
-} from "./PublicRecipePage.js";
+} from "./eciperay/MealPlanDetailPage.js";
 export {
   TabbedShellPage,
   type TabbedShellPageLinkTab,
   type TabbedShellPageProps,
   type TabbedShellPageTab,
-} from "./TabbedShellPage.js";
+} from "./memorize/TabbedShellPage.js";
 export {
   AppShellPage,
   type AppShellPageAction,
   type AppShellPageNavItem,
   type AppShellPageProps,
   type AppShellPageSearch,
-} from "./AppShellPage.js";
+} from "./eciperay/AppShellPage.js";
 export {
   MemorizeReviewPage,
   type MemorizeReviewPageProps,
   type MemorizeReviewPageVerse,
-} from "./MemorizeReviewPage.js";
+} from "./memorize/MemorizeReviewPage.js";
 export {
   VerseSearchPage,
   type VerseSearchPageItem,
   type VerseSearchPageProps,
-} from "./VerseSearchPage.js";
+} from "./memorize/VerseSearchPage.js";
 export {
   MyVersesPage,
   type MyVersesPageItem,
   type MyVersesPageProps,
   type MyVersesPageStatus,
-} from "./MyVersesPage.js";
+} from "./memorize/MyVersesPage.js";
 export {
   MemorizationSessionPage,
   type MemorizationSessionPageProps,
   type MemorizationSessionPageReadyProps,
   type MemorizationSessionPageWord,
-} from "./MemorizationSessionPage.js";
-export { MemorizeSettingsPage, type MemorizeSettingsPageProps } from "./MemorizeSettingsPage.js";
+} from "./memorize/MemorizationSessionPage.js";
+export {
+  MemorizeSettingsPage,
+  type MemorizeSettingsPageProps,
+} from "./memorize/MemorizeSettingsPage.js";
 export {
   RecipeFormPage,
   type RecipeFormPageProps,
   type RecipeFormPageField,
   type RecipeFormPageOption,
-} from "./RecipeFormPage.js";
-export { EditRecipePage } from "./EditRecipePage.js";
-export { ManualEntryPage } from "./ManualEntryPage.js";
-export { EditVersionPage, type EditVersionPageProps } from "./EditVersionPage.js";
-export { SignInPage, type SignInPageProps } from "./SignInPage.js";
-export { SignUpPage, type SignUpPageProps } from "./SignUpPage.js";
-export { ForgotPasswordPage, type ForgotPasswordPageProps } from "./ForgotPasswordPage.js";
-export { ResetPasswordPage, type ResetPasswordPageProps } from "./ResetPasswordPage.js";
+} from "./eciperay/RecipeFormPage.js";
+export { EditRecipePage } from "./eciperay/EditRecipePage.js";
+export { ManualEntryPage } from "./eciperay/ManualEntryPage.js";
+export { EditVersionPage, type EditVersionPageProps } from "./eciperay/EditVersionPage.js";
+export { SignInPage, type SignInPageProps } from "./eciperay/SignInPage.js";
+export { SignUpPage, type SignUpPageProps } from "./eciperay/SignUpPage.js";
+export { ForgotPasswordPage, type ForgotPasswordPageProps } from "./eciperay/ForgotPasswordPage.js";
+export { ResetPasswordPage, type ResetPasswordPageProps } from "./eciperay/ResetPasswordPage.js";
 export {
   ProfilePage,
   type ProfilePageProps,
@@ -137,88 +125,91 @@ export {
   type ProfilePageTransfer,
   type ProfilePageFeedbackPreference,
   type ProfilePageLegalLink,
-} from "./ProfilePage.js";
-export { ImportTextPage, type ImportTextPageProps } from "./ImportTextPage.js";
-export { ImportUrlPage, type ImportUrlPageProps } from "./ImportUrlPage.js";
-export { ImportImagePage, type ImportImagePageProps } from "./ImportImagePage.js";
-export { ImportReviewPage, type ImportReviewPageProps } from "./ImportReviewPage.js";
-export { HomePage, type HomePageProps, type HomePageRecipe } from "./HomePage.js";
+} from "./eciperay/ProfilePage.js";
+export { ImportTextPage, type ImportTextPageProps } from "./eciperay/ImportTextPage.js";
+export { ImportUrlPage, type ImportUrlPageProps } from "./eciperay/ImportUrlPage.js";
+export { ImportImagePage, type ImportImagePageProps } from "./eciperay/ImportImagePage.js";
+export { ImportReviewPage, type ImportReviewPageProps } from "./eciperay/ImportReviewPage.js";
+export { HomePage, type HomePageProps, type HomePageRecipe } from "./eciperay/HomePage.js";
 export {
   LandingPage,
   type LandingPageProps,
   type LandingPageCta,
   type LandingPageFeature,
-} from "./LandingPage.js";
+} from "./eciperay/LandingPage.js";
 export {
   TagsPage,
   type TagsPageOperationResult,
   type TagsPageProps,
   type TagsPageTag,
-} from "./TagsPage.js";
-export { FeedbackPage, type FeedbackPageProps } from "./FeedbackPage.js";
+} from "./eciperay/TagsPage.js";
+export { FeedbackPage, type FeedbackPageProps } from "./eciperay/FeedbackPage.js";
 export {
   AddRecipeMenuPage,
   type AddRecipeMenuPageProps,
   type AddRecipeMenuPageOption,
-} from "./AddRecipeMenuPage.js";
+} from "./eciperay/AddRecipeMenuPage.js";
 export {
   AiSessionPage,
   type AiSessionPageProps,
   type AiSessionPageConfig,
   type AiSessionPageMessage,
   type AiSessionPageSession,
-} from "./AiSessionPage.js";
+} from "./eciperay/AiSessionPage.js";
 export {
   MealFormPage,
   type MealFormPageProps,
   type MealFormPageRecipeOption,
-} from "./MealFormPage.js";
+} from "./eciperay/MealFormPage.js";
 export {
   MealPlanFormPage,
   type MealPlanFormPageProps,
   type MealPlanFormPageEntryOption,
-} from "./MealPlanFormPage.js";
+} from "./eciperay/MealPlanFormPage.js";
 export {
   ShoppingListPage,
   type ShoppingListPageProps,
   type ShoppingListPageLine,
-} from "./ShoppingListPage.js";
+} from "./eciperay/ShoppingListPage.js";
 export {
   MealCookingModePage,
   type MealCookingModePageErrorProps,
   type MealCookingModePageProps,
   type MealCookingModePageReadyProps,
   type MealCookingModePageStep,
-} from "./MealCookingModePage.js";
+} from "./eciperay/MealCookingModePage.js";
 export {
   CookingModePage,
   type CookingModePageProps,
   type CookingModePageStep,
   type CookingModePageIngredients,
-} from "./CookingModePage.js";
-export { PayPage, type PayPageProps, type PayPageStatus } from "./PayPage.js";
+} from "./eciperay/CookingModePage.js";
+export { PayPage, type PayPageProps, type PayPageStatus } from "./eciperay/PayPage.js";
 export {
   ConsentPreferencesPage,
   type ConsentPreferencesPageProps,
   type ConsentPreferencesPageChoice,
-} from "./ConsentPreferencesPage.js";
-export { AuthConfirmationPage, type AuthConfirmationPageProps } from "./AuthConfirmationPage.js";
+} from "./eciperay/ConsentPreferencesPage.js";
+export {
+  AuthConfirmationPage,
+  type AuthConfirmationPageProps,
+} from "./eciperay/AuthConfirmationPage.js";
 export {
   RouteErrorPage,
   type RouteErrorPageProps,
   type RouteErrorPageVariant,
-} from "./RouteErrorPage.js";
+} from "./eciperay/RouteErrorPage.js";
 export {
   MealDetailPage,
   type MealDetailPageProps,
   type MealDetailPageMember,
-} from "./MealDetailPage.js";
+} from "./eciperay/MealDetailPage.js";
 export {
   MealsHubPage,
   type MealsHubPageProps,
   type MealsHubPageMeal,
   type MealsHubPageTab,
-} from "./MealsHubPage.js";
+} from "./eciperay/MealsHubPage.js";
 export {
   LegalDocumentPage,
   type LegalDocumentPageProps,
@@ -226,7 +217,7 @@ export {
   type LegalDocumentBlock,
   type LegalDocumentSpan,
   type LegalDocumentLink,
-} from "./LegalDocumentPage.js";
+} from "./eciperay/LegalDocumentPage.js";
 
 // BigFooter (#410): the footer data types are part of the public
 // page contract — hosts supply one footer object per page through
@@ -241,4 +232,4 @@ export {
   type BigFooterSocialLink,
   type BigFooterStore,
   type BigFooterStoreLink,
-} from "../widgets/BigFooter.js";
+} from "../widgets/content/BigFooter.js";

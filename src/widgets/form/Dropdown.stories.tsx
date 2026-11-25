@@ -4,10 +4,10 @@ import { View, XStack, YStack } from "tamagui";
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Button } from "../Button.js";
+import { Button } from "../actions/Button.js";
 import { Dropdown, useDropdownClose } from "./Dropdown.js";
 import { DropdownButton } from "./DropdownButton.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof Dropdown> = {
   title: "Widgets/Form/Dropdown",

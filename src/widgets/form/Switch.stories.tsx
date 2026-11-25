@@ -9,6 +9,7 @@ const meta: Meta<typeof Switch> = {
     label: { control: "text" },
     description: { control: "text" },
     checked: { control: "boolean" },
+    disabled: { control: "boolean" },
   },
 };
 
@@ -37,4 +38,20 @@ export const On: Story = {
 
 export const WithoutDescription: Story = {
   render: () => <SwitchDemo checked={false} label="Dark mode" />,
+};
+
+export const Disabled: Story = {
+  render: () => (
+    <SwitchDemo checked={true} disabled description="Get a reminder when verses are due." />
+  ),
+};
+
+export const WithError: Story = {
+  render: () => (
+    <SwitchDemo
+      checked={false}
+      description="Get a reminder when verses are due."
+      error="Choose whether to get reminders."
+    />
+  ),
 };

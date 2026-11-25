@@ -3,7 +3,7 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { Dropdown } from "./Dropdown.js";
 import { DropdownButton } from "./DropdownButton.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof DropdownButton> = {
   title: "Widgets/Form/DropdownButton",

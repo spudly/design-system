@@ -48,7 +48,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 const textField = readCode("src/widgets/form/TextField.tsx");
-const mealPlanFormPage = readCode("src/pages/MealPlanFormPage.tsx");
+const mealPlanFormPage = readCode("src/pages/eciperay/MealPlanFormPage.tsx");
 const noop = () => null;
 function mealPlanFormProps() {
   return {
@@ -115,7 +115,7 @@ function loadRuntime() {
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const { MealPlanFormPage }: Record<string, any> =
-      await import("../dist/pages/MealPlanFormPage.js");
+      await import("../dist/pages/eciperay/MealPlanFormPage.js");
     const voiceFixtures: Record<string, any> = await import("../dist/voice/fixtures.js");
     const voiceModule: Record<string, any> = await import("../dist/voice/index.js");
     return {

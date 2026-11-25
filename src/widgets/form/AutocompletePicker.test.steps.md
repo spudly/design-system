@@ -1,7 +1,7 @@
 ---
 component: AutocompletePicker
 run_when:
-  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/form/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
+  - "src/pages/eciperay/RecipeFormPage.tsx, src/pages/eciperay/MealFormPage.tsx, src/pages/eciperay/MealPlanFormPage.tsx, src/widgets/form/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
   - "src/widgets/form/AutocompletePicker.tsx, its stories, or a changeset naming AutocompletePicker."
 ---
 
@@ -37,8 +37,9 @@ Default, NoSelection, SaveError. Open in
 4. MealFormPage Default: the meal-title heading, fields, the
    recipe search autocomplete (#383) — the search field (opened
    mid-search, "peppers") with the matching recipe as a result
-   row carrying its servings, the selected recipes as a
-   removable list, and a servings stepper per selected recipe;
+   row carrying its servings, the selected recipes as removable
+   Badge chips inside the field, and a servings stepper per
+   selected recipe;
    selecting the result adds it and the picker stays available
    to add more, Remove drops a selected recipe, and a search
    with no matches shows "No recipes found." NoSelection
@@ -51,8 +52,8 @@ Default, NoSelection, SaveError. Open in
    entry in their own field stacks; NoSelection disables Save
    plan.
 
-**Run when:** `src/pages/RecipeFormPage.tsx`,
-`src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
+**Run when:** `src/pages/eciperay/RecipeFormPage.tsx`,
+`src/pages/eciperay/MealFormPage.tsx`, `src/pages/eciperay/MealPlanFormPage.tsx`,
 `src/widgets/form/AutocompletePicker.tsx`, their stories, or a
 changeset naming any of the three pages or
 AutocompletePicker. Run only the numbered cases for the
@@ -62,15 +63,18 @@ runs only the autocomplete portions of cases 4 and 5.
 ## AutocompletePicker
 
 Open in `Widgets/Form/AutocompletePicker`: WithResults,
-NoSelection, Searching, NoResults.
+WithSelection, NoSelection, Searching, NoResults.
 
 1. WithResults: the search field (opened mid-search,
    "peppers") sits over the matching result row with its
    "6 servings" detail, and the already-selected recipe
-   renders below as a row with a Remove action; pressing the
-   result adds it to the selected list and the picker stays
-   available to add more, and an already-selected result is
-   not offered again.
+   renders as a removable Badge chip INSIDE the field frame,
+   sharing it with the search input — no selected-items list
+   renders below the field. Pressing the result adds it as
+   another in-field chip and the picker stays available to
+   add more, an already-selected result is not offered
+   again, and a chip's × removes that item and returns focus
+   to the search input.
 2. Searching: a spinner replaces the results while the
    search is in flight — no stale result is selectable. Do
    not judge this by the chicken result: the story starts
@@ -80,8 +84,10 @@ NoSelection, Searching, NoResults.
    instead and confirm its unselected result (Classic
    Stuffed Peppers) is not offered while searching.
 3. NoResults: a fruitless search shows "No results found."
-   NoSelection: no selected list renders, and the empty
-   search field shows no result area at all.
+   NoSelection: no chips render in the field, and the empty
+   search field shows no result area at all. WithSelection:
+   three chips wrap inside the field frame beside the search
+   input, each with its own × remove control.
 
 **Run when:** `src/widgets/form/AutocompletePicker.tsx`, its
 stories, or a changeset naming AutocompletePicker.

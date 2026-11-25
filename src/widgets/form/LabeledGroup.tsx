@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
-import { LabelRow } from "../LabelRow.js";
+import { LabelRow } from "../data/LabelRow.js";
 
 export type LabeledGroupProps = {
   /** The group's label, rendered in the FieldLabel treatment. */
@@ -39,11 +39,11 @@ export type LabeledGroupProps = {
  */
 export function LabeledGroup({ label, fieldId, action, children }: LabeledGroupProps) {
   return (
-    <YStack>
+    <Col>
       <LabelRow label={label} action={action} separation={2} htmlFor={fieldId} />
-      <YStack {...groupRoleProps} {...platformAccessibilityProps({ accessibilityLabel: label })}>
+      <Col {...groupRoleProps} {...platformAccessibilityProps({ accessibilityLabel: label })}>
         {children}
-      </YStack>
-    </YStack>
+      </Col>
+    </Col>
   );
 }

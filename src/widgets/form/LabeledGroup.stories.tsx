@@ -1,10 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { Button } from "../Button.js";
-import { ButtonRow } from "../ButtonRow.js";
+import { Button } from "../actions/Button.js";
+import { ButtonRow } from "../actions/ButtonRow.js";
 import { LabeledGroup } from "./LabeledGroup.js";
-import { RevertAction } from "../../views/RevertAction.js";
+import { RevertAction } from "../../views/eciperay/RevertAction.js";
 
 const meta: Meta<typeof LabeledGroup> = {
   title: "Widgets/Form/LabeledGroup",

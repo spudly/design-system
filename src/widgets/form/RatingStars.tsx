@@ -1,7 +1,8 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const STAR_STEPS = [1, 2, 3, 4, 5] as const;
 
@@ -62,11 +63,11 @@ export function RatingStars(props: RatingStarsProps) {
     // Touch-target geometry for the pressable form: a ≥44dp
     // target centering its glyphs (the StarRatingInput
     // precedent).
-    <YStack
+    <Col
+      center
+      middle
       minWidth={44}
       minHeight={44}
-      alignItems="center"
-      justifyContent="center"
       cursor="pointer"
       onPress={handlePress}
       tabIndex={0}
@@ -83,7 +84,7 @@ export function RatingStars(props: RatingStarsProps) {
           ★
         </Text>
       )}
-    </YStack>
+    </Col>
   );
 }
 
@@ -94,7 +95,7 @@ function RatingStarRow({ rating }: { rating?: number | null | undefined }) {
       ? Math.min(5, Math.max(1, Math.round(rating)))
       : 0;
   return (
-    <XStack gap={tokens.spacing[1]} alignItems="center">
+    <Row gap="xs" middle>
       {STAR_STEPS.map((star) => (
         <Text
           key={star}
@@ -106,6 +107,6 @@ function RatingStarRow({ rating }: { rating?: number | null | undefined }) {
           ★
         </Text>
       ))}
-    </XStack>
+    </Row>
   );
 }

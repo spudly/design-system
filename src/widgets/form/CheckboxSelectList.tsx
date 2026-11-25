@@ -1,12 +1,15 @@
-import { View, XStack, YStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
-import { CheckboxField } from "../CheckboxField.js";
+import { View } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { CheckboxField } from "./CheckboxField.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { BoxSkeleton } from "../BoxSkeleton.js";
-import { EmptyState } from "../EmptyState.js";
+import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
+import { EmptyState } from "../../views/shared/EmptyState.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 import { useVoice } from "../../voice/index.js";
+import { useId } from "react";
+import { FieldError } from "./FieldError.js";
 
 type CheckboxSelectItem = {
   id: string;
@@ -23,6 +26,14 @@ export type CheckboxSelectListProps = {
   loading?: boolean;
   /** Shown through EmptyState when there are no items. */
   emptyMessage?: string;
+  /**
+   * Validation error for the selection as a whole (#804):
+   * rendered below the list through the shared FieldError (an
+   * Alert); the list group carries `aria-invalid` /
+   * `aria-describedby` pointing at it.
+   */
+  error?: string;
+  id?: string;
 };
 
 // The loading list's dummy rows (#278): exactly 3 placeholder
@@ -60,7 +71,12 @@ export function CheckboxSelectList({
   disabled = false,
   loading = false,
   emptyMessage,
+  error,
+  id: idProp,
 }: CheckboxSelectListProps) {
+  const autoId = useId();
+  const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
   const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
@@ -69,28 +85,37 @@ export function CheckboxSelectList({
     // known yet.
     const rowKeys = items.length > 0 ? items.map((item) => item.id) : LOADING_ROW_KEYS;
     return (
-      <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+      <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
         <LoadingScope active>
           {rowKeys.map((key) => (
-            <XStack key={key} alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+            <Row key={key} middle gap="m" minHeight={44}>
               <View width={44} height={44} alignItems="center" justifyContent="center">
                 <BoxSkeleton width={24} height={24} />
               </View>
-              <YStack flex={1}>
+              <Col grow shrink>
                 <TextSkeleton size="md" lines={1} />
-              </YStack>
-            </XStack>
+              </Col>
+            </Row>
           ))}
         </LoadingScope>
-      </YStack>
+      </Col>
     );
   }
   if (items.length === 0) {
-    return <EmptyState title={emptyMessage ?? voice.checkboxSelectList.emptyMessage} />;
+    return (
+      <Col gap="xs">
+        <EmptyState title={emptyMessage ?? voice.checkboxSelectList.emptyMessage} />
+        {error ? <FieldError error={error} id={errorId} /> : null}
+      </Col>
+    );
   }
   const selected = new Set(selectedIds);
   return (
-    <YStack>
+    <Col
+      gap="xs"
+      aria-invalid={error ? true : undefined}
+      aria-describedby={error ? errorId : undefined}
+    >
       {items.map((item) => (
         <CheckboxField
           key={item.id}
@@ -102,6 +127,7 @@ export function CheckboxSelectList({
           disabled={disabled}
         />
       ))}
-    </YStack>
+      {error ? <FieldError error={error} id={errorId} /> : null}
+    </Col>
   );
 }

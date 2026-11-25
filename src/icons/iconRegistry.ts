@@ -4,7 +4,9 @@ import { FeedbackIcon } from "./FeedbackIcon.js";
 import { HelpIcon } from "./HelpIcon.js";
 import { HomeIcon } from "./HomeIcon.js";
 import type { IconComponentProps } from "./Icon.js";
+import { ListIcon } from "./ListIcon.js";
 import { MealsIcon } from "./MealsIcon.js";
+import { MoreIcon } from "./MoreIcon.js";
 import { PrintIcon } from "./PrintIcon.js";
 import { ProfileIcon } from "./ProfileIcon.js";
 import { RecipesIcon } from "./RecipesIcon.js";
@@ -39,15 +41,20 @@ import { WarningIcon } from "./WarningIcon.js";
  * subpath (add, feedback, home, meals, profile, recipes, shared,
  * tags, warning), plus "print" and "share" for RecipeDetailPage's
  * Print / Share actions, the icon slot's original call sites (#187),
- * plus "help" for SearchHelpPopover's trigger (#699).
-  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
+ * plus "help" for SearchHelpPopover's trigger (#699), plus "list"
+ * for SectionHeading's icon form (RecipeDetailPage's Ingredients
+ * heading, #721), plus "more" for card overflow-menu triggers
+ * (DiscoveryCard's per-card actions, #791).
+ * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export const iconNames = [
   "add",
   "feedback",
   "help",
   "home",
+  "list",
   "meals",
+  "more",
   "print",
   "profile",
   "recipes",
@@ -66,7 +73,9 @@ export const iconsByName: Record<IconName, ComponentType<IconComponentProps>> = 
   feedback: FeedbackIcon,
   help: HelpIcon,
   home: HomeIcon,
+  list: ListIcon,
   meals: MealsIcon,
+  more: MoreIcon,
   print: PrintIcon,
   profile: ProfileIcon,
   recipes: RecipesIcon,

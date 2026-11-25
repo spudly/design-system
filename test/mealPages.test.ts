@@ -51,11 +51,13 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 function pageSource(name: string) {
-  return readFileSync(join(root, "src", "pages", `${name}.tsx`), "utf8");
+  // StepNavControls is shared page scaffolding (#710: src/pages/shared/).
+  const dir = name === "StepNavControls" ? "shared" : "eciperay";
+  return readFileSync(join(root, "src", "pages", dir, `${name}.tsx`), "utf8");
 }
 
 function storySource(name: string) {
-  return readFileSync(join(root, "src", "pages", `${name}.stories.tsx`), "utf8");
+  return readFileSync(join(root, "src", "pages", "eciperay", `${name}.stories.tsx`), "utf8");
 }
 
 const PAGES = [
@@ -72,7 +74,7 @@ test("all six B3b pages are exported from the pages barrel", () => {
   for (const name of PAGES) {
     assert.ok(index.includes(name), `${name} must be exported from src/pages/index.ts`);
     assert.ok(
-      index.includes(`from "./${name}.js"`),
+      index.includes(`from "./eciperay/${name}.js"`),
       `${name} must be exported from its own module`,
     );
   }
@@ -226,7 +228,7 @@ test("MealFormPage ingredient servings-to-eat round-trips blank and divergent va
     page.includes("onIngredientChange?.(ingredient.id, { servingsToEat: value })"),
     "eat edits report through onIngredientChange with a servingsToEat patch",
   );
-  const fixture = readFileSync(join(root, "src", "pages", "fixtures.ts"), "utf8");
+  const fixture = readFileSync(join(root, "src", "pages", "shared", "fixtures.ts"), "utf8");
   assert.ok(fixture.includes('servingsToEat: ""'), "a fixture entry covers the blank eat case");
   assert.ok(
     fixture.includes('servingsToEat: "6"'),
@@ -263,7 +265,7 @@ test("ShoppingListPage check-off is controlled per line with real checkbox seman
   assert.ok(page.includes("onToggleLine"), "toggles report out through onToggleLine");
   assert.ok(
     page.includes("CheckboxField"),
-    "rows render through the unified CheckboxField's list shape since #713 retired CheckRow — the checkbox semantics and the checked strike-through are pinned in src/widgets/CheckboxField.test.ts",
+    "rows render through the unified CheckboxField's list shape since #713 retired CheckRow — the checkbox semantics and the checked strike-through are pinned in src/widgets/form/CheckboxField.test.ts",
   );
   assert.ok(page.includes("label={line.name}"), "row labels use each line's name");
   assert.ok(
@@ -339,7 +341,7 @@ test("MealCookingModePage header numbers steps by their combined position, not t
     !page.includes("current.stepNumber"),
     "the step header must not use current.stepNumber — it restarts per recipe",
   );
-  const fixture = readFileSync(join(root, "src", "pages", "fixtures.ts"), "utf8");
+  const fixture = readFileSync(join(root, "src", "pages", "shared", "fixtures.ts"), "utf8");
   const cookingFixture = fixture.slice(fixture.indexOf("mealCookingFixture"));
   const stepNumbers = [...cookingFixture.matchAll(/stepNumber: (\d+)/g)]
     .slice(0, 4)
@@ -436,7 +438,7 @@ test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab 
   // the row Delete is a ghost Button (#464), never a TextLink.
   // Since the #119 de-styling the row renders through the generic
   // TextActionCardRow; the ghost Button rendering itself is pinned
-  // in src/widgets/TextActionCardRow.test.ts.
+  // in src/widgets/content/TextActionCardRow.test.ts.
   assert.ok(
     page.includes("TextActionCardRow"),
     "meal rows render through the generic TextActionCardRow (#119)",

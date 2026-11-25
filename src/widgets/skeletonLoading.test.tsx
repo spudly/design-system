@@ -114,7 +114,7 @@ test("LoadingScope and the clock internals stay off every export surface", async
 });
 test("every bone pulses on the one shared clock — primitives own no loop", () => {
   for (const name of ["BoxSkeleton", "CircleSkeleton", "TextSkeleton"]) {
-    const code = readCode(`src/widgets/${name}.tsx`);
+    const code = readCode(`src/widgets/feedback/${name}.tsx`);
     assert.match(
       code,
       /from "\.\/SkeletonClock\.js"/,
@@ -126,7 +126,7 @@ test("every bone pulses on the one shared clock — primitives own no loop", () 
       `${name} must not run its own animation loop`,
     );
   }
-  const clock = readCode("src/widgets/SkeletonClock.tsx");
+  const clock = readCode("src/widgets/feedback/SkeletonClock.tsx");
   assert.match(clock, /requestAnimationFrame/, "the clock is the one place a frame loop lives");
   assert.match(
     clock,
@@ -140,7 +140,7 @@ test("every bone pulses on the one shared clock — primitives own no loop", () 
   );
 });
 test("bones are hidden from assistive tech and filled with the theme border role", async () => {
-  const clock = readCode("src/widgets/SkeletonClock.tsx");
+  const clock = readCode("src/widgets/feedback/SkeletonClock.tsx");
   assert.match(
     clock,
     /platformAccessibilityProps\(\{ accessibilityElementsHidden: true \}\)/,
@@ -250,10 +250,10 @@ test("LoadingScope lives in src/contexts — widgets import it from there", () =
     !existsSync(join(root, "src/widgets/LoadingScope.tsx")),
     "the context no longer lives in src/widgets",
   );
-  for (const name of ["Button", "Card", "CardRow", "StatCard"]) {
+  for (const name of ["actions/Button", "layout/Card", "layout/CardRow"]) {
     assert.match(
       read(`src/widgets/${name}.tsx`),
-      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,
       `${name} must import the scope from src/contexts`,
     );
   }
@@ -262,7 +262,7 @@ test("TextSkeleton lines occupy their size's line box, bone centered", async () 
   // Source pins: the size prop, the line-box table (md is the
   // default: 18 box, 12 bone; 3xl: 34 box, 24 bone), and the
   // centered wrapper — no flat 12px bone row, no inter-line gap.
-  const source = readCode("src/widgets/TextSkeleton.tsx");
+  const source = readCode("src/widgets/feedback/TextSkeleton.tsx");
   assert.match(source, /size\?: TextSkeletonSize/, "TextSkeleton takes a size prop");
   assert.match(source, /md: \{ lineBox: 18, bone: 12 \}/, "the md line box is 18, its bone 12");
   assert.match(source, /"3xl": \{ lineBox: 34, bone: 24 \}/, "the 3xl line box is 34, its bone 24");
@@ -282,16 +282,16 @@ test("TextSkeleton lines occupy their size's line box, bone centered", async () 
   assert.ok(lg.includes("height:14px"), "the lg bone is 14px");
 });
 test("primitive props are semantic geometry only — no styling props", () => {
-  const box = read("src/widgets/BoxSkeleton.tsx");
+  const box = read("src/widgets/feedback/BoxSkeleton.tsx");
   assert.match(box, /export type BoxSkeletonProps = \{/);
   assert.match(box, /width\?: number \| `\$\{number\}%`/);
   assert.match(box, /height\?: number/);
   assert.doesNotMatch(box, /color|background|style|className|borderRadius\?/);
-  const circle = read("src/widgets/CircleSkeleton.tsx");
+  const circle = read("src/widgets/feedback/CircleSkeleton.tsx");
   assert.match(circle, /export type CircleSkeletonProps = \{/);
   assert.match(circle, /size\?: number/);
   assert.doesNotMatch(circle, /color|background|style|className/);
-  const text = read("src/widgets/TextSkeleton.tsx");
+  const text = read("src/widgets/feedback/TextSkeleton.tsx");
   assert.match(text, /export type TextSkeletonProps = \{/);
   assert.match(text, /lines\?: number/);
   assert.doesNotMatch(text, /color|background|style|className|width\?|fontSize/);
@@ -308,16 +308,22 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   }
   // Spot-pin the renamed surfaces, plain and qualified.
   assert.match(read("src/widgets/form/CheckboxSelectList.tsx"), /\bloading\?: boolean/);
-  assert.match(read("src/views/AccessTokensPanel.tsx"), /\bloading\?: boolean/);
+  assert.match(read("src/views/eciperay/AccessTokensPanel.tsx"), /\bloading\?: boolean/);
   // RecipesPage's loading props are the qualified forms since
   // #415 (one per section of the unified page): loading +
   // qualifier, never isLoading.
-  assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
-  assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
-  assert.match(read("src/pages/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
-  assert.match(read("src/widgets/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
-  assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloadingSubstitutions\?: boolean/);
-  assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
+  assert.match(
+    read("src/views/eciperay/RecipeIngredientsPanel.tsx"),
+    /\bloadingSubstitutions\?: boolean/,
+  );
+  assert.match(
+    read("src/pages/eciperay/RecipeDetailPage.tsx"),
+    /\bloadingSubstitutions\?: boolean/,
+  );
+  assert.match(read("src/pages/eciperay/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
 });
 
 // ---------------------------------------------------------------------------
@@ -329,28 +335,54 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // (Buttons skeletonize themselves inside the scope — filled
 // buttons as rectangles, ghost buttons as text bones, Stephen
 // on #551) — and renders unchanged while not loading.
-// The collection widgets (CheckboxSelectList, StatBand) render
+// The collection widget CheckboxSelectList renders
 // exactly 3 dummy items while loading when their items are not
-// known — and mirror the known items' count when they are
+// known — and mirrors the known items' count when they are
 // (Stephen on #579); MasonryGrid renders 24
 // varied-height dummies so its loading state still reads as a
 // masonry grid (Stephen on #551). CheckboxSelectList's centered
 // spinner is gone.
 
-// Form-category widgets live in src/widgets/form since #710.
-const widgetPath = (name: string) =>
-  existsSync(join(root, "src", "widgets", "form", `${name}.tsx`))
-    ? `src/widgets/form/${name}.tsx`
-    : `src/widgets/${name}.tsx`;
+// Widgets live in per-category directories under src/widgets
+// since #710 (form was the first, the rest followed category by
+// category); views live in per-host-app directories under
+// src/views. Probe the category/host directories before falling
+// back to the flat path.
+const WIDGET_CATEGORY_DIRS = [
+  "actions",
+  "content",
+  "data",
+  "feedback",
+  "form",
+  "layout",
+  "overlays",
+] as const;
+const widgetPath = (name: string) => {
+  for (const cat of WIDGET_CATEGORY_DIRS) {
+    if (existsSync(join(root, "src", "widgets", cat, `${name}.tsx`)))
+      return `src/widgets/${cat}/${name}.tsx`;
+  }
+  return `src/widgets/${name}.tsx`;
+};
+const viewPath = (name: string) => {
+  for (const host of ["eciperay", "memorize", "shared"] as const) {
+    if (existsSync(join(root, "src", "views", host, `${name}.tsx`)))
+      return `src/views/${host}/${name}.tsx`;
+  }
+  return `src/views/${name}.tsx`;
+};
+const anyPath = (name: string) => {
+  const w = widgetPath(name);
+  if (existsSync(join(root, w))) return w;
+  return viewPath(name);
+};
 
 const T1_SCOPE_WIDGETS = [
   "CardRow",
-  "ListRow",
+  "ListItem",
   "DiscoveryCard",
   "PreviewCard",
   "CommentItem",
-  "StatCard",
-  "StatBand",
   "LogEntryCard",
   "TokenRow",
   "MasonryGrid",
@@ -358,21 +390,21 @@ const T1_SCOPE_WIDGETS = [
 ] as const;
 test("T1: every converted list/card widget declares `loading` and reads the LoadingScope", () => {
   for (const name of T1_SCOPE_WIDGETS) {
-    const code = readCode(widgetPath(name));
+    const code = readCode(anyPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
       code,
-      /TextSkeleton|BoxSkeleton|StatCard|LoadingStatTiles/,
-      `${name} must render skeletons (directly, or via a skeletonized child like StatBand's StatCards — now the shared LoadingStatTiles, #587 phase 2)`,
+      /TextSkeleton|BoxSkeleton|SkeletonBone/,
+      `${name} must render skeletons (directly, or via a skeletonized child)`,
     );
   }
   // The shells: Card provides the scope (it has no scope to read);
   // SectionCard carries the flag through CardProps.
-  const card = readCode("src/widgets/Card.tsx");
+  const card = readCode("src/widgets/layout/Card.tsx");
   assert.match(card, /\bloading\?: boolean/, "Card must declare the loading prop");
   assert.match(card, /LoadingScope/, "Card must provide the LoadingScope while loading");
-  const sectionCard = readCode("src/widgets/SectionCard.tsx");
+  const sectionCard = readCode("src/widgets/content/SectionCard.tsx");
   assert.match(sectionCard, /loading/, "SectionCard must handle the loading flag");
   assert.match(sectionCard, /TextSkeleton/, "SectionCard must skeletonize its title");
 });
@@ -382,7 +414,7 @@ test("T1: CheckboxSelectList's centered spinner is gone", () => {
   assert.match(code, /LOADING_ROW_KEYS/, "the dummy rows come from a frozen constant");
 });
 test("T1 SSR: loading rows and cards render skeletons, no real content, actions as skeletons", async () => {
-  const { CardRow, ListRow, DiscoveryCard, CommentItem, LogEntryCard, TokenRow } =
+  const { CardRow, ListItem, DiscoveryCard, CommentItem, LogEntryCard, TokenRow } =
     await loadRuntime();
   const noop = () => {};
   const cardRow = await renderToHtml(
@@ -403,10 +435,10 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
   );
   assert.match(cardRow, /aria-busy/, "a loading CardRow marks its region busy");
   const listRow = await renderToHtml(
-    <ListRow title="Secret Stew" subtitle="Serves 6" onPress={noop} loading={true} />,
+    <ListItem title="Secret Stew" subtitle="Serves 6" onPress={noop} loading={true} />,
   );
-  assert.equal(hiddenBones(listRow), 2, "a loading ListRow renders title+subtitle bones");
-  assert.ok(!listRow.includes("Secret Stew"), "a loading ListRow shows no real title");
+  assert.equal(hiddenBones(listRow), 2, "a loading ListItem renders title+subtitle bones");
+  assert.ok(!listRow.includes("Secret Stew"), "a loading ListItem shows no real title");
   const discovery = await renderToHtml(
     <DiscoveryCard title="Secret Soup" subtitle="By Maria" href="/recipe/secret" loading={true} />,
   );
@@ -482,42 +514,9 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
     "a loading TokenRow keeps its revoke action, as an inert rectangle skeleton",
   );
 });
-test("T1 SSR: loading StatCard, PreviewCard, and the collections render their dummy items", async () => {
-  const { StatCard, StatBand, PreviewCard, CheckboxSelectList, MasonryGrid, Button } =
-    await loadRuntime();
+test("T1 SSR: loading PreviewCard and the collections render their dummy items", async () => {
+  const { PreviewCard, CheckboxSelectList, MasonryGrid, Button } = await loadRuntime();
   const noop = () => {};
-  const statCard = await renderToHtml(
-    <StatCard value="42" label="secret label" sublabel="secret sub" loading={true} />,
-  );
-  assert.equal(hiddenBones(statCard), 3, "a loading StatCard renders value+label+sublabel bones");
-  assert.ok(!statCard.includes("secret label"), "a loading StatCard shows no real label");
-  const statBand = await renderToHtml(
-    <StatBand loading={true}>
-      <StatCard value="4" label="Servings" />
-    </StatBand>,
-  );
-  assert.equal(hiddenBones(statBand), 6, "a loading StatBand renders 3 dummy stats (2 bones each)");
-  assert.ok(!statBand.includes("Servings"), "a loading StatBand shows none of its children");
-  const statBandOne = await renderToHtml(
-    <StatBand loading={true} loadingCount={1}>
-      <StatCard value="4" label="Servings" />
-    </StatBand>,
-  );
-  assert.equal(
-    hiddenBones(statBandOne),
-    2,
-    "a loading StatBand with loadingCount=1 renders 1 dummy stat (2 bones) — composites with a conditional stat count mirror their loaded composition",
-  );
-  const statBandSeven = await renderToHtml(
-    <StatBand loading={true} loadingCount={7}>
-      <StatCard value="4" label="Servings" />
-    </StatBand>,
-  );
-  assert.equal(
-    hiddenBones(statBandSeven),
-    14,
-    "a loading StatBand with loadingCount=7 renders 7 dummy stats — counts above six are honored, not truncated",
-  );
   const preview = await renderToHtml(
     <PreviewCard
       title="Your recipe"
@@ -590,7 +589,7 @@ test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatmen
   // Source pins: the scope drives the fill (the theme's border
   // role, SkeletonBone's fill), the press handler is dropped,
   // and the disabled skeleton state withholds the link href.
-  const button = readCode("src/widgets/Button.tsx");
+  const button = readCode("src/widgets/actions/Button.tsx");
   assert.match(button, /const scopedLoading = useLoadingScope\(\)/, "Button reads the scope");
   assert.match(
     button,
@@ -644,68 +643,26 @@ test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatmen
     "a link Button outside any scope keeps its href",
   );
 });
-test("T1: the MasonryGrid skeleton fills its columns and the ListRow skeleton hides its hairline", () => {
-  const grid = readCode("src/widgets/MasonryGrid.tsx");
+test("T1: the MasonryGrid skeleton fills its columns and the ListItem skeleton hides its hairline", () => {
+  const grid = readCode("src/widgets/layout/MasonryGrid.tsx");
   assert.match(
     grid,
     /<View key=\{`loading-\$\{itemIndex\}`\} width="100%">/,
     "a loading MasonryGrid item wrapper takes the column's full width",
   );
-  const row = readCode("src/widgets/ListRow.tsx");
+  const row = readCode("src/widgets/data/ListItem.tsx");
   assert.match(
     row,
     /borderBottomColor="transparent"/,
-    "a loading ListRow's hairline renders transparent",
+    "a loading ListItem's hairline renders transparent",
   );
   assert.equal(
     (row.match(/borderBottomColor=\{tokens\.colors\.gray\.gray2\}/g) ?? []).length,
     1,
-    "only the loaded ListRow keeps the visible gray hairline",
+    "only the loaded ListItem keeps the visible gray hairline",
   );
 });
-test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelectList, LogEntryCard)", () => {
-  // StatCard: explicit per-row bones in each run's line box, read
-  // from TextSkeleton's LINE_BOXES table (the one source of truth
-  // for skeleton text geometry) — value (3xl: 34 box, 24 bone,
-  // 46%), label (lg: 21 box, 14 bone, 76%), sublabel (sm: 16 box,
-  // 11 bone, 58%) — not a one-size TextSkeleton.
-  const stat = readCode("src/widgets/StatCard.tsx");
-  assert.match(
-    stat,
-    /<View height=\{LINE_BOXES\["3xl"\]\.lineBox\} justifyContent="center">/,
-    "the value row uses the 3xl line box (34)",
-  );
-  assert.match(
-    stat,
-    /<SkeletonBone\s+width="46%"\s+height=\{LINE_BOXES\["3xl"\]\.bone\}/,
-    "the value bone is 46% wide, the 3xl bone (24) high",
-  );
-  assert.match(
-    stat,
-    /<View height=\{LINE_BOXES\.lg\.lineBox\} justifyContent="center">/,
-    "the label row uses the lg line box (21)",
-  );
-  assert.match(
-    stat,
-    /<SkeletonBone\s+width="76%"\s+height=\{LINE_BOXES\.lg\.bone\}/,
-    "the label bone is 76% wide, the lg bone (14) high",
-  );
-  assert.match(
-    stat,
-    /<View height=\{LINE_BOXES\.sm\.lineBox\} justifyContent="center">/,
-    "the sublabel row uses the sm line box (16)",
-  );
-  assert.match(
-    stat,
-    /<SkeletonBone\s+width="58%"\s+height=\{LINE_BOXES\.sm\.bone\}/,
-    "the sublabel bone is 58% wide, the sm bone (11) high",
-  );
-  assert.doesNotMatch(
-    stat,
-    /<TextSkeleton/,
-    "StatCard's mixed run sizes use explicit bones, not the TextSkeleton component",
-  );
-
+test("T1: structured skeletons mirror the loaded layout (CheckboxSelectList, LogEntryCard)", () => {
   // CheckboxSelectList: the box bone sits in the CheckboxField's
   // 44x44 touch-target slot, centered — the loaded field's visual
   // box is centered in its 44px target, so the skeleton's bone
@@ -726,8 +683,8 @@ test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelec
   // LogEntryCard: the skeleton header mirrors the loaded header
   // row — a date bone (sm) in a 104-wide slot, and a 72x12 box
   // bone where the star rating sits.
-  const entry = readCode("src/widgets/LogEntryCard.tsx");
-  assert.match(entry, /<YStack width=\{104\}>/, "the date bone sits in a 104-wide slot");
+  const entry = readCode("src/views/eciperay/LogEntryCard.tsx");
+  assert.match(entry, /<Col width=\{104\}>/, "the date bone sits in a 104-wide slot");
   assert.match(
     entry,
     /<TextSkeleton size="sm" lines=\{1\} \/>/,
@@ -744,7 +701,7 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
   // deprecated `ghost` variant; the skeleton frame stays
   // transparent and borderless; the label is replaced by a
   // SkeletonBone sized from the label.
-  const button = readCode("src/widgets/Button.tsx");
+  const button = readCode("src/widgets/actions/Button.tsx");
   assert.match(
     button,
     /const ghostSkeleton = scopedLoading && \(ghost \|\| variant === "ghost"\)/,
@@ -756,7 +713,11 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     "the ghost skeleton frame has no filled background and no border",
   );
   assert.match(button, /ghostLabelBone/, "the ghost label is replaced by one text bone");
-  assert.match(button, /from "\.\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
+  assert.match(
+    button,
+    /from "\.\.\/feedback\/SkeletonClock\.js"/,
+    "the ghost bone is the shared clock's bone",
+  );
   const { Button, LoadingScope } = await loadRuntime();
   const noop = () => {};
   const scopedGhost = await renderToHtml(
@@ -924,32 +885,31 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
 // ---------------------------------------------------------------------------
 // #278 Tranche 2 — data panels and the remaining data widgets:
 // NutritionPanel, RatingsCard, RecipeIngredientsPanel,
-// RecipeInstructionsPanel, RecipeOverviewPanel, SecretRevealPanel,
-// StatRow, and TagList take the same explicit `loading` prop,
+// RecipeOverviewPanel, SecretRevealPanel, StepList,
+// and TagList take the same explicit `loading` prop,
 // read the internal LoadingScope, render skeletons mirroring
 // their loaded layout (actions kept as inert skeleton Buttons
 // inside the scope, hairlines transparent), show no real content
 // while loading, and render unchanged while not loading.
 
 const T2_SCOPE_WIDGETS = [
+  "StepList",
   "NutritionPanel",
   "RatingsCard",
   "RecipeIngredientsPanel",
-  "RecipeInstructionsPanel",
   "RecipeOverviewPanel",
   "SecretRevealPanel",
-  "StatRow",
   "TagList",
 ] as const;
 test("T2: every converted data widget declares `loading` and reads the LoadingScope", () => {
   for (const name of T2_SCOPE_WIDGETS) {
-    const code = readCode(widgetPath(name));
+    const code = readCode(anyPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
       code,
-      /TextSkeleton|BoxSkeleton|SkeletonBone|StatCard|LoadingStatTiles/,
-      `${name} must render skeletons (directly, or via a skeletonized child — StatRow's is the shared LoadingStatTiles, #587 phase 2)`,
+      /TextSkeleton|BoxSkeleton|SkeletonBone/,
+      `${name} must render skeletons (directly, or via a skeletonized child)`,
     );
     assert.match(
       code,
@@ -1047,8 +1007,8 @@ test("T2 SSR: loading NutritionPanel renders the ready layout's skeleton, no rea
   assert.equal(hiddenBones(idle), 0, "a non-loading NutritionPanel renders no bones");
   assert.ok(idle.includes("520"), "a non-loading NutritionPanel renders its label values");
 });
-test("T2 SSR: loading RatingsCard, TagList, and StatRow render skeletons, no real content", async () => {
-  const { RatingsCard, TagList, StatRow, StatCard } = await loadRuntime();
+test("T2 SSR: loading RatingsCard and TagList render skeletons, no real content", async () => {
+  const { RatingsCard, TagList } = await loadRuntime();
   const noop = () => {};
   const ratings = await renderToHtml(
     <RatingsCard
@@ -1132,23 +1092,9 @@ test("T2 SSR: loading RatingsCard, TagList, and StatRow render skeletons, no rea
   );
   assert.equal(hiddenBones(idleTags), 0, "a non-loading TagList renders no bones");
   assert.ok(idleTags.includes("VisibleTag"), "a non-loading TagList renders its tags");
-  const row = await renderToHtml(
-    <StatRow loading={true}>
-      <StatCard value="4" label="Servings" />
-    </StatRow>,
-  );
-  assert.equal(hiddenBones(row), 6, "a loading StatRow renders 3 dummy stats (2 bones each)");
-  assert.ok(!row.includes("Servings"), "a loading StatRow shows none of its children");
-  const idleRow2 = await renderToHtml(
-    <StatRow>
-      <StatCard value="4" label="Servings" />
-    </StatRow>,
-  );
-  assert.equal(hiddenBones(idleRow2), 0, "a non-loading StatRow renders no bones");
-  assert.ok(idleRow2.includes("Servings"), "a non-loading StatRow renders its children");
 });
-test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their content", async () => {
-  const { SecretRevealPanel, RecipeInstructionsPanel } = await loadRuntime();
+test("T2 SSR: loading SecretRevealPanel and StepList hide their content", async () => {
+  const { SecretRevealPanel, StepList } = await loadRuntime();
   const noop = () => {};
   const secret = await renderToHtml(
     <SecretRevealPanel
@@ -1181,37 +1127,31 @@ test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their c
   const steps = [
     {
       id: "s1",
-      stepNumber: 1,
+      label: "Step 1",
       body: "Secret first step body",
     },
     {
       id: "s2",
-      stepNumber: 2,
+      label: "Step 2",
       body: "Secret second step body",
     },
   ];
-  const instructions = await renderToHtml(
-    <RecipeInstructionsPanel instructions={steps} loading={true} />,
-  );
+  const instructions = await renderToHtml(<StepList steps={steps} loading={true} />);
   assert.equal(
     hiddenBones(instructions),
     6,
-    "a loading RecipeInstructionsPanel renders eyebrow + 2 body bones per step card",
+    "a loading StepList renders eyebrow + 2 body bones per step card",
   );
   assert.ok(
     !instructions.includes("Secret first step body"),
-    "a loading RecipeInstructionsPanel shows no step text",
+    "a loading StepList shows no step text",
   );
-  assert.match(
-    instructions,
-    /aria-busy/,
-    "a loading RecipeInstructionsPanel marks its region busy",
-  );
-  const idleSteps = await renderToHtml(<RecipeInstructionsPanel instructions={steps} />);
-  assert.equal(hiddenBones(idleSteps), 0, "a non-loading RecipeInstructionsPanel renders no bones");
+  assert.match(instructions, /aria-busy/, "a loading StepList marks its region busy");
+  const idleSteps = await renderToHtml(<StepList steps={steps} />);
+  assert.equal(hiddenBones(idleSteps), 0, "a non-loading StepList renders no bones");
   assert.ok(
     idleSteps.includes("Secret first step body"),
-    "a non-loading RecipeInstructionsPanel renders its steps",
+    "a non-loading StepList renders its steps",
   );
 });
 test("T2 SSR: loading RecipeOverviewPanel mirrors its blocks; no real content", async () => {
@@ -1246,8 +1186,8 @@ test("T2 SSR: loading RecipeOverviewPanel mirrors its blocks; no real content", 
   const loading = await renderToHtml(<RecipeOverviewPanel {...overviewProps} loading={true} />);
   assert.equal(
     hiddenBones(loading),
-    14,
-    "hero + title + badge + 2 description + 6 stat-band + 3 tag bones",
+    9,
+    "hero + title + badge + 2 description + 1 metadata pill + 3 tag bones",
   );
   assert.ok(!loading.includes("Secret Recipe Title"), "a loading overview shows no title");
   assert.ok(!loading.includes("Dinner"), "a loading overview shows no tag names");
@@ -1355,38 +1295,37 @@ const T4_CONVERTED_PAGES = [
   "MealPlanDetailPage",
   "ShoppingListPage",
   "TagsPage",
-  "PublicRecipePage",
   "RecipeDetailPage",
   "RecipeFormPage",
   "RecipesPage",
 ] as const;
 test("T4: every converted page renders skeletons — no Spinner remains in its code", () => {
   for (const name of T4_CONVERTED_PAGES) {
-    const code = readCode(`src/pages/${name}.tsx`);
+    const code = readCode(`src/pages/eciperay/${name}.tsx`);
     assert.doesNotMatch(code, /Spinner/, `${name} must not render a Spinner (#278 tranche 4)`);
     assert.match(
       code,
-      /LoadingScope|TextSkeleton|BoxSkeleton|TagList|CardRow|DiscoveryCard|LogEntryCard|StatBand/,
+      /LoadingScope|TextSkeleton|BoxSkeleton|TagList|CardRow|DiscoveryCard|LogEntryCard/,
       `${name} must render skeletons (directly, or via a skeletonized child)`,
     );
   }
   // The per-page skeleton compositions, pinned:
   assert.match(
-    readCode("src/pages/RecipeFormPage.tsx"),
+    readCode("src/pages/eciperay/RecipeFormPage.tsx"),
     /<TagList tags=\{\[\]\} loading \/>/,
     "RecipeFormPage's tags fetch renders TagList's loading pills, not a spinner",
   );
   assert.match(
-    readCode("src/pages/RecipesPage.tsx"),
+    readCode("src/pages/eciperay/RecipesPage.tsx"),
     /function LoadingOwnRows\(\)/,
     "RecipesPage's own section loads as MediaRow-shaped skeleton rows",
   );
   assert.match(
-    readCode("src/pages/RecipesPage.tsx"),
+    readCode("src/pages/eciperay/RecipesPage.tsx"),
     /function LoadingDiscoveryRows\(/,
     "RecipesPage's discovery/public sections load as skeleton DiscoveryCards",
   );
-  const detail = readCode("src/pages/RecipeDetailPage.tsx");
+  const detail = readCode("src/pages/eciperay/RecipeDetailPage.tsx");
   assert.match(
     detail,
     /LOADING_COOK_LOG_KEYS\.map/,
@@ -1400,12 +1339,12 @@ test("T4: every converted page renders skeletons — no Spinner remains in its c
 });
 test("T4: the approved spinner survivors keep their Spinners", () => {
   assert.match(
-    readCode("src/pages/PayPage.tsx"),
+    readCode("src/pages/eciperay/PayPage.tsx"),
     /<Spinner label=\{voice\.payPage\.openingLabel\} \/>/,
     "PayPage's wait is an external secure-payment window — no page content shape to skeletonize (approved survivor)",
   );
   assert.match(
-    readCode("src/pages/VerseSearchPage.tsx"),
+    readCode("src/pages/memorize/VerseSearchPage.tsx"),
     /\{isSearching \? <Spinner label="Loading" \/> : null\}/,
     "VerseSearchPage's inline search keeps its spinner — the field and existing results stay live (approved survivor)",
   );
@@ -1420,14 +1359,13 @@ let pagesPromise: Promise<Record<string, any>> | undefined;
 function loadPages() {
   pagesPromise ??= (async () => {
     const modules = await Promise.all([
-      import("../../dist/pages/HomePage.js"),
-      import("../../dist/pages/MealPlansPage.js"),
-      import("../../dist/pages/MealsHubPage.js"),
-      import("../../dist/pages/MealPlanDetailPage.js"),
-      import("../../dist/pages/ShoppingListPage.js"),
-      import("../../dist/pages/TagsPage.js"),
-      import("../../dist/pages/PublicRecipePage.js"),
-      import("../../dist/pages/RecipeDetailPage.js"),
+      import("../../dist/pages/eciperay/HomePage.js"),
+      import("../../dist/pages/eciperay/MealPlansPage.js"),
+      import("../../dist/pages/eciperay/MealsHubPage.js"),
+      import("../../dist/pages/eciperay/MealPlanDetailPage.js"),
+      import("../../dist/pages/eciperay/ShoppingListPage.js"),
+      import("../../dist/pages/eciperay/TagsPage.js"),
+      import("../../dist/pages/eciperay/RecipeDetailPage.js"),
     ]);
     return Object.assign({}, ...modules) as Record<string, any>;
   })();
@@ -1600,7 +1538,7 @@ test("T4 SSR: loading TagsPage renders skeleton rows, the create form stays live
 });
 test("T4 SSR: the union pages' loading states render their skeleton compositions", async () => {
   const {} = await loadRuntime();
-  const { MealPlanDetailPage, PublicRecipePage, RecipeDetailPage } = await loadPages();
+  const { MealPlanDetailPage, RecipeDetailPage } = await loadPages();
   const plan = await renderToHtml(<MealPlanDetailPage state="loading" />);
   assert.equal(
     hiddenBones(plan),
@@ -1609,19 +1547,11 @@ test("T4 SSR: the union pages' loading states render their skeleton compositions
   );
   assert.match(plan, /aria-busy/, "a loading MealPlanDetailPage marks its regions busy");
   assert.ok(plan.includes("Shopping list"), "the action row stays, as skeleton Buttons");
-  const pub = await renderToHtml(<PublicRecipePage state="loading" />);
-  assert.equal(
-    hiddenBones(pub),
-    17,
-    "hero (1) + title (1) + description (3) + stat band (6) + ingredients (4) + instructions (2)",
-  );
-  assert.ok(pub.includes("Ingredients"), "the section headings stay rendered while loading");
-  assert.ok(pub.includes("Instructions"), "the section headings stay rendered while loading");
   const detail = await renderToHtml(<RecipeDetailPage state="loading" />);
   assert.equal(
     hiddenBones(detail),
-    25,
-    "skeleton toolbar (badge 1 + picker 1) + overview (hero 1 + title 1 + description 3 + stat band 6) + ingredients (4) + instructions (2) + cook history (3) + nutrition (3)",
+    20,
+    "skeleton toolbar (badge 1 + picker 1) + overview (hero 1 + title 1 + description 3 + metadata pill 1) + ingredients (4) + instructions (2) + cook history (3) + nutrition (3)",
   );
   assert.ok(detail.includes("Cook History"), "the section headings stay rendered while loading");
   assert.ok(detail.includes("Nutrition"), "the section headings stay rendered while loading");
@@ -1634,7 +1564,7 @@ test("T4: RecipesPage's loading sections and footers render the skeleton rows", 
   // pinned here at the source level; the skeleton rows it
   // renders are the T1-verified DiscoveryCard loading state and
   // the MediaRow-shaped composition below.
-  const code = readCode("src/pages/RecipesPage.tsx");
+  const code = readCode("src/pages/eciperay/RecipesPage.tsx");
   assert.match(code, /case "loadingOwn":\s*return <LoadingOwnRows \/>;/);
   assert.match(code, /case "loadingOwnMore":\s*return <LoadingOwnRows \/>;/);
   assert.match(
@@ -1661,7 +1591,7 @@ test("T4: RecipesPage's loading sections and footers render the skeleton rows", 
     /function LoadingOwnRows\(\) \{[\s\S]*?<LoadingMediaRow key=\{key\} \/>/,
     "the own skeleton rows render as LoadingMediaRows",
   );
-  const mediaRow = readCode("src/widgets/LoadingMediaRow.tsx");
+  const mediaRow = readCode("src/widgets/feedback/LoadingMediaRow.tsx");
   assert.match(
     mediaRow,
     /<BoxSkeleton width=\{64\} height=\{64\} \/>/,
@@ -1706,18 +1636,16 @@ const T3_PROP_VIEWS = [
   "TransferRecipesView",
 ] as const;
 // #698 tranche 4: CandidateList, ChangedListBanner, and
-// LegalSection moved to src/widgets (they own their styling).
-const T3_WIDGET_COMPONENTS = new Set(["CandidateList", "ChangedListBanner", "LegalSection"]);
+// LegalSection moved to src/widgets (they own their styling);
+// anyPath above resolves widgets and views alike.
 test("T3: every converted view declares `loading` and reads the LoadingScope", () => {
   for (const name of T3_PROP_VIEWS) {
-    const code = readCode(
-      `src/${T3_WIDGET_COMPONENTS.has(name) ? "widgets" : "views"}/${name}.tsx`,
-    );
+    const code = readCode(anyPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
       code,
-      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,
       `${name} must import the scope from src/contexts`,
     );
     assert.match(
@@ -1729,13 +1657,13 @@ test("T3: every converted view declares `loading` and reads the LoadingScope", (
 });
 test("T3: the spinner views' spinners are gone; LazySlot's fallback is a skeleton", () => {
   for (const name of ["RecipeCommentsView", "SubscriptionView", "LazySlot"]) {
-    const code = readCode(`src/views/${name}.tsx`);
+    const code = readCode(viewPath(name));
     assert.doesNotMatch(code, /Spinner/, `${name} must not render a content-loading spinner`);
   }
-  const lazySlot = readCode("src/views/LazySlot.tsx");
+  const lazySlot = readCode("src/views/shared/LazySlot.tsx");
   assert.match(lazySlot, /BoxSkeleton/, "LazySlot's fallback renders box skeletons");
   assert.match(lazySlot, /TextSkeleton/, "LazySlot's fallback renders text skeletons");
-  const tokensPanel = readCode("src/views/AccessTokensPanel.tsx");
+  const tokensPanel = readCode("src/views/eciperay/AccessTokensPanel.tsx");
   assert.doesNotMatch(
     tokensPanel,
     /Loading tokens/,
@@ -1845,7 +1773,13 @@ test("T3 SSR: loading CandidateList and NutritionGoalsForm render skeletons", as
     />,
   );
   assert.ok(hiddenBones(goals) > 0, "a loading NutritionGoalsForm renders bones");
-  assert.ok(!goals.includes("2000"), "a loading NutritionGoalsForm shows no real goal values");
+  // Standalone-token match: the raw substring "2000" also occurs inside
+  // Tamagui's generated class hashes in the SSR CSS (e.g. _b-2023200006,
+  // the hash for the #799 indigo tag shade #4338ca), which is not a goal value.
+  assert.ok(
+    !/(?<![-\d])2000(?!\d)/.test(goals),
+    "a loading NutritionGoalsForm shows no real goal values",
+  );
   assert.match(goals, /aria-busy/, "a loading NutritionGoalsForm marks its region busy");
 });
 test("T5 survivor audit: only the approved survivor files render a Spinner", () => {
@@ -1857,14 +1791,14 @@ test("T5 survivor audit: only the approved survivor files render a Spinner", () 
   // stories are exempt (stories demonstrate the widget itself, and
   // Center's story uses it as arbitrary example content).
   const allowed = new Set([
-    "src/pages/PayPage.tsx",
-    "src/pages/VerseSearchPage.tsx",
+    "src/pages/eciperay/PayPage.tsx",
+    "src/pages/memorize/VerseSearchPage.tsx",
     "src/widgets/form/AutocompletePicker.tsx",
   ]);
   const rendering = [];
   for (const file of sourceFiles(join(root, "src"))) {
     const rel = file.slice(root.length).replace(/^\//, "");
-    if (rel.endsWith(".stories.tsx") || rel === "src/widgets/Spinner.tsx") continue;
+    if (rel.endsWith(".stories.tsx") || rel === "src/widgets/feedback/Spinner.tsx") continue;
     if (readCode(rel).includes("<Spinner")) rendering.push(rel);
   }
   assert.deepEqual(

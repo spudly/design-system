@@ -1,8 +1,9 @@
-import { TextArea as TamaguiTextArea, Label, YStack, styled } from "tamagui";
+import { TextArea as TamaguiTextArea, Label, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
-import { useFieldA11y } from "../../views/useFieldA11y.js";
-import { Text } from "../Text.js";
+import { useFieldA11y } from "../../views/shared/useFieldA11y.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
   name: "TextAreaField",
@@ -99,7 +100,7 @@ export function TextAreaField({
   );
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <Col gap="xs">
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}
@@ -114,11 +115,7 @@ export function TextAreaField({
         {...a11yProps}
         {...rest}
       />
-      {error ? (
-        <Text variant="error" id={errorId}>
-          {error}
-        </Text>
-      ) : null}
-    </YStack>
+      {error ? <FieldError error={error} id={errorId} /> : null}
+    </Col>
   );
 }

@@ -1,0 +1,89 @@
+import type { ReactNode } from "react";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { ActionBar } from "../actions/ActionBar.js";
+import { Button } from "../actions/Button.js";
+import { Alert } from "./Alert.js";
+import { useVoice } from "../../voice/index.js";
+
+type FixedActionBannerAction = {
+  label: string;
+  onPress: () => void;
+};
+
+export type FixedActionBannerProps = {
+  /** Banner content; a ReactNode so callers can compose text and links. */
+  message: ReactNode;
+  primaryAction?: FixedActionBannerAction;
+  secondaryAction?: FixedActionBannerAction;
+  /** Optional: without it the banner renders no dismiss control. */
+  onDismiss?: () => void;
+  dismissAriaLabel?: string;
+  /** Which screen edge the bar pins to (the ActionBar placement). */
+  position?: "top" | "bottom";
+};
+
+/**
+ * Pinned action banner (consent bars, install prompts): the DS ActionBar
+ * pinned to a screen edge, holding an info Alert above a wrapping
+ * row of actions — secondary first, then primary, then an optional ghost
+ * dismiss button labeled with the voice object's fixedActionBanner
+ * dismiss label (#539). Content sits in a centered column
+ * capped at 1024px so the bar reads the same on wide screens.
+ *
+ * Pinning is to the viewport (#405): on web the bar is viewport-fixed,
+ * so it stays at the viewport edge at any scroll position instead of
+ * scrolling away with the document; a viewport-fixed bar taller than
+ * the viewport is capped at the viewport height and scrolls internally,
+ * so its action row stays reachable on short screens or at high zoom.
+ * On native there is no viewport/document split, so the bar pins
+ * absolute inside its full-screen container. All of those styles live
+ * inside ActionBar's own styled definition — DS components own their
+ * styles and never take styling props — and this banner selects the
+ * behavior through ActionBar's semantic `pinning="viewport"` prop.
+ *
+ * This exists alongside Alert because that component's contract cannot
+ * express this shape: it is not pinned to a screen edge, and every one
+ * of its actions renders as a secondary button (design-system #123,
+ * gap 1).
+ */
+export function FixedActionBanner({
+  message,
+  primaryAction,
+  secondaryAction,
+  onDismiss,
+  dismissAriaLabel,
+  position = "bottom",
+}: FixedActionBannerProps) {
+  const voice = useVoice();
+  const resolvedDismissAriaLabel = dismissAriaLabel ?? voice.fixedActionBanner.dismissLabel;
+  return (
+    <ActionBar placement={position} pinning="viewport">
+      <Col width="100%" maxWidth={1024} alignSelf="center" gap="m">
+        <Alert severity="info">{message}</Alert>
+        <Row wrap middle gap="s">
+          {secondaryAction ? (
+            <Button variant="secondary" onPress={secondaryAction.onPress}>
+              {secondaryAction.label}
+            </Button>
+          ) : null}
+          {primaryAction ? (
+            <Button variant="primary" onPress={primaryAction.onPress}>
+              {primaryAction.label}
+            </Button>
+          ) : null}
+          {onDismiss ? (
+            <Button
+              ghost
+              size="sm"
+              accessibilityLabel={resolvedDismissAriaLabel}
+              onPress={onDismiss}
+            >
+              {voice.fixedActionBanner.dismissLabel}
+            </Button>
+          ) : null}
+        </Row>
+      </Col>
+    </ActionBar>
+  );
+}

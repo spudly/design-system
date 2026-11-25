@@ -3,13 +3,19 @@ import { base, react, typescriptPendingIgnores } from "@spudly/eslint-config";
 import pageStyling from "./eslintRules/noPageStyling.mjs";
 import marginSpacing from "./eslintRules/noMarginSpacing.mjs";
 import sourceReadsInTests from "./eslintRules/noSourceReadsInTests.mjs";
+import directStacks from "./eslintRules/noDirectStacks.mjs";
 
 // The repo-local design-system plugin: the #119 page-styling rule
 // and the #209 margin-spacing rule, registered under one namespace
 // (flat config cannot register the same namespace twice for one
 // file with different plugin objects).
 const designSystem = {
-  rules: { ...pageStyling.rules, ...marginSpacing.rules, ...sourceReadsInTests.rules },
+  rules: {
+    ...pageStyling.rules,
+    ...marginSpacing.rules,
+    ...sourceReadsInTests.rules,
+    ...directStacks.rules,
+  },
 };
 
 // Shared config: @spudly/eslint-config (ported from Eciperay's
@@ -109,6 +115,48 @@ export default [
     rules: { "design-system/no-margin-spacing": "error" },
   },
   {
+    // #746: layout composes through Row/Col/Spacer — no direct
+    // XStack/YStack elements and no styled() derivations from
+    // them anywhere in shipped components, views, pages, or
+    // icons. The conversion tranches (#820–#827) rebuilt every
+    // surface, so this is a non-event at activation. DORMANT
+    // today, beside the sibling rules: typescriptPendingIgnores
+    // above ignores every .ts/.tsx file until the TS lint
+    // restoration. Rule: eslintRules/noDirectStacks.mjs.
+    files: [
+      "src/widgets/**/*.tsx",
+      "src/views/**/*.tsx",
+      "src/pages/**/*.tsx",
+      "src/icons/**/*.tsx",
+    ],
+    plugins: { "design-system": designSystem },
+    rules: { "design-system/no-direct-stacks": "error" },
+  },
+  {
+    // The #746 allowlist (recorded on the issue and in the rule's
+    // header): the only files that keep a raw stack.
+    // - Row.tsx / Col.tsx: the primitives' own implementations —
+    //   Row renders an XStack and Col a YStack after resolving
+    //   the subset props; they are the one sanctioned place a
+    //   raw stack renders, because they ARE the enforcement.
+    // - SearchField: Option B allowlist #1 — the search
+    //   container's focus-within ring needs pseudo-style props
+    //   this Tamagui version accepts only in styled() configs,
+    //   so its StyledContainer (styled XStack) is retained under
+    //   Stephen's Option B ruling (2026-11-24).
+    // - MasonryGrid: PENDING STEPHEN'S DECISION — its runtime
+    //   numeric gap fits no Row/Col prop combination; the file
+    //   is untouched until he decides its shape, and this
+    //   exemption comes out with that conversion.
+    files: [
+      "src/widgets/layout/Row.tsx",
+      "src/widgets/layout/Col.tsx",
+      "src/widgets/form/SearchField.tsx",
+      "src/widgets/layout/MasonryGrid.tsx",
+    ],
+    rules: { "design-system/no-direct-stacks": "off" },
+  },
+  {
     // #772 (split from #733): test files must not read JS/TS source
     // files — source-string pins protect spelling, not behavior.
     // Adopted WARN-first; promotion to error waits until #733's
@@ -131,11 +179,19 @@ export default [
     rules: {
       "design-system/no-page-styling": "off",
       "design-system/no-margin-spacing": "off",
+      "design-system/no-direct-stacks": "off",
     },
   },
   {
-    files: ["src/widgets/**/*.stories.tsx", "src/views/**/*.stories.tsx"],
-    rules: { "design-system/no-margin-spacing": "off" },
+    files: [
+      "src/widgets/**/*.stories.tsx",
+      "src/views/**/*.stories.tsx",
+      "src/icons/**/*.stories.tsx",
+    ],
+    rules: {
+      "design-system/no-margin-spacing": "off",
+      "design-system/no-direct-stacks": "off",
+    },
   },
   {
     // The storybook host app's Babel/Metro configs are CommonJS in

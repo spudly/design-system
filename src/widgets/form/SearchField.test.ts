@@ -43,8 +43,8 @@ function readCode(rel: string) {
 const searchField = readCode("src/widgets/form/SearchField.tsx");
 // The guard itself lives in the shared hook since the #587
 // phase-2 dedupe; the field files only wire its handlers in.
-const guard = readCode("src/views/useImeCompositionGuard.ts");
-const fieldShell = readCode("src/widgets/FieldShell.tsx");
+const guard = readCode("src/views/shared/useImeCompositionGuard.ts");
+const fieldShell = readCode("src/widgets/form/FieldShell.tsx");
 
 test("SearchField destructures the submit/composition handlers out of rest (#562)", () => {
   assert.match(searchField, /\n {4}onSubmitEditing,/);

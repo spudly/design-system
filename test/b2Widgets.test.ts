@@ -5,10 +5,12 @@
  * CheckboxSelectList, CommentItem, FixedActionBanner, StatRow, TagPill,
  * TokenRow (see docs/b2-component-audit.md). TagPill was later merged
  * into Badge (#183): it is no longer exported, and Badge's `color`
- * form carries its tint contract.
+ * form carries its tint contract. StatRow was later retired in
+ * favor of the metadata badge (#743): it is no longer exported
+ * either, and its contract below is gone with it.
  *
  * The contracts pinned here:
- * 1. The six remaining widgets are exported from the internal components barrel
+ * 1. The five remaining widgets are exported from the internal components barrel
  *    (dist), next to the widgets they compose.
  * 2. Badge's colored-tag form (the former TagPill) tints from the data
  *    color: surface = color + "22" alpha, label = the color itself,
@@ -27,8 +29,6 @@
  *    marker's meaning in `staleHintLabel`.
  * 7. TokenRow renders no action for a revoked token and switches the
  *    action label on `revoking`.
- * 8. StatRow is the recessed band: gray step-1 fill, large radius,
- *    space-around distribution.
  *
  * Run against the built output: `npm run build` first (the `test`
  * script does both).
@@ -45,21 +45,45 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist: Record<string, any> = await loadInternalDist();
 
 function source(name: string) {
-  // Form-category widgets live in src/widgets/form since #710.
-  const formPath = join(root, "src", "widgets", "form", `${name}.tsx`);
-  return readFileSync(existsSync(formPath) ? formPath : join(root, "src", "widgets", `${name}.tsx`), "utf8");
+  // Widgets live in per-category directories under src/widgets
+  // since #710; views in per-host-app directories under src/views.
+  for (const cat of ["actions", "content", "data", "feedback", "form", "layout", "overlays"]) {
+    const p = join(root, "src", "widgets", cat, `${name}.tsx`);
+    if (existsSync(p)) return readFileSync(p, "utf8");
+  }
+  // BulkSelectToolbar (#712) and CommentItem (#714) were reclassified as Views.
+  for (const host of ["eciperay", "memorize", "shared"]) {
+    const p = join(root, "src", "views", host, `${name}.tsx`);
+    if (existsSync(p)) return readFileSync(p, "utf8");
+  }
+  const viewPath = join(root, "src", "views", `${name}.tsx`);
+  return readFileSync(
+    existsSync(viewPath) ? viewPath : join(root, "src", "widgets", `${name}.tsx`),
+    "utf8",
+  );
 }
 
-const MOVED = [
-  "BulkSelectToolbar",
-  "CheckboxSelectList",
-  "CommentItem",
-  "FixedActionBanner",
-  "StatRow",
-  "TokenRow",
-];
+const MOVED = ["CheckboxSelectList", "FixedActionBanner", "TokenRow"];
 
-test("the six remaining B2 widgets are exported from the internal components barrel", () => {
+test("BulkSelectToolbar is exported from the internal barrel as a view, not a widget (#712)", () => {
+  assert.equal(
+    typeof dist.BulkSelectToolbar,
+    "function",
+    "BulkSelectToolbar must remain exported from the internal barrel",
+  );
+  const widgetsBarrel = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
+  assert.ok(
+    !widgetsBarrel.includes("BulkSelectToolbar"),
+    "BulkSelectToolbar must not be exported from the widgets barrel",
+  );
+  const viewsBarrel = readFileSync(join(root, "src", "views", "index.ts"), "utf8");
+  assert.ok(
+    viewsBarrel.includes("BulkSelectToolbar"),
+    "BulkSelectToolbar must be exported from the views barrel",
+  );
+});
+
+test("the remaining B2 widgets are exported from the internal components barrel", () => {
   for (const name of MOVED) {
     assert.equal(
       typeof dist[name],
@@ -70,18 +94,39 @@ test("the six remaining B2 widgets are exported from the internal components bar
   assert.equal(dist.TagPill, undefined, "TagPill was merged into Badge (#183)");
 });
 
-test("Badge's colored-tag form tints its surface and label from the resolved token color", () => {
-  const badge = source("Badge");
-  // #207: the tag color (a token name, strictly typed) resolves
-  // through the shared tag-color resolver first; the tint and label
-  // use the resolved hex.
+test("CommentItem is exported from the internal barrel as a view, not a widget (#714)", () => {
+  assert.equal(
+    typeof dist.CommentItem,
+    "function",
+    "CommentItem must remain exported from the internal barrel",
+  );
+  const widgetsBarrel = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
   assert.ok(
-    badge.includes("{resolvedColor}22`"),
-    "surface must be the resolved color at 22 hex alpha",
+    !widgetsBarrel.includes("CommentItem"),
+    "CommentItem must not be exported from the widgets barrel",
+  );
+  const viewsBarrel = readFileSync(join(root, "src", "views", "index.ts"), "utf8");
+  assert.ok(
+    viewsBarrel.includes("CommentItem"),
+    "CommentItem must be exported from the views barrel",
+  );
+});
+
+test("Badge's colored-tag form inverts to the resolved dark shade surface with the light shade label (#799)", () => {
+  const badge = source("Badge");
+  // #799 (superseding the #207 tint): the tag color (a token name,
+  // strictly typed) resolves through the shared tag-color shade
+  // resolver; the surface takes the pair's dark shade and the label
+  // its light shade.
+  assert.ok(
+    badge.includes(
+      'const backgroundColor = isSelected ? "$primary" : (tagDark ?? styles.background)',
+    ),
+    "surface must be the resolved tag color's dark shade while unselected (the selectable form's selected state takes the primary fill)",
   );
   assert.ok(
-    badge.includes('const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text)'),
-    "label must render in the resolved color itself while unselected (the selectable form's selected state takes the on-primary ink)",
+    badge.includes('const textColor = isSelected ? "$onPrimary" : (tagLight ?? styles.text)'),
+    "label must render in the resolved tag color's light shade while unselected (the selectable form's selected state takes the on-primary ink)",
   );
   assert.ok(badge.includes("radii.full"), "pill must use the full radius token");
 });
@@ -115,7 +160,9 @@ test("BulkSelectToolbar disables selection at zero filtered and counts only when
   );
   assert.ok(toolbar.includes("disabled || busy"), "busy must disable the controls like disabled");
   assert.ok(
-    toolbar.includes('alignItems="center"'),
+    // #746: the actions row is a Row — centering is its `middle`
+    // alignment prop.
+    toolbar.includes('<Row wrap middle gap="m">'),
     "the actions row must center its children so the selected count aligns with the buttons (#175)",
   );
 });
@@ -158,11 +205,4 @@ test("TokenRow hides the action when revoked and relabels it while revoking", ()
   assert.ok(row.includes('"Revoking…"'), "the pending label missing");
   assert.ok(row.includes("(Revoked)"), "the revoked marker missing");
   assert.ok(row.includes("fontFamily.mono"), "the prefix line must be mono");
-});
-
-test("StatRow is the recessed space-around band", () => {
-  const row = source("StatRow");
-  assert.ok(row.includes("gray.gray1"), "band fill must be gray step 1");
-  assert.ok(row.includes("radii.lg"), "band must use the large radius token");
-  assert.ok(row.includes('justifyContent: "space-around"'), "stats must spread space-around");
 });

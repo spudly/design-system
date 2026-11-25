@@ -33,18 +33,28 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    return { React, renderToString, TamaguiProvider, ...dist };
+    const { VoiceProvider }: Record<string, any> = await import("../../../dist/voice/index.js");
+    const { fixtureVoice }: Record<string, any> = await import("../../../dist/voice/fixtures.js");
+    return { React, renderToString, TamaguiProvider, VoiceProvider, fixtureVoice, ...dist };
   })();
   return runtimePromise;
 }
 
 async function renderToHtml(element: any) {
-  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
-    await loadRuntime();
+  const {
+    renderToString,
+    TamaguiProvider,
+    createTamaguiConfig,
+    baseTheme,
+    VoiceProvider,
+    fixtureVoice,
+  } = await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
+  // #804: the forwarded error renders through Alert, which reads
+  // the voice object — supply the fixture voice.
   return renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
-      {element}
+      <VoiceProvider voice={fixtureVoice}>{element}</VoiceProvider>
     </TamaguiProvider>,
   );
 }
@@ -98,9 +108,7 @@ test("SSR: revealed — unmasked input, toggle named for hiding (#758)", async (
 
 test("SSR: label and error forward to the composed field (#758)", async () => {
   const { PasswordField } = await loadRuntime();
-  const html = await renderToHtml(
-    <PasswordField {...fieldProps} error="Password is required." />,
-  );
+  const html = await renderToHtml(<PasswordField {...fieldProps} error="Password is required." />);
   assert.ok(html.includes("Password"), "the visible label renders");
   assert.ok(html.includes("Password is required."), "the error text renders");
   assert.ok(html.includes('aria-invalid="true"'), "the input reports the error state");

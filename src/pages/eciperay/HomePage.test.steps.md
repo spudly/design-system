@@ -1,0 +1,103 @@
+---
+component: HomePage
+run_when:
+  - "src/widgets/layout/Col.tsx, src/widgets/content/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
+  - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
+  - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
+---
+
+# HomePage — manual test steps
+
+Colocated manual test steps for `src/pages/eciperay/HomePage.tsx` (design-system #530).
+Run these at release finalization when a trigger below matches the
+release's changed components. The full index lives in
+`docs/manual-tests.md` (generated — do not edit it by hand).
+
+## HomePage actions & CenteredText
+
+Open in `Pages/Eciperay/HomePage` (its stories);
+`Widgets/CenteredText`: Default.
+
+1. HomePage actions: the three buttons stretch full width
+   at an even 12px rhythm (the Col at gap m in HomePage).
+2. CenteredText: the subtitle line centers (each wrapped line
+   centered) in the muted ink; the plain line centers in the
+   default ink.
+
+**Run when:** `src/widgets/layout/Col.tsx`,
+`src/widgets/content/CenteredText.tsx`, their stories, HomePage's
+header, or a changeset naming either.
+
+## List states
+
+Open in `Pages/Eciperay/RecipesPage`: Loading,
+LoadingMore.
+
+1. The loading state is a centered Spinner (Center +
+   Spinner) composed by the page: the spinner renders
+   centered in its parent with its label as its accessible name (verify the rendered element's `aria-label` or the accessibility tree — the label is not displayed as visible text); the state carries
+   no padding or margin of its own — spacing around it is
+   the parent's. The same composition renders directly at
+   the foot of a list for the loading-more slot — check
+   that rendering in `Pages/Eciperay/RecipesPage`:
+   LoadingMore, where the spinner follows the last card
+   directly — the list's separator renders only between
+   cards, so no gap follows the last card.
+2. A list's error state has no wrapper component: the page
+   renders the Alert component directly — check in
+   `Pages/Eciperay/RecipesPage`: DiscoveryError, where the alert
+   sits under the filter bar, flush to the parent's inset.
+
+**Run when:** a catalog page's loading or error state
+(Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or
+a changeset naming the list loading or error states.
+
+## Meals & planning pages (MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)
+
+Open in `Pages/Eciperay/MealDetailPage`: Default,
+NoNotesOrNutrition; `Pages/Eciperay/MealsHubPage`: Default,
+PlansTab, Empty; `Pages/Eciperay/ShoppingListPage`: Default,
+Loading, Empty; `Pages/Eciperay/HomePage`: WithRecipes, Empty,
+Loading; `Pages/Eciperay/MealCookingModePage`: Default,
+FirstStep, LastStep, LoadError.
+
+1. MealDetailPage Default: xl bold title, muted notes and
+   nutrition lines, Cook meal / Edit side by side, then the
+   Recipes card whose member rows link (title over its meta
+   line); an unavailable member would show its
+   " (unavailable)" suffix and not link. NoNotesOrNutrition
+   drops the two muted lines with no leftover gaps.
+2. MealsHubPage Default: Meals title over the tab bar, the
+   full-width New meal button, then meal cards at an even 8px
+   rhythm, each card's Delete a bare text action at its right
+   edge. PlansTab: the same chrome stays pinned above the
+   plans list. Empty: the empty state replaces the list.
+3. ShoppingListPage Default: each line's box, medium-weight
+   (500) name, and muted quantity / "optional" segments
+   render on one line;
+   checking a line fills its box and strikes the line through.
+   Loading shows the spinner under the title; Empty shows the
+   empty state.
+4. HomePage WithRecipes: hero title, centered muted subtitle,
+   three full-width buttons, then the section title over the
+   shared recipe rows (#657 — the same rows RecipesPage
+   renders: link rows with the star log-cook control, no
+   Delete, no "Log cook" text button) at the rows' own rhythm.
+   Loading centers the spinner under the section title; Empty
+   centers the empty message there.
+5. MealCookingModePage: the dark overlay covers the full viewport — cooking mode is a full-screen view and no footer renders (#752/#753) —
+   uppercase meal title and "Step N of M · recipe" eyebrows
+   over the step body, Done pill at the top right, dots and
+   Back / Next below. FirstStep has no Back; LastStep disables
+   Next.
+6. MealCookingModePage LoadError: no overlay and no step UI —
+   the meal title over an error alert reading "Couldn't load
+   the cook plan for this meal. Please try again.", with a
+   Done button below it. This check verifies the Done
+   button's presence only: the story's `onDone` is a no-op,
+   so pressing it does not leave the error state in
+   Storybook.
+
+**Run when:** any of the five pages' sources or stories, or a
+changeset naming any of them. Run only the numbered cases for
+the page(s) that changed.

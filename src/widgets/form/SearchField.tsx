@@ -1,10 +1,13 @@
 import { forwardRef, useId } from "react";
+import type { ReactNode } from "react";
 import { Input as TamaguiInput, View, XStack, styled } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
+import { Row } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { FieldShell } from "../FieldShell.js";
-import { Text } from "../Text.js";
+import { FieldShell } from "./FieldShell.js";
+import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 /**
  * The ⌕ glyph must NOT get an explicit lineHeight. It previously received
@@ -18,7 +21,7 @@ import { Text } from "../Text.js";
  * the recipe list missing from the layout — Tamagui's style engine
  * resolves the numeric lineHeight the same multiplying way on native.
  * With no lineHeight prop the glyph takes the font's line height
- * (size × 1.5), and it renders inside StyledGlyphBox — a fixed-height
+ * (size × 1.5), and it renders inside GlyphBox — a fixed-height
  * clipping box — so a mis-measured glyph can never again grow the
  * field, while the row itself keeps a minHeight so a caller-sized
  * input (SearchField forwards input props via ...rest) can still
@@ -35,12 +38,25 @@ import { Text } from "../Text.js";
  * no font size centers asymmetric ink. The search icon is therefore
  * no longer a text glyph at all: SearchGlyph below draws it from two
  * fixed-dimension shapes (a bordered circle + a rotated bar) inside a
- * 24px box, so the flex centering of StyledGlyphBox centers the icon
+ * 24px box, so the flex centering of GlyphBox centers the icon
  * by construction, identically on web and native. Do not reintroduce
  * a text glyph for this icon, and do not "fix" centering with an
  * explicit lineHeight — that is the explosion above.
  */
 
+/**
+ * The field's bordered container. This root KEEPS a styled
+ * surface (#746, Option B exception — recorded for the
+ * tranche-9 ESLint allowlist): the focus ring belongs on the
+ * whole field, not the inner input (whose own outline is
+ * suppressed), and Tamagui exposes pseudo-style props
+ * (focus-within) only inside styled() configs — a plain
+ * function component cannot express the ring. Everything the
+ * subset can say is restated here in the styled config; the
+ * asymmetric horizontal padding (12px leading, 4px trailing —
+ * the clear button carries its own 44px target) and the
+ * grow path's height fill stay as before.
+ */
 const StyledContainer = styled(XStack, {
   name: "SearchField",
 
@@ -55,7 +71,7 @@ const StyledContainer = styled(XStack, {
   // minHeight, deliberately not a fixed height: the row must stay
   // able to grow for a caller-sized input (props forward via ...rest).
   // What must never grow it is the glyph — that is capped separately
-  // by StyledGlyphBox below (on Android this container reached 1826px
+  // by GlyphBox below (on Android this container reached 1826px
   // when the glyph's line box exploded; see the note at the top).
   minHeight: 44,
   alignItems: "center",
@@ -67,20 +83,50 @@ const StyledContainer = styled(XStack, {
   outlineStyle: "none focus-within:solid",
   outlineColor: "$link",
   outlineOffset: 2,
+
+  variants: {
+    // Embedded (#805): the caller's field frame owns the border,
+    // background, and focus ring, so the container renders none
+    // of its own.
+    // Error state (#804): the container's border takes the
+    // danger color, the same error border TextField's styled
+    // input carries. The embedded form renders no border of its
+    // own, so an embedded field's error border is its frame's
+    // owner's concern (AutocompletePicker renders its own error
+    // Alert below the frame instead).
+    error: {
+      true: {
+        borderColor: "$danger",
+      },
+    },
+    embedded: {
+      true: {
+        borderWidth: 0,
+        backgroundColor: "transparent",
+        paddingLeft: 0,
+        paddingRight: 0,
+        outlineWidth: "0px",
+        outlineStyle: "none",
+      },
+    },
+  },
 });
 
-const StyledGlyphBox = styled(XStack, {
-  name: "SearchFieldGlyphBox",
-
-  // Fixed height + hidden overflow: the glyph's own box. If the
-  // glyph's measurement ever explodes again, it clips inside this
-  // 44px box instead of stretching the row (eciperay#162).
-  height: 44,
-  alignItems: "center",
-  justifyContent: "center",
-  overflow: "hidden",
-  flexShrink: 0,
-});
+/**
+ * The glyph's own box (#746, Option B): fixed height + hidden
+ * overflow. If the glyph's measurement ever explodes again, it
+ * clips inside this 44px box instead of stretching the row
+ * (eciperay#162). The never-shrink rule rides the style
+ * channel — Row's shrink prop only adds shrink, it cannot
+ * pin 0.
+ */
+function GlyphBox({ children }: { children: ReactNode }) {
+  return (
+    <Row middle center height={44} overflow="hidden" style={{ flexShrink: 0 }}>
+      {children}
+    </Row>
+  );
+}
 
 /**
  * The search icon, drawn from fixed-dimension shapes rather than the
@@ -89,7 +135,7 @@ const StyledGlyphBox = styled(XStack, {
  * overlapping the lens edge on its lower-right diagonal. Both are
  * absolutely positioned inside a fixed 24px box, so the icon's own
  * geometry — not a font's metrics — decides where the ink sits, and
- * StyledGlyphBox's flex centering centers the icon itself.
+ * GlyphBox's flex centering centers the icon itself.
  */
 function SearchGlyph() {
   return (
@@ -158,6 +204,21 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
    * inside stays 44 and centered. Off by default; a standalone
    * field sizes as before. */
   grow?: boolean;
+  /** Borderless form for embedding inside a bordered field frame
+   * owned by the caller (AutocompletePicker's in-field chips
+   * frame, #805): the container drops its own border, background,
+   * horizontal padding, and focus ring — the caller's frame owns
+   * all four — and the field flexes to share the frame's row with
+   * whatever else the frame holds. Used only by the picker; every
+   * other consumer renders the standalone bordered field. */
+  embedded?: boolean;
+  /**
+   * Validation error (#804): rendered below the field through
+   * the shared FieldError (an Alert), wired to the input with
+   * `aria-invalid` / `aria-describedby` at `${id}-error`, and
+   * the container's border takes the error treatment.
+   */
+  error?: string;
 };
 
 /**
@@ -171,7 +232,7 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
  * `disabled` disables the whole field, clear button included: the
  * input takes the prop as before, and the clear button drops its
  * press handler entirely and reports the disabled state through
- * the platform translator (the ListRow disabled treatment) — a
+ * the platform translator (the ListItem disabled treatment) — a
  * disabled field's text cannot be cleared out from under its
  * owner. The component forwards a ref to the inner input, so a
  * caller that must move focus back to the field — the
@@ -186,6 +247,8 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
     id: idProp,
     placeholder,
     grow = false,
+    embedded = false,
+    error,
     disabled = false,
     onSubmitEditing,
     onCompositionStart,
@@ -196,6 +259,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
 ) {
   const autoId = useId();
   const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
 
   return (
     <FieldShell
@@ -207,46 +271,55 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
       onSubmitEditing={onSubmitEditing}
     >
       {({ submitEditingProps, compositionProps }) => (
-        <StyledContainer {...(grow && !label ? { flex: 1 } : {})}>
-          <StyledGlyphBox>
-            <SearchGlyph />
-          </StyledGlyphBox>
-          <StyledInput
-            ref={ref}
-            id={id}
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            disabled={disabled}
-            {...rest}
-            {...submitEditingProps}
-            {...compositionProps}
-          />
-          {value ? (
-            <XStack
-              onPress={disabled ? undefined : () => onChangeText("")}
-              {...platformAccessibilityProps({
-                accessibilityRole: "button",
-                accessibilityLabel: "Clear search",
-                accessibilityState: { disabled },
-              })}
-              alignItems="center"
-              justifyContent="center"
-              minWidth={44}
-              minHeight={44}
-            >
-              <Text
-                aria-hidden
-                style={{
-                  fontSize: tokens.typography.fontSize.lg,
-                  color: "$textMuted",
-                }}
+        <>
+          <StyledContainer
+            error={!!error}
+            {...(embedded ? { flex: 1, minWidth: 120, embedded: true } : {})}
+            {...(grow && !label ? { flex: 1 } : {})}
+          >
+            <GlyphBox>
+              <SearchGlyph />
+            </GlyphBox>
+            <StyledInput
+              ref={ref}
+              id={id}
+              value={value}
+              onChangeText={onChangeText}
+              placeholder={placeholder}
+              disabled={disabled}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? errorId : undefined}
+              {...rest}
+              {...submitEditingProps}
+              {...compositionProps}
+            />
+            {value ? (
+              <Row
+                middle
+                center
+                minWidth={44}
+                minHeight={44}
+                onPress={disabled ? undefined : () => onChangeText("")}
+                {...platformAccessibilityProps({
+                  accessibilityRole: "button",
+                  accessibilityLabel: "Clear search",
+                  accessibilityState: { disabled },
+                })}
               >
-                ×
-              </Text>
-            </XStack>
-          ) : null}
-        </StyledContainer>
+                <Text
+                  aria-hidden
+                  style={{
+                    fontSize: tokens.typography.fontSize.lg,
+                    color: "$textMuted",
+                  }}
+                >
+                  ×
+                </Text>
+              </Row>
+            ) : null}
+          </StyledContainer>
+          {error ? <FieldError error={error} id={errorId} /> : null}
+        </>
       )}
     </FieldShell>
   );

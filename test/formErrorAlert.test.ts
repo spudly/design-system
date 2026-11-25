@@ -15,12 +15,16 @@
  *   Alert too;
  * - no in-scope file still renders its form-level error as plain
  *   error-variant Text;
- * - field-level errors are untouched: they keep their id wiring
- *   (LabeledField / the field components), which is a separate,
- *   already-announced path.
- * - exception (#472): ColorPickerField's field error renders
- *   through Alert instead, keeping its errorId on the Alert so the
+ * - field-level errors were originally untouched by #329: they
+ *   kept their id wiring (LabeledField / the field components).
+ * - exception (#472): ColorPickerField's field error rendered
+ *   through Alert, keeping its errorId on the Alert so the
  *   swatch group's aria-describedby wiring is unchanged.
+ * - #804 (Stephen, 2026-11-24) supersedes the field-level
+ *   exemption: EVERY field-level error now renders through the
+ *   shared FieldError (an Alert at error severity), keeping its
+ *   errorId wiring — the #472 treatment generalized to all
+ *   controls. The pins below record that contract.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -45,10 +49,19 @@ const VIEW_FORM_COMPONENTS = new Set([
 ]);
 // Form-category widgets live in src/widgets/form since #710;
 // TextAreaField joined them in #748.
-const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField", "TextField", "TextAreaField"]);
+const FORM_CATEGORY_COMPONENTS = new Set([
+  "SelectField",
+  "ColorPickerField",
+  "TextField",
+  "TextAreaField",
+  "CheckboxField",
+  "FieldShell",
+  "NumberStepper",
+  "RatingForm",
+]);
 const formSource = (name: string) =>
   read(
-    `src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,
+    `src/${VIEW_FORM_COMPONENTS.has(name) ? "views/eciperay" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,
   );
 
 const FORM_COMPONENTS = [
@@ -75,7 +88,7 @@ test("form components render their form-level error through Alert (assertive)", 
   // The four auth forms render their error through the shared
   // AuthFormSubmit tail since the #587 phase-2 dedupe — the tail
   // carries the Alert rendering for them.
-  const authFormSubmit = read("src/views/AuthFormSubmit.tsx");
+  const authFormSubmit = read("src/views/eciperay/AuthFormSubmit.tsx");
   assert.ok(
     authFormSubmit.includes(ERROR_ALERT),
     `AuthFormSubmit renders its error via Alert severity="error"`,
@@ -97,7 +110,7 @@ test("form components render their form-level error through Alert (assertive)", 
 
 test("page-level error lines of the same shape render through Alert", () => {
   for (const name of ERROR_PAGES) {
-    const source = read(`src/pages/${name}.tsx`);
+    const source = read(`src/pages/eciperay/${name}.tsx`);
     assert.ok(source.includes(ERROR_ALERT), `${name} renders its error via Alert severity="error"`);
     assert.doesNotMatch(
       source,
@@ -110,7 +123,7 @@ test("page-level error lines of the same shape render through Alert", () => {
 test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
   // AiSessionPage renders its error in BOTH branches (no-session and
   // active-session); pin each region so deleting one line can't pass.
-  const aiSession = read("src/pages/AiSessionPage.tsx");
+  const aiSession = read("src/pages/eciperay/AiSessionPage.tsx");
   const noSessionStart = aiSession.indexOf("if (!session) {");
   const activeSessionStart = aiSession.indexOf("\n  return (", noSessionStart);
   assert.notEqual(noSessionStart, -1, "AiSessionPage has a no-session branch");
@@ -123,7 +136,7 @@ test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
     aiSession.slice(activeSessionStart).includes(ERROR_ALERT),
     "AiSessionPage renders its error via Alert in the active-session branch",
   );
-  const recipeForm = read("src/pages/RecipeFormPage.tsx");
+  const recipeForm = read("src/pages/eciperay/RecipeFormPage.tsx");
   assert.ok(
     recipeForm.includes('<Alert severity="error" message={submitError} />'),
     'RecipeFormPage renders its submitError via Alert severity="error"',
@@ -135,30 +148,41 @@ test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
   );
 });
 
-test("field-level errors keep their id-wired plain Text rendering", () => {
+test("field-level errors render through the shared FieldError with their id wiring (#804)", () => {
   for (const name of ["TextField", "TextAreaField", "SelectField", "CheckboxField"]) {
     const source = formSource(name);
     assert.match(
       source,
+      /<FieldError error=\{error\} id=\{errorId\} \/>/,
+      `${name} renders its field error through FieldError with the errorId wiring`,
+    );
+    assert.doesNotMatch(
+      source,
       /<Text variant="error" id=\{errorId\}>/,
-      `${name} still renders its field error with the errorId wiring`,
+      `${name} no longer renders its field error as plain error Text`,
     );
   }
 });
 
-test("ColorPickerField renders its field error through Alert, keeping the errorId wiring (#472)", () => {
-  // Stephen's #472 directive overrides the field-level plain-Text
-  // treatment for ColorPickerField alone: the error renders inside
-  // an Alert (which announces it), and the Alert carries the
-  // errorId so the swatch group's aria-describedby still resolves.
+test("ColorPickerField renders its field error through FieldError, keeping the errorId wiring (#472, generalized by #804)", () => {
+  // Stephen's #472 directive first moved ColorPickerField's field
+  // error into an Alert (which announces it), with the errorId so
+  // the swatch group's aria-describedby still resolves; #804
+  // generalizes that treatment to every control through the
+  // shared FieldError, which is the Alert rendering.
   const source = formSource("ColorPickerField");
   assert.ok(
-    source.includes('<Alert severity="error" message={error} id={errorId} />'),
-    'ColorPickerField renders its error via Alert severity="error" with the errorId',
+    source.includes("<FieldError error={error} id={errorId} />"),
+    "ColorPickerField renders its error via FieldError (the Alert treatment) with the errorId",
   );
   assert.doesNotMatch(
     source,
     /<Text variant="error" id=\{errorId\}>/,
     "ColorPickerField no longer renders its field error as plain error Text",
+  );
+  const fieldError = read("src/widgets/form/FieldError.tsx");
+  assert.ok(
+    fieldError.includes('<Alert severity="error" message={error}'),
+    "FieldError is the Alert rendering the field errors share (#804)",
   );
 });

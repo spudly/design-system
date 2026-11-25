@@ -1,4 +1,4 @@
-import { YStack } from "tamagui";
+import { Col } from "../widgets/layout/Col.js";
 import { Icon, type IconComponentProps, type IconElement } from "./Icon.js";
 
 /**
@@ -25,8 +25,8 @@ export type CollapsibleIconProps = IconComponentProps & {
  */
 export function CollapsibleIcon({ isOpen, ...props }: CollapsibleIconProps) {
   return (
-    <YStack transition="fast" rotate={isOpen ? "90deg" : "0deg"}>
+    <Col transition="fast" rotate={isOpen ? "90deg" : "0deg"}>
       <Icon elements={chevronRightElements} {...props} />
-    </YStack>
+    </Col>
   );
 }

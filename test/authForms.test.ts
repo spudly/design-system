@@ -12,10 +12,10 @@
  *   the built dist, and each auth page composes its form unit
  *   (the page keeps its prop surface — the b3cPages pins hold
  *   the declarations);
- * - the forms compose the shared FormStack (the #119 dedupe
- *   canonical form stack), which owns the 16px field rhythm —
- *   no form defines a local form stack — and the pages render
- *   no fields directly;
+ * - the forms compose the shared form stack — a Col at
+ *   gap "m" since #746 eliminated the #119 FormStack wrapper —
+ *   which owns the 12px field rhythm; no form defines a local
+ *   form stack — and the pages render no fields directly;
  * - each form's submit button is named for the label it
  *   renders in both its idle and loading states;
  * - SignUpForm keeps the legalNotice copy data between the submit
@@ -58,7 +58,7 @@ test("the auth forms and LegalSection are exported from their barrels", () => {
 
 test("the auth pages compose their form units and render no fields directly", () => {
   for (const [form, page] of Object.entries(FORM_PAGES)) {
-    const pageSource = read(`src/pages/${page}.tsx`);
+    const pageSource = read(`src/pages/eciperay/${page}.tsx`);
     assert.match(pageSource, new RegExp(String.raw`<${form}\b`), `${page} composes ${form}`);
     assert.doesNotMatch(pageSource, /<TextField/, `${page} renders no field directly`);
     assert.doesNotMatch(
@@ -69,26 +69,26 @@ test("the auth pages compose their form units and render no fields directly", ()
   }
 });
 
-test("each form composes the shared FormStack and owns its submit handling", () => {
+test("each form composes the shared Col form stack and owns its submit handling", () => {
   for (const form of FORMS) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
       source,
-      /import \{ FormStack \} from "\.\.\/widgets\/FormStack\.js";/,
-      `${form} imports the shared FormStack`,
+      /import \{ Col \} from "\.\.\/\.\.\/widgets\/layout\/Col\.js";/,
+      `${form} imports the shared Col`,
     );
-    assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);
+    assert.match(source, /<Col gap="m">/, `${form} renders its sections in the Col form stack`);
     assert.doesNotMatch(
       source,
       /const StyledForm\b/,
-      `${form} defines no local form stack (FormStack owns the 16px field rhythm)`,
+      `${form} defines no local form stack (the Col gap owns the 12px field rhythm)`,
     );
     // SignInForm/SignUpForm declare the bare submit intent in
     // the shared EmailPasswordFormProps (#587 phase 3); the
     // other forms declare it in their own props.
     const intentSource =
       form === "SignInForm" || form === "SignUpForm"
-        ? read("src/views/AuthFormSubmit.tsx")
+        ? read("src/views/eciperay/AuthFormSubmit.tsx")
         : source;
     assert.match(intentSource, /onSubmit: \(\) => void/, `${form} submits a bare intent`);
     assert.doesNotMatch(
@@ -146,7 +146,7 @@ const PAGE_FORM_PROPS: Record<string, string[]> = {
 
 test("auth pages forward their props to their forms", () => {
   for (const [form, page] of Object.entries(FORM_PAGES)) {
-    const pageSource = read(`src/pages/${page}.tsx`);
+    const pageSource = read(`src/pages/eciperay/${page}.tsx`);
     const invocation = pageSource.match(new RegExp(String.raw`<${form}\b[\s\S]*?/>`));
     assert.ok(invocation, `${page} invokes ${form}`);
     for (const prop of PAGE_FORM_PROPS[page]) {
@@ -157,13 +157,13 @@ test("auth pages forward their props to their forms", () => {
 
 test("the email-bearing forms thread emailError to the email field only (#535)", () => {
   for (const form of ["SignInForm", "SignUpForm", "ForgotPasswordForm"]) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     // SignInForm/SignUpForm declare emailError in the shared
     // EmailPasswordFormProps (#587 phase 3); ForgotPasswordForm
     // declares it in its own props.
     const declarationSource =
       form === "SignInForm" || form === "SignUpForm"
-        ? read("src/views/AuthFormSubmit.tsx")
+        ? read("src/views/eciperay/AuthFormSubmit.tsx")
         : source;
     assert.ok(
       declarationSource.includes("emailError?: string | null | undefined;"),
@@ -179,7 +179,7 @@ test("the email-bearing forms thread emailError to the email field only (#535)",
       `${form} threads emailError exactly once (the email field only)`,
     );
   }
-  const reset = read("src/views/ResetPasswordForm.tsx");
+  const reset = read("src/views/eciperay/ResetPasswordForm.tsx");
   assert.ok(
     !reset.includes("emailError"),
     "ResetPasswordForm has no email field and no emailError",
@@ -201,7 +201,7 @@ test("each form's submit button is named for the label it renders, in both state
     ResetPasswordForm: "resetPasswordForm",
   };
   for (const [form, voiceKey] of Object.entries(BUTTON_VOICE)) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
       source.replace(/\s+/g, " "),
       new RegExp(
@@ -217,7 +217,7 @@ test("each form's submit button is named for the label it renders, in both state
       source.includes("submitLabel={submitLabel}"),
       `${form} passes its resolved label to the shared AuthFormSubmit tail`,
     );
-    const tail = read(`src/views/AuthFormSubmit.tsx`);
+    const tail = read(`src/views/eciperay/AuthFormSubmit.tsx`);
     assert.ok(
       tail.includes("accessibilityLabel={submitLabel}"),
       `${form} names its submit button with the resolved label`,
@@ -230,7 +230,7 @@ test("each form's submit button is named for the label it renders, in both state
 });
 
 test("SignUpForm keeps the legal notice between submit and the sign-in link", () => {
-  const source = read("src/views/SignUpForm.tsx");
+  const source = read("src/views/eciperay/SignUpForm.tsx");
   const submitAt = source.indexOf("{submitLabel}");
   const noticeAt = source.indexOf("{legalNotice ? (");
   const linkAt = source.indexOf("{voice.signUpForm.signInLabel}");
@@ -242,7 +242,7 @@ test("SignUpForm keeps the legal notice between submit and the sign-in link", ()
 });
 
 test("LegalSection frames the host's links under its title in the app treatment", () => {
-  const source = read("src/widgets/LegalSection.tsx");
+  const source = read("src/widgets/content/LegalSection.tsx");
   assert.match(source, /title: string/, "the title crosses as the host's copy");
   assert.match(source, /children: ReactNode/, "the links cross as children");
   assert.match(
@@ -255,7 +255,7 @@ test("LegalSection frames the host's links under its title in the app treatment"
     /fontWeight: tokens\.typography\.fontWeight\.semibold/,
     "the title keeps the app section title's weight",
   );
-  assert.match(source, /gap: tokens\.spacing\[3\]/, "the block carries its 12px rhythm");
+  assert.match(source, /<Col gap="m">/, "the block carries its 12px rhythm");
   assert.match(
     source,
     /color: "\$color"/,
@@ -269,7 +269,7 @@ test("LegalSection frames the host's links under its title in the app treatment"
 });
 
 test("TextLink's muted tone is the muted role on both frames, under an explicit color", () => {
-  const source = read("src/widgets/TextLink.tsx");
+  const source = read("src/widgets/actions/TextLink.tsx");
   assert.match(source, /tone\?: "default" \| "muted"/, "the tone prop is declared");
   assert.match(
     source,

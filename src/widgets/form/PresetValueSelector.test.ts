@@ -49,7 +49,7 @@ test("the selector is a labeled preset row of toggle buttons plus the editable c
     /\{isCustomEditing \? \(/,
     "the editor replaces the custom button while editing",
   );
-  assert.match(code, /<TextField\s+accessibilityLabel=\{customAccessibilityLabel\}/);
+  assert.match(code, /<TextField\s+disabled=\{disabled\}\s+accessibilityLabel=\{customAccessibilityLabel\}/);
   assert.match(
     code,
     /onChange\(String\(parsed\)\)/,
@@ -70,6 +70,22 @@ test("the custom slot keeps the widened share that keeps its label on one line (
   // which wrapped mid-word and made the button taller than the
   // preset row. The widened share is the fix; shrinking it back
   // reintroduces the wrap.
-  assert.match(code, /<XStack flex=\{0\.35\}>/);
-  assert.match(code, /<XStack flex=\{1\} gap=/, "the preset row keeps the remaining share");
+  assert.match(code, /<Row grow=\{0\.35\} shrink style=\{\{ flexBasis: 0 \}\}>/);
+  assert.match(code, /<Row grow shrink gap=/, "the preset row keeps the remaining share");
+});
+
+test("disabled declares, dims, and disables presets, the custom slot, and its editor (#801)", () => {
+  assert.match(code, /disabled\?: boolean/);
+  assert.match(code, /disabled = false/);
+  assert.match(code, /opacity=\{disabled \? 0\.5 : 1\}/);
+  assert.match(code, /disabled=\{disabled\}/);
+  assert.match(code, /if \(disabled\) \{\s*return;/);
+});
+test("PresetValueSelector has a Disabled story (#801)", () => {
+  const stories = readFileSync(
+    join(here, "../../..", "src", "widgets", "form", "PresetValueSelector.stories.tsx"),
+    "utf8",
+  );
+  assert.match(stories, /export const Disabled/);
+  assert.match(stories, /disabled/);
 });

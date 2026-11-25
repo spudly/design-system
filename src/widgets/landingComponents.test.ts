@@ -9,8 +9,10 @@
  * so they were composed back into LandingPage, and this test
  * guarded that end state. Tranche 2 of the refreshed #119
  * inventory supersedes it for the geometry: the hero, CTA-row,
- * and grid geometry now live in the generic HeroStack,
- * StackedButtonRow, and CardGrid widgets (CardGrid returns
+ * and grid geometry now live in the generic widgets —
+ * StackedButtonRow and CardGrid (the hero's geometry lived in
+ * HeroStack until #746 eliminated it for a Col composition in
+ * the page; CardGrid returns
  * under its old name as a generic card grid, not the
  * page-specific component that was eliminated), while Hero,
  * CtaRow, and FeatureCard stay eliminated — this test guards
@@ -23,7 +25,7 @@
  * href form and was deleted on Stephen's ruling on PR #311 —
  * the landing's CTAs are <Button href>. The page-level SSR
  * pins for the rendered anchors and headings live in
- * src/pages/LandingPage.test.ts.)
+ * src/pages/eciperay/LandingPage.test.ts.)
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -41,11 +43,10 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const page = readCode("src/pages/LandingPage.tsx");
+const page = readCode("src/pages/eciperay/LandingPage.tsx");
 const componentsBarrel = readCode("src/widgets/index.ts");
-const heroStack = readCode("src/widgets/HeroStack.tsx");
-const stackedButtonRow = readCode("src/widgets/StackedButtonRow.tsx");
-const cardGrid = readCode("src/widgets/CardGrid.tsx");
+const stackedButtonRow = readCode("src/widgets/actions/StackedButtonRow.tsx");
+const cardGrid = readCode("src/widgets/layout/CardGrid.tsx");
 
 const ELIMINATED = ["Hero", "CtaRow", "FeatureCard"];
 
@@ -76,27 +77,17 @@ test("the landing components are not library components anymore", async () => {
   assert.ok(!componentsBarrel.includes("CtaLink"), "the barrel must not export CtaLink");
 });
 
-test("the hero treatment lives in HeroStack: centered, 12px rhythm, top breathing room", () => {
+test("the hero treatment lives in the page's hero Col: centered, 12px rhythm", () => {
   assert.match(page, /<Text variant="heading" textAlign="center">/);
   assert.match(page, /color="\$textMuted" textAlign="center"/);
-  assert.match(page, /<HeroStack>/, "the hero renders in HeroStack");
-  assert.match(heroStack, /alignItems: "center",/);
-  assert.match(heroStack, /gap: tokens\.spacing\[3\],/);
-  assert.match(
-    heroStack,
-    /paddingTop: tokens\.spacing\[6\],/,
-    "the hero stack owns its top breathing room",
-  );
+  assert.match(page, /<Col center gap="m">/, "the hero renders in a centered Col at gap m (#746)");
   assert.match(page, /heroTitle: string;/);
   assert.match(page, /heroSubtitle: string;/);
 });
 
 test("the CTA row treatment lives in StackedButtonRow: stacks narrow, rows on web, never wrapping", () => {
   assert.match(page, /<StackedButtonRow>/, "the CTAs render in StackedButtonRow");
-  assert.match(
-    stackedButtonRow,
-    /flexDirection="web:row"\s+gap=\{tokens\.spacing\[3\]\}\s+alignItems="center"\s+justifyContent="center"/,
-  );
+  assert.match(stackedButtonRow, /<Col flexDirection="web:row" gap="m" center middle>/);
   assert.ok(!stackedButtonRow.includes("flexWrap"), "the CTA row never wraps");
 });
 
@@ -105,7 +96,7 @@ test("the feature card and grid treatments live in CardGrid: 260px flex basis, w
   assert.match(page, /<Card key=\{feature\.title\}>/, "the page supplies plain cards");
   assert.match(page, /<Text variant="subheading">\{feature\.title\}<\/Text>/);
   assert.match(page, /color="\$textMuted"/, "the description is muted ink");
-  assert.match(cardGrid, /<XStack flexWrap="wrap" gap=\{tokens\.spacing\[3\]\}>/);
+  assert.match(cardGrid, /<Row wrap gap="m">/);
   assert.match(cardGrid, /flex: 1,/, "the grid grows each card to share its row");
   assert.match(cardGrid, /flexBasis: 260,/, "the grid's wrap basis is 260px");
   assert.match(cardGrid, /gap: "\$2",/, "the grid sets each card's internal rhythm");

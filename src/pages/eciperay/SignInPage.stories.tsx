@@ -1,0 +1,78 @@
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+import { useState } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+import { Text } from "../../widgets/data/Text.js";
+import { SignInPage } from "./SignInPage.js";
+
+const meta: Meta<typeof SignInPage> = {
+  title: "Pages/Eciperay/SignInPage",
+  component: SignInPage,
+  globals: { theme: "light_warmHarvest" },
+};
+
+export default meta;
+type Story = StoryObj<typeof SignInPage>;
+
+const filledValue = "correct horse battery";
+
+/**
+ * Interactive wrapper: the fields are stateful so the story
+ * can be typed in, and submit switches the page to its
+ * loading state — so Enter-to-submit (#255) and the
+ * held-while-loading guard are observable in Storybook
+ * (submit shows "Signing in…" and disables the button; the "Submissions: N"
+ * readout under the page counts each submit).
+ */
+function Interactive({
+  error,
+  emailError,
+  initialLoading = false,
+}: {
+  error?: string;
+  emailError?: string;
+  initialLoading?: boolean;
+}) {
+  const [email, setEmail] = useState("cook@example.com");
+  const [password, setPassword] = useState(filledValue);
+  const [loading, setLoading] = useState(initialLoading);
+  const [submissions, setSubmissions] = useState(0);
+  return (
+    <>
+      <>
+        <SignInPage
+          footer={eciperayFooterFixture}
+          email={email}
+          password={password}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          loading={loading}
+          error={error ?? null}
+          emailError={emailError ?? null}
+          onSubmit={() => {
+            setSubmissions((count) => count + 1);
+            setLoading(true);
+          }}
+          signUpHref="/signup"
+          forgotPasswordHref="/forgot-password"
+        />
+      </>
+      <Text>Submissions: {submissions}</Text>
+    </>
+  );
+}
+
+export const Filled: Story = {
+  render: () => <Interactive />,
+};
+
+export const WithError: Story = {
+  render: () => <Interactive error="Invalid email or password." />,
+};
+
+export const WithEmailError: Story = {
+  render: () => <Interactive emailError="Enter a valid email address." />,
+};
+
+export const Loading: Story = {
+  render: () => <Interactive initialLoading />,
+};

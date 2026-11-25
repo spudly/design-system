@@ -1,8 +1,11 @@
 import { useId } from "react";
-import { RadioGroup as TamaguiRadioGroup, Label, XStack, YStack, styled } from "tamagui";
+import { RadioGroup as TamaguiRadioGroup, Label, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledItem = styled(TamaguiRadioGroup.Item, {
   name: "RadioItem",
@@ -33,6 +36,8 @@ export type RadioOptionGroupProps = Omit<
   value: string;
   onValueChange: (value: string) => void;
   error?: string;
+  /** When true, the whole group is inert and dimmed; no option can be selected. */
+  disabled?: boolean;
   id?: string;
 };
 
@@ -50,6 +55,7 @@ export function RadioOptionGroup({
   value,
   onValueChange,
   error,
+  disabled = false,
   id: idProp,
   ...rest
 }: RadioOptionGroupProps) {
@@ -59,7 +65,7 @@ export function RadioOptionGroup({
   const errorId = `${id}-error`;
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <Col gap="xs">
       {label ? (
         <Text id={groupLabelId} variant="body">
           {label}
@@ -67,20 +73,30 @@ export function RadioOptionGroup({
       ) : null}
       <TamaguiRadioGroup
         value={value}
-        onValueChange={onValueChange}
+        onValueChange={(next) => {
+          if (disabled) {
+            return;
+          }
+          onValueChange(next);
+        }}
+        disabled={disabled}
+        opacity={disabled ? 0.5 : 1}
+        aria-disabled={disabled || undefined}
         aria-labelledby={label ? groupLabelId : undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...rest}
       >
-        <YStack gap={tokens.spacing[1]}>
+        <Col gap="xs">
           {options.map((opt) => {
             const selected = opt.value === value;
             const optionLabelId = `${id}-option-${opt.value}`;
             return (
-              <XStack key={opt.value} alignItems="center" gap={tokens.spacing[2]}>
-                <StyledItem value={opt.value} aria-labelledby={optionLabelId}>
-                  <XStack
+              <Row key={opt.value} middle gap="s">
+                <StyledItem value={opt.value} disabled={disabled} aria-labelledby={optionLabelId}>
+                  <Row
+                    middle
+                    center
                     width={24}
                     height={24}
                     borderRadius={tokens.radii.full}
@@ -95,8 +111,6 @@ export function RadioOptionGroup({
                     // same ≥3:1 (WCAG 1.4.11) in both modes — see TextField.
                     borderColor={selected ? "$link" : "$textMuted"}
                     backgroundColor="$surface"
-                    alignItems="center"
-                    justifyContent="center"
                   >
                     {/* The Indicator itself is the dot: Tamagui sizes the
                         Indicator frame to 50% of the circle (10x10), so a
@@ -110,28 +124,30 @@ export function RadioOptionGroup({
                       borderRadius={tokens.radii.full}
                       backgroundColor="$link"
                     />
-                  </XStack>
+                  </Row>
                 </StyledItem>
-                <YStack flex={1} gap={tokens.spacing[1]}>
+                <Col grow shrink gap="xs">
                   <Label
                     id={optionLabelId}
-                    onPress={() => onValueChange(opt.value)}
+                    onPress={
+                      disabled
+                        ? undefined
+                        : () => {
+                            onValueChange(opt.value);
+                          }
+                    }
                     fontSize={tokens.typography.fontSize.md}
                   >
                     {opt.label}
                   </Label>
                   {opt.description ? <Text variant="hint">{opt.description}</Text> : null}
-                </YStack>
-              </XStack>
+                </Col>
+              </Row>
             );
           })}
-        </YStack>
+        </Col>
       </TamaguiRadioGroup>
-      {error ? (
-        <Text variant="error" id={errorId}>
-          {error}
-        </Text>
-      ) : null}
-    </YStack>
+      {error ? <FieldError error={error} id={errorId} /> : null}
+    </Col>
   );
 }

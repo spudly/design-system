@@ -1,33 +1,51 @@
 import { useId } from "react";
-import { XStack, YStack, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { useTagColorResolver } from "../tagColors.js";
-import { Alert } from "../Alert.js";
-import { Text } from "../Text.js";
+import { FieldError } from "./FieldError.js";
+import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
-const Swatch = styled(YStack, {
-  name: "ColorSwatch",
+/**
+ * One color swatch (#746, Option B): a 44px round Col whose
+ * ring darkens when selected — the former styled variant is a
+ * conditional borderColor prop in code. The press and a11y
+ * props ride Col's passthrough from the use site.
+ */
+type SwatchProps = Omit<
+  ColProps,
+  | "width"
+  | "height"
+  | "borderRadius"
+  | "borderWidth"
+  | "borderColor"
+  | "cursor"
+  | "center"
+  | "middle"
+> & {
+  /** The selected swatch's ring darkens (gray10 over gray3). */
+  selected: boolean;
+};
 
-  width: 44,
-  height: 44,
-  borderRadius: tokens.radii.full,
-  borderWidth: 2,
-  borderColor: tokens.colors.gray.gray3,
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-
-  variants: {
-    selected: {
-      true: {
-        borderColor: tokens.colors.gray.gray10,
-      },
-    },
-  } as const,
-});
+function Swatch({ selected, ...rest }: SwatchProps) {
+  return (
+    <Col
+      center
+      middle
+      width={44}
+      height={44}
+      borderRadius={tokens.radii.full}
+      borderWidth={2}
+      borderColor={selected ? tokens.colors.gray.gray10 : tokens.colors.gray.gray3}
+      cursor="pointer"
+      {...rest}
+    />
+  );
+}
 
 export type ColorPickerFieldProps = {
   label?: string;
@@ -44,6 +62,8 @@ export type ColorPickerFieldProps = {
   value?: TagColorName;
   onChange?: (color: TagColorName) => void;
   error?: string;
+  /** When true, every swatch is inert and the group is dimmed. */
+  disabled?: boolean;
   id?: string;
 };
 
@@ -64,6 +84,7 @@ export function ColorPickerField({
   value,
   onChange,
   error,
+  disabled = false,
   id: idProp,
 }: ColorPickerFieldProps) {
   const voice = useVoice();
@@ -75,15 +96,16 @@ export function ColorPickerField({
   const resolvedValue = value ? resolveTagColor(value) : undefined;
 
   return (
-    <YStack gap={tokens.spacing[2]} flexShrink={1} flexGrow={1} minWidth={0}>
+    <Col gap="s" grow shrink minWidth={0}>
       {label ? (
         <Text id={labelId} style={{ fontSize: tokens.typography.fontSize.sm }}>
           {label}
         </Text>
       ) : null}
-      <XStack
-        flexWrap="wrap"
-        gap={tokens.spacing[2]}
+      <Row
+        wrap
+        gap="s"
+        opacity={disabled ? 0.5 : 1}
         {...groupRoleProps}
         aria-labelledby={label ? labelId : undefined}
         aria-label={label ? undefined : voice.colorPickerField.chooseColorLabel}
@@ -100,14 +122,24 @@ export function ColorPickerField({
               {...platformAccessibilityProps({
                 accessibilityRole: "button",
                 accessibilityLabel: voice.colorPickerField.selectColorLabel(color),
+                accessibilityState: { disabled },
               })}
               aria-pressed={selected}
-              onPress={() => onChange?.(color)}
+              aria-disabled={disabled || undefined}
+              disabled={disabled}
+              tabIndex={disabled ? -1 : 0}
+              onPress={
+                disabled
+                  ? undefined
+                  : () => {
+                      onChange?.(color);
+                    }
+              }
             />
           );
         })}
-      </XStack>
-      {error ? <Alert severity="error" message={error} id={errorId} /> : null}
-    </YStack>
+      </Row>
+      {error ? <FieldError error={error} id={errorId} /> : null}
+    </Col>
   );
 }

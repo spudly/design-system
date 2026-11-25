@@ -26,8 +26,8 @@ function readCode(name: string) {
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
-const brandLink = readCode("BrandLink.tsx");
-const footer = readCode("BigFooter.tsx");
+const brandLink = readCode("actions/BrandLink.tsx");
+const footer = readCode("content/BigFooter.tsx");
 test("BrandLink is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
@@ -67,7 +67,7 @@ test("BigFooter is the public pages' footer (#410)", () => {
   // through BigFooterShell), and it stays unexported from the
   // package root.
   assert.match(footer, /backgroundColor="\$primary"/, "the primary band (#465)");
-  assert.match(footer, /flexWrap="wrap"/, "the columns wrap — the mobile collapse");
+  assert.match(footer, /<Row wrap/, "the columns wrap — the mobile collapse");
   assert.match(footer, /export type BigFooterData = \{/);
   assert.match(footer, /columns: BigFooterColumn\[\];/);
   assert.match(footer, /storeLinks: BigFooterStoreLink\[\];/);
@@ -115,7 +115,8 @@ test("SSR: BrandLink renders as a real anchor carrying the given href", async ()
 });
 test("SSR: BigFooter renders exactly the caller's links, in order", async () => {
   const {} = await loadRuntime();
-  const { BigFooter }: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
+  const { BigFooter }: Record<string, any> =
+    await import("../../dist/widgets/content/BigFooter.js");
   const html = await renderToHtml(
     <BigFooter
       footer={{

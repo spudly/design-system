@@ -26,8 +26,8 @@ function readCode(rel: string) {
 
 // Shared by the two #237 page-pattern tests below (hoisted so each
 // page source is read once).
-const aiSession = readCode("src/pages/AiSessionPage.tsx");
-const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
+const aiSession = readCode("src/pages/eciperay/AiSessionPage.tsx");
+const recipeDetail = readCode("src/pages/eciperay/RecipeDetailPage.tsx");
 
 test("button-role pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
   // A Tamagui stack carrying role="button" is a div: without

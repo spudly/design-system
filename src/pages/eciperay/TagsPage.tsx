@@ -1,0 +1,409 @@
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { useState } from "react";
+import type { TagColorName } from "../../themes/tagColors.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
+import { Badge } from "../../widgets/data/Badge.js";
+import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
+import { Card } from "../../widgets/layout/Card.js";
+import { ColorPickerField } from "../../widgets/form/ColorPickerField.js";
+import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
+import { LoadingScope } from "../../contexts/LoadingScope.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
+import { Text } from "../../widgets/data/Text.js";
+import { TextField } from "../../widgets/form/TextField.js";
+import { TrailingActionsRow } from "../../widgets/actions/TrailingActionsRow.js";
+
+/**
+ * TagsPage (#126, B3c): the tag management view — the split
+ * view half of Eciperay's `TagsView` (the B2 audit's
+ * page-view disposition). The screen keeps the tags query and
+ * the create/delete mutations; this view renders the create
+ * form and the list, and reports intents.
+ *
+ * The form is controlled (name + color values with change
+ * callbacks), the form idiom. The selectable colors cross as a
+ * prop in token names (#207): the host passes which of the DS
+ * tag color names it offers (the canonical list is
+ * `tagColorNames`), and the DS renders the DS ColorPickerField
+ * with them, resolving each name through the active theme.
+ *
+ * Rows render the DS Badge in its colored-tag form (the
+ * former TagPill, merged into Badge in #183) with Edit /
+ * Delete actions rendered as ghost Buttons in the row's own
+ * inline composition (#464, retiring TextAction), so they are real
+ * buttons — keyboard-focusable and Enter/Space-operable on
+ * web; the row card treatment is the app view's, on DS
+ * tokens. While `loading`, the list region renders skeleton
+ * rows (#278, tranche 4 — the centered-Spinner pattern is
+ * deleted): the title and the create form stay rendered (the
+ * form is user input, not loaded content) and the list holds
+ * exactly 3 dummy rows mirroring the display-row composition
+ * — a pill bone at the badge's geometry in a compact card,
+ * with the row's ghost actions kept as inert text-bone
+ * Buttons inside the loading scope (Edit only when the host
+ * wires it, as the loaded rows render it).
+ *
+ * The create form is stacked (#189): the name field takes its
+ * own full-width row, and the color swatches and Add button
+ * share the row below. All three previously shared one row,
+ * where the swatch row overlapped the name input and the
+ * input collapsed to a sliver behind the first swatch.
+ *
+ * That second row wraps (#219): at narrow widths the
+ * ColorPickerField shrinks (its swatches wrap internally)
+ * and, if the row still cannot fit, the Add button wraps
+ * below the swatches instead of overflowing off-screen.
+ *
+ * Rows can be edited in place (eciperay#254): when the host
+ * supplies `onStartEdit`, each row carries an Edit action next
+ * to Delete. Starting an edit swaps the row for the edit form
+ * — name field, swatches, Save/Cancel — whose draft is
+ * controlled exactly like the create form and the CommentItem
+ * editor: the host seeds the draft from the tag it is handed,
+ * holds it while the user types, and applies it on
+ * `onSaveEdit`. Without `onStartEdit`, rows offer no Edit action,
+ * but a host can still show the inline editor by supplying
+ * `editingTagId` for an eligible row. Delete remains available
+ * unless `canDelete: false`.
+ *
+ * Row actions are per-row eligible (#375): a host whose server
+ * only permits changing some tags (Eciperay's preset tags are
+ * read-only to callers, eciperay#254) marks those tags with
+ * `canEdit: false` and/or `canDelete: false` on the tag data
+ * itself, and the page renders Edit/Delete only where the row
+ * is eligible — an ineligible row shows no control that could
+ * only fail server-side. Both flags default to eligible when
+ * absent, so hosts that pass neither see the actions on every
+ * row, exactly as before. An edit-ineligible row never swaps
+ * to the edit form either, even if the host's `editingTagId`
+ * names it.
+ *
+ * De-styled for #119: the page composes DS components only —
+ * the sections stack in a Col at gap xxl, the title is Text's
+ * `title` variant, each form's fields stack in a Col at gap m,
+ * the picker-and-actions rows are TrailingActionsRow (which
+ * carries the #219 wrap), the editor card is Card's `compact`
+ * variant, each display row composes its badge and ghost
+ * action Buttons inline in a compact Card (#709 — the row
+ * was a single-use widget until it was inlined into this,
+ * its only caller), and the rows stack in a Col at gap s at
+ * its 8px rhythm
+ * (the per-row bottom padding they carried before). The
+ * display row composes through the same TrailingActionsRow
+ * as the form rows, so it gains the same wrap at narrow
+ * widths instead of squeezing.
+ *
+ * Save failures surface on the page itself (#374): the
+ * mutating handlers (create, save-edit, delete) may report
+ * failure by returning `false` — synchronously or from a
+ * promise — or by rejecting/throwing; any other result
+ * (including the `void` existing hosts return, and any other
+ * value a host's handler returns for its own purposes) is
+ * success. The page tracks which operation failed and renders the
+ * page-level error pattern — a dismissible error `Alert`
+ * (its error severity announces with role="alert", the
+ * #329-governed announcement mechanics) above the create
+ * form, with a message naming the failed operation. There
+ * is deliberately no error-string prop: hosts own no markup
+ * to render one, and the copy is the page's own.
+ */
+
+/**
+ * What a mutating handler (create / save-edit / delete) may
+ * return (#374): `false` — synchronously or from a promise —
+ * reports failure, as does a rejection or throw; every other
+ * result is success. The type is `unknown` on purpose: the
+ * pre-#374 contract typed the handlers `() => void`, which
+ * silently discarded return values, so existing handlers that
+ * return a created tag, a mutation result, a count, or a
+ * promise of any of those must keep typechecking unchanged.
+ * Narrowing this to a boolean union would break those hosts
+ * on a patch upgrade for no runtime gain — the page only
+ * ever compares the awaited result against `false`.
+ */
+export type TagsPageOperationResult = unknown;
+
+type TagsPageFailedOperation = "create" | "update" | "delete";
+
+const tagsPageFailureMessages: Record<TagsPageFailedOperation, string> = {
+  create: "Couldn't create the tag. Please try again.",
+  update: "Couldn't save the tag changes. Please try again.",
+  delete: "Couldn't delete the tag. Please try again.",
+};
+
+export type TagsPageTag = {
+  id: string;
+  name: string;
+  /**
+   * The tag's color: a DS tag color token name, strictly typed (a
+   * raw hex is a compile error). The host converts stored tag data
+   * to a name through `tagColorNameForHex` before passing tags in.
+   */
+  color: TagColorName;
+  /**
+   * Whether this tag's row offers the Edit action (#375): the
+   * host sets `false` for tags its server will not let the
+   * caller update (preset tags). Absent means eligible — the
+   * row offers Edit whenever the host supplies `onStartEdit`.
+   */
+  canEdit?: boolean;
+  /**
+   * Whether this tag's row offers the Delete action (#375):
+   * the host sets `false` for tags its server will not let the
+   * caller delete (preset tags). Absent means eligible — the
+   * row offers Delete, as every row did before #375.
+   */
+  canDelete?: boolean;
+};
+
+export type TagsPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
+  tags: TagsPageTag[];
+  loading?: boolean;
+  name: string;
+  /** The form's color value: a tag color token name. */
+  color: TagColorName;
+  /** The selectable swatches, as tag color token names — host-supplied. */
+  colorOptions: TagColorName[];
+  onNameChange: (value: string) => void;
+  onColorChange: (value: TagColorName) => void;
+  /** Creates the tag; returning `false` (or rejecting) reports failure (#374). */
+  onCreate: () => TagsPageOperationResult;
+  /** Deletes the tag; returning `false` (or rejecting) reports failure (#374). */
+  onDelete: (id: string) => TagsPageOperationResult;
+  isCreating?: boolean;
+  /** Id of the tag whose row is showing the inline edit form, if any. */
+  editingTagId?: string | null;
+  /** The edit form's name draft (controlled, like the create form). */
+  editName?: string;
+  /** The edit form's color draft: a tag color token name. */
+  editColor?: TagColorName;
+  /**
+   * Starts an inline edit of the given tag; the host seeds the
+   * edit draft from it. When omitted, rows offer no Edit action.
+   */
+  onStartEdit?: (tag: TagsPageTag) => void;
+  onEditNameChange?: (value: string) => void;
+  onEditColorChange?: (value: TagColorName) => void;
+  /**
+   * Applies the edit draft to the tag named by `editingTagId`;
+   * returning `false` (or rejecting) reports failure (#374).
+   */
+  onSaveEdit?: () => TagsPageOperationResult;
+  onCancelEdit?: () => void;
+  isUpdating?: boolean;
+  /**
+   * Seeds the page's failed-operation state (#374): the error
+   * alert for the named operation renders from the first frame,
+   * before any handler runs. Hosts normally leave this unset —
+   * failures arrive through the handlers — but a static capture
+   * (the Android visual-regression driver, a Chromatic snapshot)
+   * never presses a control, so the FailingSaves story seeds
+   * `"create"` to pin the error surface deterministically. The
+   * copy stays the page's own; this names an operation, never a
+   * message.
+   */
+  initialFailedOperation?: TagsPageFailedOperation | null;
+};
+
+// The dummy skeleton rows for the loading list (#278): exactly
+// 3, from a frozen module-level constant — never generated per
+// render (the CheckboxSelectList convention).
+const LOADING_TAG_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
+export function TagsPage({
+  tags,
+  loading = false,
+  name,
+  color,
+  colorOptions,
+  onNameChange,
+  onColorChange,
+  onCreate,
+  onDelete,
+  isCreating = false,
+  editingTagId = null,
+  editName = "",
+  editColor,
+  onStartEdit,
+  onEditNameChange,
+  onEditColorChange,
+  onSaveEdit,
+  onCancelEdit,
+  isUpdating = false,
+  initialFailedOperation = null,
+  footer,
+}: TagsPageProps) {
+  const [failedOperation, setFailedOperation] = useState<TagsPageFailedOperation | null>(
+    initialFailedOperation,
+  );
+
+  const runOperation = async (
+    operation: TagsPageFailedOperation,
+    action: () => TagsPageOperationResult,
+  ) => {
+    try {
+      const result = await action();
+      setFailedOperation(result === false ? operation : null);
+    } catch {
+      setFailedOperation(operation);
+    }
+  };
+
+  const handleCreate = () => {
+    void runOperation("create", onCreate);
+  };
+
+  const handleSaveEdit = () => {
+    void runOperation("update", () => onSaveEdit?.());
+  };
+
+  const handleDelete = (id: string) => {
+    void runOperation("delete", () => onDelete(id));
+  };
+
+  return (
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <Col gap="xxl">
+          <Text variant="title">Tags</Text>
+          {failedOperation ? (
+            <Alert
+              severity="error"
+              dismissible
+              onDismiss={() => {
+                setFailedOperation(null);
+              }}
+            >
+              {tagsPageFailureMessages[failedOperation]}
+            </Alert>
+          ) : null}
+          <Col gap="m">
+            <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
+            <TrailingActionsRow
+              leading={
+                <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
+              }
+            >
+              <Button
+                variant="primary"
+                disabled={!name.trim() || isCreating}
+                onPress={handleCreate}
+                accessibilityLabel="Add"
+              >
+                Add
+              </Button>
+            </TrailingActionsRow>
+          </Col>
+          {loading ? (
+            <LoadingScope active>
+              <Col gap="s">
+                {LOADING_TAG_KEYS.map((key) => (
+                  <Card key={key} variant="compact">
+                    <TrailingActionsRow leading={<BoxSkeleton width={96} height={24} />}>
+                      {onStartEdit ? (
+                        <Button ghost size="sm" accessibilityLabel="Edit tag" onPress={() => {}}>
+                          Edit
+                        </Button>
+                      ) : null}
+                      <Button
+                        ghost
+                        size="sm"
+                        variant="danger"
+                        accessibilityLabel="Delete tag"
+                        onPress={() => {}}
+                      >
+                        Delete
+                      </Button>
+                    </TrailingActionsRow>
+                  </Card>
+                ))}
+              </Col>
+            </LoadingScope>
+          ) : (
+            <Col gap="s">
+              {tags.map((tag) =>
+                editingTagId === tag.id && tag.canEdit !== false ? (
+                  <Card key={tag.id} variant="compact">
+                    <Col gap="m">
+                      <TextField
+                        placeholder="Tag name"
+                        value={editName}
+                        onChangeText={(value) => {
+                          onEditNameChange?.(value);
+                        }}
+                        accessibilityLabel={`Rename tag ${tag.name}`}
+                      />
+                      <TrailingActionsRow
+                        leading={
+                          <ColorPickerField
+                            colors={colorOptions}
+                            value={editColor ?? tag.color}
+                            onChange={(value) => {
+                              onEditColorChange?.(value);
+                            }}
+                          />
+                        }
+                      >
+                        <Button
+                          variant="secondary"
+                          disabled={isUpdating}
+                          onPress={() => {
+                            onCancelEdit?.();
+                          }}
+                          accessibilityLabel="Cancel"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          disabled={!editName.trim() || isUpdating}
+                          onPress={handleSaveEdit}
+                          accessibilityLabel="Save"
+                        >
+                          Save
+                        </Button>
+                      </TrailingActionsRow>
+                    </Col>
+                  </Card>
+                ) : (
+                  <Card key={tag.id} variant="compact">
+                    <TrailingActionsRow leading={<Badge color={tag.color}>{tag.name}</Badge>}>
+                      {onStartEdit && tag.canEdit !== false ? (
+                        <Button
+                          ghost
+                          size="sm"
+                          accessibilityLabel={`Edit tag ${tag.name}`}
+                          onPress={() => {
+                            onStartEdit(tag);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      ) : null}
+                      {tag.canDelete !== false ? (
+                        <Button
+                          ghost
+                          size="sm"
+                          variant="danger"
+                          accessibilityLabel={`Delete tag ${tag.name}`}
+                          onPress={() => {
+                            handleDelete(tag.id);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      ) : null}
+                    </TrailingActionsRow>
+                  </Card>
+                ),
+              )}
+            </Col>
+          )}
+        </Col>
+      </ScreenContainer>
+    </BigFooterShell>
+  );
+}

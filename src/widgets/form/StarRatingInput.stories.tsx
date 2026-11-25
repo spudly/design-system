@@ -68,3 +68,8 @@ export const Disabled: Story = {
   args: { label: "Rate this recipe", value: 2, disabled: true },
   render: (args) => <RatingDemo {...args} />,
 };
+
+export const WithError: Story = {
+  args: { label: "Rate this recipe", value: 0, error: "Please rate this recipe." },
+  render: (args) => <RatingDemo {...args} />,
+};
