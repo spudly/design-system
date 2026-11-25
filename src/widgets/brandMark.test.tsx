@@ -44,7 +44,7 @@ const shellPage = codeOf("src/pages/eciperay/AppShellPage.tsx");
 const footer = codeOf("src/widgets/content/BigFooter.tsx");
 
 test("BrandMark carries the Eciperay mark geometry, ported from the logo (#726)", () => {
-  assert.match(brandMark, /export type BrandMarkName = "eciperay";/);
+  assert.match(brandMark, /export type BrandMarkName = "eciperay" \| "memorize";/);
   assert.match(brandMark, /export function BrandMark\(/);
   assert.match(brandMark, /viewBox="0 0 256 256"/, "the logo's own 256 grid");
   assert.match(brandMark, /fill=\{ECIPERAY_MARK_FIELD\}/, "the blue app-icon field");
@@ -56,6 +56,17 @@ test("BrandMark carries the Eciperay mark geometry, ported from the logo (#726)"
   );
   assert.match(brandMark, /aria-hidden=\{true\}/, "the mark is decorative");
   assert.ok(!brandMark.includes("<img"), "the mark is DS artwork, never a host image");
+});
+
+test("BrandMark carries the Memorize mark, ported from Stephen's concept-1 pick in Quiet Dawn (#861)", () => {
+  assert.match(brandMark, /case "memorize":/, "the Memorize case renders");
+  assert.match(brandMark, /MEMORIZE_MARK_FIELD = "#faf8f2"/, "the warm-paper field");
+  assert.match(brandMark, /MEMORIZE_MARK_BOOK = "#0f766e"/, "the deep teal book");
+  assert.match(brandMark, /MEMORIZE_MARK_ACCENT = "#b45309"/, "the gold rays, flame, and bookmark");
+  assert.match(brandMark, /fill=\{MEMORIZE_MARK_FIELD\}/, "the field renders in Quiet Dawn paper");
+  assert.match(brandMark, /fill=\{MEMORIZE_MARK_BOOK\}/, "the open book renders in deep teal");
+  assert.match(brandMark, /fill=\{MEMORIZE_MARK_ACCENT\}/, "the rays and flame render in gold");
+  assert.match(brandMark, /MEMORIZE_FLAME_PATH/, "the central flame is part of the port");
 });
 
 test("BrandLink renders the named mark and keeps the label as its accessible name (#726)", () => {
@@ -108,6 +119,8 @@ test("stories pin the marked Eciperay brand and the wordmark-only Memorize brand
   const brandLinkStories = readFileSync(join(root, "src/widgets/actions/BrandLink.stories.tsx"), "utf8");
   assert.match(brandLinkStories, /export const WithMark/);
   assert.match(brandLinkStories, /mark: "eciperay"/);
+  assert.match(brandLinkStories, /export const WithMemorizeMark/, "the Memorize story exists (#861)");
+  assert.match(brandLinkStories, /mark: "memorize"/);
   const topBarStories = readFileSync(join(root, "src/widgets/layout/AppTopBar.stories.tsx"), "utf8");
   assert.match(topBarStories, /export const WordmarkOnlyBrand/);
   assert.match(topBarStories, /brand: \{ label: "Memorize", href: "\/" \}/);

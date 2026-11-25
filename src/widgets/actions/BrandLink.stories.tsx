@@ -33,7 +33,21 @@ export const WithMark: Story = {
 };
 
 /**
- * A brand with no graphic mark (Memorize, #726): no mark is
+ * With the Memorize graphic mark (#861): the DS-owned Memorize
+ * mark — the open book with golden rays, a central flame, and
+ * a bookmark, in the Quiet Dawn palette — renders before the
+ * wordmark, inside the same real link.
+ */
+export const WithMemorizeMark: Story = {
+  args: {
+    label: "Memorize",
+    href: "/",
+    mark: "memorize",
+  },
+};
+
+/**
+ * A brand that names no graphic mark (#726): no mark is
  * named, so the wordmark renders alone — no placeholder, no
  * empty slot.
  */

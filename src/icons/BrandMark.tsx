@@ -10,20 +10,34 @@ import { Path, Rect, Svg } from "react-native-svg";
  * #726 — an optional brand-mark name), and the DS renders the
  * mark itself from artwork bundled here.
  *
- * The one mark today is Eciperay's: its geometry is ported
- * verbatim from the eciperay logo's own minimal variant
+ * Eciperay's mark: its geometry is ported verbatim from the
+ * eciperay logo's own minimal variant
  * (packages/theme/logos/generated/logo-minimal.svg in the
  * eciperay repo — the rounded blue app-icon field with the
  * white spoon, without the blueprint grid the full logo
  * carries, which would muddy at header sizes). Stephen
  * approved the port (option A on #726, 2026-11-20): it
  * restores exactly the mark eciperay #620 lost when the host
- * adopted the DS AppShellPage. The mark's colors are the
- * brand's own — part of the artwork, never recolored from the
- * active theme.
+ * adopted the DS AppShellPage.
  *
- * A brand with no mark (Memorize, today) names none: callers
- * render the wordmark alone, exactly as before — there is no
+ * Memorize's mark (#861): Stephen picked concept 1 on
+ * 2026-11-25 — an open book with golden rays fanning from its
+ * pages, a central flame, and a bookmark hanging below the
+ * right cover — and confirmed the composition stands ported
+ * in Memorize's Quiet Dawn palette: the book in deep teal
+ * (#0f766e), the rays, flame, and bookmark in gold (#b45309),
+ * on the warm-paper field (#faf8f2). The artwork below is an
+ * original vector port of that composition, drawn on the
+ * same 256 grid: a fan of tapered rays behind a front-facing
+ * open book (two covers either side of a central spine), the
+ * flame rising on the center ray's stem, and the notched
+ * bookmark below the right cover.
+ *
+ * Each mark's colors are the brand's own — part of the
+ * artwork, never recolored from the active theme.
+ *
+ * A brand with no mark names none: callers render the
+ * wordmark alone, exactly as before — there is no
  * placeholder or empty slot for a missing mark.
  *
  * This is filled brand artwork, not a Feather glyph, so it
@@ -36,7 +50,7 @@ import { Path, Rect, Svg } from "react-native-svg";
  */
 
 /** The brands that have a DS-owned graphic mark, named as data. */
-export type BrandMarkName = "eciperay";
+export type BrandMarkName = "eciperay" | "memorize";
 
 /**
  * The Eciperay spoon glyph, ported from the eciperay logo's
@@ -49,6 +63,19 @@ const ECIPERAY_SPOON_PATH =
 /** The Eciperay mark's own colors — brand artwork, never theme-derived. */
 const ECIPERAY_MARK_FIELD = "#0943ce";
 const ECIPERAY_MARK_GLYPH = "#eef2f6";
+
+/** The Memorize mark's Quiet Dawn colors — brand artwork, never theme-derived. */
+const MEMORIZE_MARK_FIELD = "#faf8f2";
+const MEMORIZE_MARK_BOOK = "#0f766e";
+const MEMORIZE_MARK_ACCENT = "#b45309";
+
+/**
+ * The Memorize flame (#861): a single flame on a slim stem,
+ * rising from the book's center along the middle of the ray
+ * fan — the concept's central flame.
+ */
+const MEMORIZE_FLAME_PATH =
+  "M128 38c5 10 13 17 13 28 0 8-5 14-9 18l-1 34h-6l-1-34c-4-4-9-10-9-18 0-6 3-11 6-16-1 4 0 7 2 10-1-7 1-15 8-22z";
 
 export type BrandMarkProps = {
   /** The brand whose mark renders — data, never an element. */
@@ -70,6 +97,36 @@ export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
         <Svg width={size} height={size} viewBox="0 0 256 256" aria-hidden={true}>
           <Rect x={20} y={20} width={216} height={216} rx={48} fill={ECIPERAY_MARK_FIELD} />
           <Path d={ECIPERAY_SPOON_PATH} fill={ECIPERAY_MARK_GLYPH} />
+        </Svg>
+      );
+    case "memorize":
+      return (
+        <Svg width={size} height={size} viewBox="0 0 256 256" aria-hidden={true}>
+          <Rect x={20} y={20} width={216} height={216} rx={48} fill={MEMORIZE_MARK_FIELD} />
+          {/* The golden ray fan, tapered rays rising from the book's center. */}
+          <Path d="M128.3 158.8 L66.3 155.5 L127.7 165.2 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M129.0 159.0 L44.3 134.8 L127.0 165.0 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M129.7 159.3 L53.4 115.4 L126.3 164.7 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M130.3 159.8 L66.9 98.7 L125.7 164.2 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M130.8 160.4 L84.0 85.8 L125.2 163.6 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M131.1 161.1 L103.7 77.4 L124.9 162.9 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M131.1 162.9 L152.3 77.4 L124.9 161.1 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M130.8 163.6 L172.0 85.8 L125.2 160.4 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M130.3 164.2 L189.1 98.7 L125.7 159.8 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M129.7 164.7 L202.6 115.4 L126.3 159.3 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M129.0 165.0 L211.7 134.8 L127.0 159.0 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M128.3 165.2 L189.7 155.5 L127.7 158.8 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d={MEMORIZE_FLAME_PATH} fill={MEMORIZE_MARK_ACCENT} />
+          {/* The open book: page edges, two covers, and the central spine. */}
+          <Path
+            d="M42 148 L118 162 L118 168 L42 156 Z M138 162 L214 148 L214 156 L138 168 Z"
+            fill={MEMORIZE_MARK_BOOK}
+          />
+          <Path d="M40 156 L116 170 L116 224 L40 210 Z" fill={MEMORIZE_MARK_BOOK} />
+          <Path d="M140 170 L216 156 L216 210 L140 224 Z" fill={MEMORIZE_MARK_BOOK} />
+          <Path d="M116 170 L140 170 L140 226 Q128 232 116 226 Z" fill={MEMORIZE_MARK_BOOK} />
+          {/* The notched bookmark hanging below the right cover. */}
+          <Path d="M178 212 L196 212 L196 234 L187 227 L178 234 Z" fill={MEMORIZE_MARK_ACCENT} />
         </Svg>
       );
   }
