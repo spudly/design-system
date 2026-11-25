@@ -124,18 +124,18 @@ test("SSR: the RecipeDetailPage shape (shell + ScreenShell + ScrollRegion) flows
   );
   assertWholePageFlow(html, "Detail section", 20);
 });
-test("SSR: the PublicRecipePage shape (shell + ScrollShell) flows as one page (#547)", async () => {
+test("SSR: the RecipeDetailPage guest shape (shell + ScrollShell) flows as one page (#547)", async () => {
   const { ScrollShell, BigFooterShell, Text, eciperayFooterFixture } = await loadRuntime();
   const markers = Array.from(
     {
       length: 20,
     },
-    (_, index) => <Text key={index}>{`Public section ${index + 1}`}</Text>,
+    (_, index) => <Text key={index}>{`Guest section ${index + 1}`}</Text>,
   );
   const html = await renderToHtml(
     <BigFooterShell footer={eciperayFooterFixture} scrollMode="content">
       <ScrollShell>{markers}</ScrollShell>
     </BigFooterShell>,
   );
-  assertWholePageFlow(html, "Public section", 20);
+  assertWholePageFlow(html, "Guest section", 20);
 });

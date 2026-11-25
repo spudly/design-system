@@ -1,7 +1,7 @@
 ---
 component: MessageCard
 run_when:
-  - "src/widgets/content/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
+  - "src/widgets/content/MessageCard.tsx, its stories, RecipeDetailPage's notFound and unavailable states, or a changeset naming MessageCard."
 ---
 
 # MessageCard — manual test steps
@@ -28,10 +28,10 @@ strings.
 2. LongMessage: the message wraps inside the card and every
    wrapped line stays centered; the card grows taller and
    remains vertically centered.
-3. PublicRecipePage's NotFound and Unavailable stories show
+3. RecipeDetailPage's NotFound and Unavailable stories show
    the identical state — the page already renders
    MessageCard for both states.
 
 **Run when:** `src/widgets/content/MessageCard.tsx`, its stories,
-PublicRecipePage's notFound and unavailable states, or a
+RecipeDetailPage's notFound and unavailable states, or a
 changeset naming MessageCard.

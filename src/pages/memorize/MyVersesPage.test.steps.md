@@ -1,7 +1,7 @@
 ---
 component: MyVersesPage
 run_when:
-  - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
+  - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), RecipeDetailPage's guest-mode CTA bar, or a changeset naming ButtonRow."
 ---
 
 # MyVersesPage — manual test steps
@@ -40,7 +40,7 @@ minimum width), so there are no sizing props to pass.
    a button.
 4. EqualInCard: the same two-over-one treatment inside the
    card, inset by the card's own padding (the CTA-bar
-   composition PublicRecipePage adopts).
+   composition RecipeDetailPage's guest mode adopts).
 
 5. Page composition: in `Pages/Memorize/MemorizeReviewPage`:
    Default, each verse card's "I remembered it" / "I forgot
@@ -53,5 +53,5 @@ minimum width), so there are no sizing props to pass.
 
 **Run when:** `src/widgets/actions/ButtonRow.tsx`, its stories, the
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
-MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset
+MealPlanDetailPage), RecipeDetailPage's guest-mode CTA bar, or a changeset
 naming ButtonRow.

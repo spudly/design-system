@@ -119,24 +119,20 @@ test("no recipe surface gains a second level-1 heading from the panel (#364)", (
     readFileSync(join(pagesDir, name), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
       .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-  // PublicRecipePage composes the panel and renders no
-  // level-1 heading variant of its own — the panel's title is
-  // its page's sole level-1 heading (its section headings are
+  // Since #757 the merged RecipeDetailPage composes the panel
+  // in its guest branch and renders no level-1 heading variant
+  // of its own there — the panel's title is the guest form's
+  // sole level-1 heading (its section headings are
   // SectionHeading, level 2).
-  const publicCode = readCode("eciperay/PublicRecipePage.tsx");
-  assert.match(publicCode, /<RecipeOverviewPanel/);
-  assert.ok(
-    !/variant="(heading|title|formTitle)"/.test(publicCode),
-    "PublicRecipePage renders no level-1 heading variant besides the panel's title",
-  );
-  // RecipeDetailPage does not compose the panel; its inline
-  // overview title already carries level-1 semantics through
-  // the `formTitle` variant, so it is untouched by this change.
   const detailCode = readCode("eciperay/RecipeDetailPage.tsx");
+  assert.match(detailCode, /<RecipeOverviewPanel/);
   assert.ok(
-    !detailCode.includes("RecipeOverviewPanel"),
-    "RecipeDetailPage does not compose the panel",
+    !/variant="(heading|title|formTitle)"/.test(detailCode),
+    "RecipeDetailPage renders no level-1 heading variant besides the panel's title",
   );
+  // The owner form does not compose the panel; its inline
+  // overview title already carries level-1 semantics through
+  // the `display` variant, so it is untouched by this change.
   assert.match(detailCode, /<Text variant="display">\{title\}<\/Text>/);
 });
 

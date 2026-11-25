@@ -61,10 +61,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const stepper = readFileSync(join(root, "src/widgets/form/NumberStepper.tsx"), "utf8");
 const selector = readFileSync(join(root, "src/widgets/form/PresetValueSelector.tsx"), "utf8");
 const page = readFileSync(join(root, "src/pages/eciperay/RecipeDetailPage.tsx"), "utf8");
-// PublicRecipePage's ingredients section is the shared library
-// panel since the #331 extraction, so its control pins scan the
-// panel source (the page wires its view-model into the panel;
-// src/pages/eciperay/PublicRecipePage.test.ts pins that wiring).
+// RecipeDetailPage's guest-mode ingredients section is the shared
+// library panel since the #331 extraction, so its control pins scan
+// the panel source (the page wires its view-model into the panel;
+// src/pages/eciperay/RecipeDetailPage.test.ts pins that wiring).
 const ingredientsPanel = readFileSync(
   join(root, "src/views/eciperay/RecipeIngredientsPanel.tsx"),
   "utf8",
@@ -114,7 +114,7 @@ test("the ingredients panels use the inline stepper and the PresetValueSelector"
       /<PresetValueSelector\s+label="Scale"\s+options=\{SCALE_OPTIONS\}\s+value=\{view\.scaleValue\}\s+onChange=\{view\.onScaleChange\}/,
     ],
     [
-      "PublicRecipePage (via RecipeIngredientsPanel)",
+      "RecipeDetailPage guest mode (via RecipeIngredientsPanel)",
       ingredientsPanel,
       /<NumberStepper\s+label=\{panelVoice\.servingsLabel\}\s+layout="inline"/,
       /<PresetValueSelector\s+label=\{panelVoice\.scaleLabel\}\s+options=\{SCALE_OPTIONS\}\s+value=\{view\.scaleValue\}\s+onChange=\{view\.onScaleChange\}/,

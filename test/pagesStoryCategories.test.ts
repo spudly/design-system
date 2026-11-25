@@ -32,7 +32,6 @@ const pagesDir = join(dirname(fileURLToPath(import.meta.url)), "..", "src", "pag
 const categorized = [
   ["RecipesPage.stories.tsx", "Pages/Eciperay/RecipesPage"],
   ["RecipeDetailPage.stories.tsx", "Pages/Eciperay/RecipeDetailPage"],
-  ["PublicRecipePage.stories.tsx", "Pages/Eciperay/PublicRecipePage"],
   ["MealPlansPage.stories.tsx", "Pages/Eciperay/MealPlansPage"],
   ["MealPlanDetailPage.stories.tsx", "Pages/Eciperay/MealPlanDetailPage"],
   ["RecipeFormPage.stories.tsx", "Pages/Eciperay/RecipeFormPage"],

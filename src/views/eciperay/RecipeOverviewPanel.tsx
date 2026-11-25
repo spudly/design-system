@@ -15,17 +15,17 @@ import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 import { useVoice } from "../../voice/index.js";
 
 /**
- * A recipe's overview panel: the header block of the two recipe
- * surfaces (RecipeDetailPage and PublicRecipePage) — hero image,
+ * A recipe's overview panel: the header block of the merged
+ * recipe page's two forms (owner and guest, #757) — hero image,
  * title, status badge, description, the servings/prep/cook
- * metadata badge, and the tag row. Both pages carried this panel inline
+ * metadata badge, and the tag row. The page carried this panel inline
  * before it moved here (#119); the view-model shape is declared
- * here structurally so either page's overview object composes
+ * here structurally so either form's overview object composes
  * it without a second shape to drift. The panel carries no
  * outer padding or spacing — the page shell's column insets it,
  * and separation from the sections around it is the parent
  * stack's; the panel's own blocks separate with padding
- * wrappers, the recipe pages' settled form.
+ * wrappers, the recipe page's settled form.
  *
  * The title carries Text's `heading` treatment (#364): level-1
  * heading semantics on web, so a page composing this panel
@@ -38,10 +38,11 @@ import { useVoice } from "../../voice/index.js";
  * heading-variant title carries (#256 — VoiceOver/TalkBack
  * heading navigation), while the level itself is web-only.
  * Verified
- * for #364: PublicRecipePage (the panel's composing page)
- * renders no other level-1 heading, and RecipeDetailPage does
- * not compose this panel — its inline overview title already
- * carries level-1 semantics through the `formTitle` variant —
+ * for #364 and re-verified for #757: the guest branch (the
+ * panel's composing branch) renders no other level-1 heading,
+ * and the owner form does not compose this panel — its inline
+ * overview title already
+ * carries level-1 semantics through the `display` variant —
  * so no recipe surface gains a second level-1 heading.
  *
  * The pieces are the shared ones (#119 dedupe): the status
@@ -52,8 +53,8 @@ import { useVoice } from "../../voice/index.js";
  * the design system owns no status map (Stephen's ruling on
  * the #119 dedupe: status words are the app's data, the same
  * principle that keeps filter option sets out of
- * CatalogFiltersBar); PublicRecipePage carries the map and
- * passes the pair in.
+ * CatalogFiltersBar); the page's guest branch carries the pair
+ * in its overview view-model and passes it in.
  */
 
 type RecipeOverviewPanelTag = {

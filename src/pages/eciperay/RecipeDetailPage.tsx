@@ -18,6 +18,7 @@ import {
   type NutritionPanelData,
 } from "../../widgets/data/NutritionPanel.js";
 import { NumberStepper } from "../../widgets/form/NumberStepper.js";
+import { Card } from "../../widgets/layout/Card.js";
 import { Col } from "../../widgets/layout/Col.js";
 import {
   PresetValueSelector,
@@ -31,7 +32,10 @@ import {
 } from "../../widgets/data/RatingsCard.js";
 import { ScreenShell } from "../../widgets/layout/ScreenShell.js";
 import { ScrollRegion } from "../../widgets/layout/ScrollRegion.js";
+import { MainLandmark } from "../../widgets/layout/MainLandmark.js";
+import { ScrollShell } from "../../widgets/layout/ScrollShell.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
+import { MessageCard } from "../../widgets/content/MessageCard.js";
 import { SelectField } from "../../widgets/form/SelectField.js";
 import { SkeletonBone } from "../../widgets/feedback/SkeletonClock.js";
 import { Badge } from "../../widgets/data/Badge.js";
@@ -51,6 +55,8 @@ import {
   RecipeCommentsView,
   type RecipeCommentsViewProps,
 } from "../../views/eciperay/RecipeCommentsView.js";
+import { RecipeIngredientsPanel } from "../../views/eciperay/RecipeIngredientsPanel.js";
+import { RecipeOverviewPanel } from "../../views/eciperay/RecipeOverviewPanel.js";
 import { RatingForm } from "../../widgets/form/RatingForm.js";
 import {
   RecipeSharingView,
@@ -97,8 +103,25 @@ import { STATUS_BADGES } from "../shared/recipeStatusBadges.js";
  * bones, a pill bone for the metadata badge, then bone regions
  * under the real Ingredients / Instructions / Cook History /
  * Nutrition headings), and `{ state: "ready", ... }` renders
- * the chrome and panels. If the app grows a not-found state, the
- * union grows a member.
+ * the chrome and panels.
+ *
+ * One auth-aware page (#757): PublicRecipePage merged into this
+ * page — there is no longer a separate public surface. The union
+ * also carries the public surface's two error states,
+ * `notFound` and `unavailable`, as members with DS-owned copy
+ * (the web messages verbatim, in the constants below), and the
+ * ready member splits on the `viewer` discriminator: the owner
+ * form (this page's original contract — status, versions,
+ * lifecycle, history, nutrition) and the guest form (the public
+ * page's ready contract — a CTA bar over the shared overview /
+ * ingredients / instructions panels, ratings, and comments,
+ * inside MainLandmark + ScrollShell). The host picks the form
+ * from its auth state: the owner viewing their recipe gets the
+ * owner form; a signed-in non-owner or a signed-out visitor
+ * gets the guest form. The guest form's sections are the shared
+ * library panels (RecipeOverviewPanel, RecipeIngredientsPanel,
+ * StepList), as on the retired public page, so the two forms
+ * render one interaction model where they overlap.
  *
  * The cook-log form (#687): the history section's form is
  * rendered by the page itself — the DS RatingForm (the
@@ -438,10 +461,18 @@ export type RecipeDetailPageNutritionFact = NutritionFact;
 export type RecipeDetailPageNutritionFactKind = NutritionFactKind;
 export type RecipeDetailPageNutritionProps = NutritionPanelData;
 
-export type RecipeDetailPageReadyProps = {
+export type RecipeDetailPageOwnerReadyProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
   state: "ready";
+  /**
+   * The viewer discriminator (#757): the ready union splits on
+   * it — the owner form (this type) and the guest form
+   * (RecipeDetailPageGuestReadyProps). Optional here so existing
+   * hosts, fixtures, and stories compile unchanged: absent
+   * means the owner is viewing their own recipe.
+   */
+  viewer?: "owner";
   /** Recipe status as a plain string; the page maps it to the
    * shared Badge's tone/label below as caller data (the
    * design system owns no status vocabulary). Unknown values
@@ -484,8 +515,75 @@ export type RecipeDetailPageReadyProps = {
   nutritionNotice?: RecipeDetailPageConfirmation | null;
 };
 
+// ---------------------------------------------------------------------------
+// Guest form (#757): the retired PublicRecipePage's ready contract,
+// absorbed as this page's second ready form. A guest — a signed-in
+// non-owner or a signed-out visitor — sees the public treatment:
+// a CTA bar over the shared overview / ingredients / instructions
+// panels, then the engagement stack (ratings, comments). No
+// account data in the view-model, no version picker, no
+// lifecycle/sharing/cook-history/nutrition sections. The section
+// shapes are this page's own (ingredients, instructions, ratings,
+// comments), shared by both forms so they cannot drift apart.
+// ---------------------------------------------------------------------------
+
+export type RecipeDetailPageGuestOverviewProps = {
+  imageUrl?: string | null;
+  title: string;
+  description?: string | null;
+  /** Overview stat band values, app-formatted ("4", "15m", "30m"). */
+  servingsLabel: string;
+  prepTimeLabel?: string;
+  cookTimeLabel?: string;
+  tags: RecipeDetailPageTag[];
+};
+
+/** The CTA bar's variant, chosen by the host's auth state. The
+ * signed-in variant carries the clone mutation's pending state:
+ * its button reads "Saving…" and disables while a clone is in
+ * flight. */
+export type RecipeDetailPageCtas =
+  { variant: "signedOut" } | { variant: "signedIn"; isClonePending?: boolean };
+
+export type RecipeDetailPageGuestReadyProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
+  state: "ready";
+  /** The guest form's viewer: a signed-in non-owner, or a
+   * signed-out visitor. The CTA bar's variant follows it. */
+  viewer: "signedIn" | "signedOut";
+  overview: RecipeDetailPageGuestOverviewProps;
+  ctas: RecipeDetailPageCtas;
+  /** Sign-up intent (signed-out bar): the host navigates. */
+  onSignUpPress: () => void;
+  /** Clone intent: signed out, the host navigates to sign-up with
+   * the clone target; signed in, it runs the clone mutation. */
+  onClonePress: () => void;
+  /** Get-the-app intent: the host opens the install URL. */
+  onGetAppPress: () => void;
+  ingredients: RecipeDetailPageIngredientsProps;
+  instructions: RecipeDetailPageInstructionsProps;
+  /** Engagement block; omit (or pass null) to hide it. */
+  ratings?: RecipeDetailPageRatings | null;
+  onViewerRatingChange?: (stars: number | null) => void;
+  /**
+   * The comments section as data (#130 T7): renders
+   * RecipeCommentsView in the engagement stack, under the
+   * ratings card.
+   */
+  comments?: RecipeDetailPageComments | null;
+};
+
+/** The ready union (#757): the owner form and the guest form,
+ * discriminated by `viewer` (absent = owner). */
+export type RecipeDetailPageReadyProps =
+  RecipeDetailPageOwnerReadyProps | RecipeDetailPageGuestReadyProps;
+
 export type RecipeDetailPageProps =
-  { state: "loading"; footer?: BigFooterData } | RecipeDetailPageReadyProps;
+  | { state: "loading"; footer?: BigFooterData }
+  | { state: "notFound"; footer?: BigFooterData }
+  | { state: "unavailable"; footer?: BigFooterData }
+  | RecipeDetailPageReadyProps;
 
 // ---------------------------------------------------------------------------
 // Constants moved with the page (the pilot's rule for option sets
@@ -493,10 +591,12 @@ export type RecipeDetailPageProps =
 // ---------------------------------------------------------------------------
 
 // The status badge map (labels and tones for the app's four
-// statuses) is shared with PublicRecipePage in
-// ./recipeStatusBadges.ts (#587 phase 3 tranche 5) — the vocabulary
-// is the pages' caller data, not something the shared Badge owns
-// (Stephen's #119 dedupe ruling).
+// statuses) lives in ./recipeStatusBadges.ts (#587 phase 3
+// tranche 5) — the vocabulary is the page's caller data, not
+// something the shared Badge owns (Stephen's #119 dedupe
+// ruling). It was shared with PublicRecipePage until #757
+// merged that page into this one; the guest form renders no
+// status badge (the public surface never carried one).
 
 // Scale multipliers from the app's scaling constants; labels are
 // presentation, the servings math stays app-side.
@@ -526,6 +626,24 @@ const COOK_LOG_EMPTY_MESSAGE =
   "No cooks logged yet. Log a cook here or finish a cooking session to record feedback for this version.";
 const MISSING_INGREDIENTS_HINT =
   "Tap an ingredient to mark it missing and see substitutions below.";
+
+// Guest-mode copy (#757, carried from the retired public page —
+// the copy precedent: section copy is DS-owned and moves with
+// the page). CTA copy, verbatim from the web surface's CTA bar.
+// The signed-in clone label is the app's shared
+// SAVE_RECIPE_COPY_LABEL; its pending label is the web button's
+// in-flight text.
+const SIGN_UP_LABEL = "Sign up free";
+const CLONE_LABEL = "Clone this recipe";
+const SAVE_COPY_LABEL = "Save a copy";
+const SAVE_COPY_PENDING_LABEL = "Saving…";
+const GET_APP_LABEL = "Get the mobile app";
+
+// Error copy, verbatim from the web surface's error cards.
+const NOT_FOUND_TITLE = "Recipe not found";
+const NOT_FOUND_MESSAGE = "This recipe may be private or no longer available.";
+const UNAVAILABLE_TITLE = "Recipe unavailable";
+const UNAVAILABLE_MESSAGE = "This recipe link is invalid or has expired.";
 
 // ---------------------------------------------------------------------------
 // Chrome: status badge + version picker (pinned above the scroll
@@ -1054,6 +1172,134 @@ function HistoryPanel({
 }
 
 // ---------------------------------------------------------------------------
+// Guest-mode sections (#757): the retired public page's sections,
+// absorbed as file-local components of the guest branch. The CTA
+// bar sits above the sections, its variant chosen by the host's
+// auth state: signed-out visitors get sign-up / clone /
+// get-the-app intents; signed-in viewers get the clone mutation's
+// own button (with its pending state) and get-the-app. All three
+// intents are plain callbacks — the host navigates, runs the
+// clone mutation, or opens the install URL.
+// ---------------------------------------------------------------------------
+
+// The bar's card has no outer spacing of its own: the shell
+// column insets it and owns its separation from the overview
+// below (#119). Inside the card, ButtonRow (`equal`) owns the
+// buttons' treatment: they share the card's width equally —
+// flex 1 with a 40% minimum, wrapping instead of shrinking — so
+// no caller sizes a button itself. The bar passes the row the
+// variant's buttons as one fragment; the row flattens and
+// sizes them.
+function CtaBar({
+  ctas,
+  onSignUpPress,
+  onClonePress,
+  onGetAppPress,
+}: {
+  ctas: RecipeDetailPageCtas;
+  onSignUpPress: () => void;
+  onClonePress: () => void;
+  onGetAppPress: () => void;
+}) {
+  const buttons =
+    ctas.variant === "signedOut" ? (
+      <>
+        <Button key="sign-up" variant="primary" onPress={onSignUpPress}>
+          {SIGN_UP_LABEL}
+        </Button>
+        <Button key="clone" variant="secondary" onPress={onClonePress}>
+          {CLONE_LABEL}
+        </Button>
+        <Button key="get-app" variant="secondary" onPress={onGetAppPress}>
+          {GET_APP_LABEL}
+        </Button>
+      </>
+    ) : (
+      <>
+        <Button
+          key="clone"
+          variant="primary"
+          disabled={ctas.isClonePending ?? false}
+          onPress={onClonePress}
+        >
+          {ctas.isClonePending ? SAVE_COPY_PENDING_LABEL : SAVE_COPY_LABEL}
+        </Button>
+        <Button key="get-app" variant="secondary" onPress={onGetAppPress}>
+          {GET_APP_LABEL}
+        </Button>
+      </>
+    );
+  return (
+    <Card>
+      <ButtonRow equal>{buttons}</ButtonRow>
+    </Card>
+  );
+}
+
+// The three guest recipe sections are the shared library panels
+// (RecipeOverviewPanel, RecipeIngredientsPanel and StepList
+// carry the sections' rendering); these wrappers only wire the
+// guest view-models into them.
+
+/** The guest overview header block: the shared
+ * RecipeOverviewPanel, fed the guest overview view-model. The
+ * guest form renders no status badge (#735: recipe status is
+ * removed entirely). */
+function OverviewSection({ overview }: { overview: RecipeDetailPageGuestOverviewProps }) {
+  return (
+    <RecipeOverviewPanel
+      {...(overview.imageUrl !== undefined ? { imageUrl: overview.imageUrl } : {})}
+      title={overview.title}
+      {...(overview.description !== undefined ? { description: overview.description } : {})}
+      servingsLabel={overview.servingsLabel}
+      {...(overview.prepTimeLabel !== undefined ? { prepTimeLabel: overview.prepTimeLabel } : {})}
+      {...(overview.cookTimeLabel !== undefined ? { cookTimeLabel: overview.cookTimeLabel } : {})}
+      tags={overview.tags}
+    />
+  );
+}
+
+/** The guest ingredients section: the shared
+ * RecipeIngredientsPanel (the servings stepper and scale
+ * selector, the pressable ingredient rows, and the substitutions
+ * block), fed the page's ingredients view-model — one shape
+ * shared by both forms. */
+function IngredientsSection({ ingredients }: { ingredients: RecipeDetailPageIngredientsProps }) {
+  return <RecipeIngredientsPanel ingredients={ingredients} />;
+}
+
+/** The guest instructions section: the shared StepList (the
+ * step cards in step-number order, the tapped card highlighted
+ * as the active step), fed the page's instruction list sorted
+ * by step number with each step's "Step N" eyebrow label
+ * composed here — labels are caller-voiced copy (#747: the
+ * panel that used to do this wiring was removed, its loading
+ * skeleton moved into StepList). */
+function InstructionsSection({ instructions }: { instructions: RecipeDetailPageInstruction[] }) {
+  const sorted = [...instructions].sort((a, b) => a.stepNumber - b.stepNumber);
+  return (
+    <StepList
+      steps={sorted.map((step) => ({
+        id: step.id,
+        label: `Step ${step.stepNumber}`,
+        body: step.body,
+      }))}
+    />
+  );
+}
+
+/** The guest-form discriminant: the ready union's guest member
+ * is the one whose viewer is a signed-in or signed-out guest
+ * (the owner member's viewer is "owner" or absent). A guard
+ * function because the optional owner discriminant defeats
+ * inline negative narrowing. */
+function isGuestReadyProps(
+  props: RecipeDetailPageReadyProps,
+): props is RecipeDetailPageGuestReadyProps {
+  return props.viewer === "signedIn" || props.viewer === "signedOut";
+}
+
+// ---------------------------------------------------------------------------
 // The page.
 // ---------------------------------------------------------------------------
 
@@ -1061,7 +1307,11 @@ function HistoryPanel({
  * Full-page recipe detail view: all sections in a single scroll
  * region (#71 — no tabs), in the #721 fidelity round's order
  * (the visual direction's in-image flow first, everything else
- * below Start Cooking).
+ * below Start Cooking). The guest form renders its sections in
+ * one ScrollShell inside the main landmark, and the two
+ * whole-screen message states (notFound / unavailable) render
+ * the shared MessageCard inside the landmark — every state
+ * renders its own BigFooter through BigFooterShell.
  * Controlled — see the file header for the contract, the slot
  * design, and the layout decisions.
  */
@@ -1110,6 +1360,60 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
             </ScrollRegion>
           </ScreenShell>
         </LoadingScope>
+      </BigFooterShell>
+    );
+  }
+
+  if (props.state === "notFound") {
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <MainLandmark>
+          <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
+        </MainLandmark>
+      </BigFooterShell>
+    );
+  }
+
+  if (props.state === "unavailable") {
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <MainLandmark>
+          <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
+        </MainLandmark>
+      </BigFooterShell>
+    );
+  }
+
+  if (isGuestReadyProps(props)) {
+    // Guest form (#757): the public surface's ready composition,
+    // verbatim — a CTA bar above all four sections in a single
+    // scroll (no tabs — overview, ingredients, instructions,
+    // engagement, in the order the public tabs had), inside the
+    // page's main landmark (#366/#473).
+    const { ratings, onViewerRatingChange, comments: commentsData } = props;
+    const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
+
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <MainLandmark>
+          <ScrollShell>
+            <CtaBar
+              ctas={props.ctas}
+              onSignUpPress={props.onSignUpPress}
+              onClonePress={props.onClonePress}
+              onGetAppPress={props.onGetAppPress}
+            />
+            <OverviewSection overview={props.overview} />
+            <SectionHeading>Ingredients</SectionHeading>
+            <IngredientsSection ingredients={props.ingredients} />
+            <SectionHeading>Instructions</SectionHeading>
+            <InstructionsSection instructions={props.instructions.instructions} />
+            {ratings ? (
+              <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
+            ) : null}
+            {comments}
+          </ScrollShell>
+        </MainLandmark>
       </BigFooterShell>
     );
   }

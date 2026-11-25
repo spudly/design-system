@@ -1,7 +1,7 @@
 ---
 component: RecipeCommentsView
 run_when:
-  - "src/views/eciperay/RecipeCommentsView.tsx, its stories, RecipeDetailPage, PublicRecipePage, or a changeset naming RecipeCommentsView."
+  - "src/views/eciperay/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
 ---
 
 # RecipeCommentsView — manual test steps
@@ -26,5 +26,5 @@ Empty, Loading, SignedOut.
    comments with no composer.
 
 **Run when:** `src/views/eciperay/RecipeCommentsView.tsx`, its
-stories, RecipeDetailPage, PublicRecipePage, or a changeset naming
+stories, RecipeDetailPage, or a changeset naming
 RecipeCommentsView.

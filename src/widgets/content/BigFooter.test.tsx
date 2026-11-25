@@ -276,7 +276,6 @@ test("list and self-scrolling pages put the shell in content mode (PR #556)", ()
     "memorize/MemorizeReviewPage.tsx",
     "eciperay/RecipeFormPage.tsx",
     "eciperay/RecipeDetailPage.tsx",
-    "eciperay/PublicRecipePage.tsx",
     "eciperay/AppShellPage.tsx",
     "memorize/TabbedShellPage.tsx",
   ]) {
@@ -401,12 +400,14 @@ test("composed pages and stories render exactly one footer", () => {
       `${story} must not supply a footer to the nested RecipeFormPage`,
     );
   }
-  // #473: PublicPageFrame is retired — PublicRecipePage owns its
-  // footer itself, so its stories supply the footer to the page.
+  // #473: PublicPageFrame is retired — the recipe page owns its
+  // footer itself, so its stories supply the footer to the page
+  // (the public surface's stories are RecipeDetailPage's guest
+  // stories since #757 merged the pages).
   assert.match(
-    readCode("src/pages/eciperay/PublicRecipePage.stories.tsx"),
-    /<PublicRecipePage footer=\{eciperayFooterFixture\}/,
-    "the PublicRecipePage stories supply the footer to the page itself — the page owns it (#473)",
+    readCode("src/pages/eciperay/RecipeDetailPage.stories.tsx"),
+    /<RecipeDetailPage footer=\{eciperayFooterFixture\}/,
+    "the RecipeDetailPage stories supply the footer to the page itself — the page owns it (#473)",
   );
 });
 test("the eciperay story fixture carries the Legal column convention as data", () => {
