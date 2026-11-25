@@ -9,8 +9,10 @@
  * so they were composed back into LandingPage, and this test
  * guarded that end state. Tranche 2 of the refreshed #119
  * inventory supersedes it for the geometry: the hero, CTA-row,
- * and grid geometry now live in the generic HeroStack,
- * StackedButtonRow, and CardGrid widgets (CardGrid returns
+ * and grid geometry now live in the generic widgets —
+ * StackedButtonRow and CardGrid (the hero's geometry lived in
+ * HeroStack until #746 eliminated it for a Col composition in
+ * the page; CardGrid returns
  * under its old name as a generic card grid, not the
  * page-specific component that was eliminated), while Hero,
  * CtaRow, and FeatureCard stay eliminated — this test guards
@@ -43,7 +45,6 @@ function readCode(rel: string) {
 
 const page = readCode("src/pages/eciperay/LandingPage.tsx");
 const componentsBarrel = readCode("src/widgets/index.ts");
-const heroStack = readCode("src/widgets/layout/HeroStack.tsx");
 const stackedButtonRow = readCode("src/widgets/actions/StackedButtonRow.tsx");
 const cardGrid = readCode("src/widgets/layout/CardGrid.tsx");
 
@@ -76,17 +77,10 @@ test("the landing components are not library components anymore", async () => {
   assert.ok(!componentsBarrel.includes("CtaLink"), "the barrel must not export CtaLink");
 });
 
-test("the hero treatment lives in HeroStack: centered, 12px rhythm, top breathing room", () => {
+test("the hero treatment lives in the page's hero Col: centered, 12px rhythm", () => {
   assert.match(page, /<Text variant="heading" textAlign="center">/);
   assert.match(page, /color="\$textMuted" textAlign="center"/);
-  assert.match(page, /<HeroStack>/, "the hero renders in HeroStack");
-  assert.match(heroStack, /alignItems: "center",/);
-  assert.match(heroStack, /gap: tokens\.spacing\[3\],/);
-  assert.match(
-    heroStack,
-    /paddingTop: tokens\.spacing\[6\],/,
-    "the hero stack owns its top breathing room",
-  );
+  assert.match(page, /<Col center gap="m">/, "the hero renders in a centered Col at gap m (#746)");
   assert.match(page, /heroTitle: string;/);
   assert.match(page, /heroSubtitle: string;/);
 });

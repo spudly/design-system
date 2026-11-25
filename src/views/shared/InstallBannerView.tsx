@@ -1,8 +1,8 @@
-import { CompactRow } from "../../widgets/layout/CompactRow.js";
 import { FixedActionBanner } from "../../widgets/feedback/FixedActionBanner.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { useVoice } from "../../voice/index.js";
+import { Row } from "../../widgets/layout/Row.js";
 
 type InstallBannerViewLink = {
   label: string;
@@ -44,14 +44,14 @@ export function InstallBannerView({
     <FixedActionBanner
       position="top"
       message={
-        <CompactRow>
+        <Row middle wrap gap="s">
           <Text>{message}</Text>
           {links.map((link) => (
             <TextLink key={link.href} href={link.href}>
               {link.label}
             </TextLink>
           ))}
-        </CompactRow>
+        </Row>
       }
       onDismiss={onDismiss}
       dismissAriaLabel={dismissAriaLabel}

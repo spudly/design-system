@@ -4,8 +4,8 @@ import { tokens } from "../../tokens/index.js";
 import { useVoice } from "../../voice/index.js";
 import { politeLiveRegionProps } from "../../widgets/accessibility.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
-import { CompactRow } from "../../widgets/layout/CompactRow.js";
 import { SearchField } from "../../widgets/form/SearchField.js";
 import {
   SearchHelpPopover,
@@ -402,7 +402,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
         </Text>
       ) : null}
       {chooserOpen && addable.length > 0 ? (
-        <CompactRow>
+        <Row middle wrap gap="s">
           {addable.map((definition) => (
             <Button
               key={definition.id}
@@ -416,7 +416,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
               {definition.label}
             </Button>
           ))}
-        </CompactRow>
+        </Row>
       ) : null}
       {added.map((definition) => (
         // The added filter's remove pairing, inlined here (#740 —

@@ -1,8 +1,6 @@
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
+import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
-import { CenteredRow } from "../../widgets/layout/CenteredRow.js";
-import { Grow } from "../../widgets/layout/Grow.js";
-import { CompactRow } from "../../widgets/layout/CompactRow.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { Button } from "../../widgets/actions/Button.js";
@@ -125,11 +123,11 @@ export function FeedbackPreferenceView({
     return (
       <SectionCard title={title} variant="elevated" loading={showSkeleton}>
         <Col gap="xs">
-          <CenteredRow>
+          <Row middle gap="m" minHeight={44}>
             <Center width={44} height={44}>
               <BoxSkeleton width={24} height={24} />
             </Center>
-            <Grow>
+            <Col grow>
               <Col gap="xs">
                 {/* The label bone sits centered in the
                   CheckboxField Label's own line box
@@ -144,19 +142,19 @@ export function FeedbackPreferenceView({
                 </Center>
                 <TextSkeleton size="sm" lines={2} />
               </Col>
-            </Grow>
-          </CenteredRow>
+            </Col>
+          </Row>
           <Col gap="s">
             <TextSkeleton size="md" lines={1} />
             <LoadingScope active>
-              <CompactRow>
+              <Row middle wrap gap="s">
                 <Button ghost size="sm" onPress={onAcceptConsent}>
                   {acceptLabel}
                 </Button>
                 <Button ghost size="sm" onPress={onDeclineConsent}>
                   {declineLabel}
                 </Button>
-              </CompactRow>
+              </Row>
             </LoadingScope>
           </Col>
         </Col>
@@ -180,17 +178,17 @@ export function FeedbackPreferenceView({
           {consentPromptOpen ? (
             <Col gap="s">
               <Text variant="body">{consentPromptText}</Text>
-              <CompactRow>
+              <Row middle wrap gap="s">
                 <Button variant="secondary" size="sm" onPress={onDeclineConsent}>
                   {declineLabel}
                 </Button>
                 <Button variant="primary" size="sm" onPress={onAcceptConsent}>
                   {acceptLabel}
                 </Button>
-              </CompactRow>
+              </Row>
             </Col>
           ) : (
-            <CompactRow>
+            <Row middle wrap gap="s">
               {consent !== true ? (
                 <Button ghost size="sm" onPress={onAcceptConsent}>
                   {acceptLabel}
@@ -206,7 +204,7 @@ export function FeedbackPreferenceView({
                   {withdrawLabel}
                 </Button>
               ) : null}
-            </CompactRow>
+            </Row>
           )}
           {choicesHref ? (
             <Text variant="hint">

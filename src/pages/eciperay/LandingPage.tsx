@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Card } from "../../widgets/layout/Card.js";
 import { CardGrid } from "../../widgets/layout/CardGrid.js";
-import { HeroStack } from "../../widgets/layout/HeroStack.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { StackedButtonRow } from "../../widgets/actions/StackedButtonRow.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -39,7 +39,8 @@ import { Text } from "../../widgets/data/Text.js";
  *
  * The page composes DS components only (#119): the sections'
  * geometry now lives in the named widgets (tranche 2) — the
- * hero's centering and top breathing room in HeroStack, the
+ * hero's centering in a Col at gap m (#746 — HeroStack's top
+ * breathing room is the parent shell's spacing now), the
  * CTA row's geometry in StackedButtonRow, and the cards' flex,
  * 260px wrap basis, and the grid's wrap in CardGrid — so the
  * page passes only content (Text, Button, Card) and applies no
@@ -102,14 +103,14 @@ export function LandingPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <HeroStack>
+        <Col center gap="m">
           <Text variant="heading" textAlign="center">
             {heroTitle}
           </Text>
           <Text color="$textMuted" textAlign="center">
             {heroSubtitle}
           </Text>
-        </HeroStack>
+        </Col>
         <StackedButtonRow>
           <Button href={discoverCta.href} variant="primary">
             {discoverCta.label}

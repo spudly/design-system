@@ -1,9 +1,8 @@
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CheckboxSkeletonRow } from "../../widgets/feedback/CheckboxSkeletonRow.js";
+import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
-import { CompactRow } from "../../widgets/layout/CompactRow.js";
-import { Grow } from "../../widgets/layout/Grow.js";
 import { RadioSkeletonRow } from "../../widgets/feedback/RadioSkeletonRow.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
@@ -238,7 +237,7 @@ export function RecipeSharingView({
             ) : (
               <Text variant="hint">{shareLinkLabel}</Text>
             )}
-            <CompactRow>
+            <Row middle wrap gap="s">
               <Button
                 variant="secondary"
                 size="sm"
@@ -252,7 +251,7 @@ export function RecipeSharingView({
                   {copyShareLinkLabel}
                 </Button>
               ) : null}
-            </CompactRow>
+            </Row>
           </Col>
         ) : null}
         {permalinkUrl && onCopyPermalink ? (
@@ -262,18 +261,18 @@ export function RecipeSharingView({
             ) : (
               <Text variant="hint">{permalinkLabel}</Text>
             )}
-            <CompactRow>
+            <Row middle wrap gap="s">
               {showSkeleton ? (
-                <Grow>
+                <Col grow>
                   <TextSkeleton size="md" lines={1} />
-                </Grow>
+                </Col>
               ) : (
                 <Text variant="muted">{permalinkUrl}</Text>
               )}
               <Button ghost size="sm" onPress={onCopyPermalink}>
                 {copyPermalinkLabel}
               </Button>
-            </CompactRow>
+            </Row>
           </Col>
         ) : null}
       </Col>
