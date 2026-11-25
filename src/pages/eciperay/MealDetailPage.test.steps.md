@@ -1,7 +1,7 @@
 ---
 component: MealDetailPage
 run_when:
-  - "src/widgets/data/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
+  - "the pages whose rows compose in a plain Col (MealPlanDetailPage, MealDetailPage), or a changeset naming the row list composition."
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
 ---
 
@@ -12,12 +12,12 @@ Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
-## ListStack
+## Recipe rows
 
-Open in `Widgets/ListStack`: Default.
+Open in `Pages/Eciperay/MealDetailPage` (its stories).
 
-A ListStack composes hairline rows as one continuous list; the
-stack adds no gap of its own — the rows own their separation.
+The recipe rows compose in a plain Col as one continuous list;
+the Col adds no gap of its own — the rows own their separation.
 
 1. The three rows read as one ruled surface: hairlines run
    continuously from row to row with no gaps of card background
@@ -25,9 +25,9 @@ stack adds no gap of its own — the rows own their separation.
    (MealPlanDetailPage's Entries card and MealDetailPage's
    Recipes card are the live cases).
 
-**Run when:** `src/widgets/data/ListStack.tsx`, its stories, the
-pages that compose ListStack (MealPlanDetailPage,
-MealDetailPage), or a changeset naming ListStack.
+**Run when:** the pages whose rows compose in a plain Col
+(MealPlanDetailPage, MealDetailPage), or a changeset naming
+the row list composition.
 
 ## Meals & planning pages (MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)
 

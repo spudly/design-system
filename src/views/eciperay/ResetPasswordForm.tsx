@@ -1,5 +1,5 @@
-import { FormStack } from "../../widgets/layout/FormStack.js";
 import { AuthFormSubmit } from "./AuthFormSubmit.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { PasswordField } from "../../widgets/form/PasswordField.js";
 import { useVoice } from "../../voice/index.js";
 
@@ -48,7 +48,7 @@ export function ResetPasswordForm({
     }
   };
   return (
-    <FormStack>
+    <Col gap="m">
       <PasswordField
         label={voice.resetPasswordForm.passwordLabel}
         value={password}
@@ -66,6 +66,6 @@ export function ResetPasswordForm({
         onSubmit={onSubmit}
         submitLabel={submitLabel}
       />
-    </FormStack>
+    </Col>
   );
 }

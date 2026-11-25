@@ -8,7 +8,8 @@ run_when:
   - "src/pages/eciperay/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
   - "src/views/eciperay/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
   - "src/views/eciperay/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
-  - "src/widgets/data/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."---
+  - "src/widgets/data/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."
+---
 
 # PublicRecipePage — manual test steps
 

@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { DetailRow } from "../../views/eciperay/DetailRow.js";
 import { ListItem } from "./ListItem.js";
-import { ListStack } from "./ListStack.js";
 import { Text } from "./Text.js";
 import { WeekDayColumn, WeekDayColumns } from "./WeekDayColumn.js";
+import { Col } from "../layout/Col.js";
 
 const meta: Meta<typeof WeekDayColumn> = {
   title: "Widgets/Data Display/WeekDayColumn",
@@ -19,7 +19,7 @@ export const Default: Story = {
     <YStack maxWidth={860}>
       <WeekDayColumns>
         <WeekDayColumn label="Monday" dateLabel="2026-10-19">
-          <ListStack>
+          <Col>
             <ListItem
               prefix="Meal · "
               title="Sunday Dinner leftovers"
@@ -32,7 +32,7 @@ export const Default: Story = {
               subtitle="Qty 1 · 4 servings · 520 cal"
               onPress={() => {}}
             />
-          </ListStack>
+          </Col>
           <DetailRow label="Calories" value="1,850 cal" />
           <DetailRow label="Satiety" value="62" />
         </WeekDayColumn>

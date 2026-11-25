@@ -4,14 +4,12 @@ import type { TagColorName } from "../../themes/tagColors.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Badge } from "../../widgets/data/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Card } from "../../widgets/layout/Card.js";
-import { CardStack } from "../../widgets/layout/CardStack.js";
 import { ColorPickerField } from "../../widgets/form/ColorPickerField.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
-import { FormStack } from "../../widgets/layout/FormStack.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { TrailingActionsRow } from "../../widgets/actions/TrailingActionsRow.js";
@@ -82,14 +80,14 @@ import { TrailingActionsRow } from "../../widgets/actions/TrailingActionsRow.js"
  * names it.
  *
  * De-styled for #119: the page composes DS components only —
- * the sections stack in SectionStack, the title is Text's
- * `title` variant, each form's fields stack in FormStack,
+ * the sections stack in a Col at gap xxl, the title is Text's
+ * `title` variant, each form's fields stack in a Col at gap m,
  * the picker-and-actions rows are TrailingActionsRow (which
  * carries the #219 wrap), the editor card is Card's `compact`
  * variant, each display row composes its badge and ghost
  * action Buttons inline in a compact Card (#709 — the row
  * was a single-use widget until it was inlined into this,
- * its only caller), and the rows stack in CardStack at
+ * its only caller), and the rows stack in a Col at gap s at
  * its 8px rhythm
  * (the per-row bottom padding they carried before). The
  * display row composes through the same TrailingActionsRow
@@ -269,7 +267,7 @@ export function TagsPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="title">Tags</Text>
           {failedOperation ? (
             <Alert
@@ -282,7 +280,7 @@ export function TagsPage({
               {tagsPageFailureMessages[failedOperation]}
             </Alert>
           ) : null}
-          <FormStack>
+          <Col gap="m">
             <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
             <TrailingActionsRow
               leading={
@@ -298,10 +296,10 @@ export function TagsPage({
                 Add
               </Button>
             </TrailingActionsRow>
-          </FormStack>
+          </Col>
           {loading ? (
             <LoadingScope active>
-              <CardStack>
+              <Col gap="s">
                 {LOADING_TAG_KEYS.map((key) => (
                   <Card key={key} variant="compact">
                     <TrailingActionsRow leading={<BoxSkeleton width={96} height={24} />}>
@@ -322,14 +320,14 @@ export function TagsPage({
                     </TrailingActionsRow>
                   </Card>
                 ))}
-              </CardStack>
+              </Col>
             </LoadingScope>
           ) : (
-            <CardStack>
+            <Col gap="s">
               {tags.map((tag) =>
                 editingTagId === tag.id && tag.canEdit !== false ? (
                   <Card key={tag.id} variant="compact">
-                    <FormStack>
+                    <Col gap="m">
                       <TextField
                         placeholder="Tag name"
                         value={editName}
@@ -368,7 +366,7 @@ export function TagsPage({
                           Save
                         </Button>
                       </TrailingActionsRow>
-                    </FormStack>
+                    </Col>
                   </Card>
                 ) : (
                   <Card key={tag.id} variant="compact">
@@ -402,9 +400,9 @@ export function TagsPage({
                   </Card>
                 ),
               )}
-            </CardStack>
+            </Col>
           )}
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

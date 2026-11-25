@@ -3,7 +3,7 @@ import { Alert } from "../../widgets/feedback/Alert.js";
 import { BulkSelectToolbar } from "./BulkSelectToolbar.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { CheckboxSelectList } from "../../widgets/form/CheckboxSelectList.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { FramedScrollRegion } from "../../widgets/layout/FramedScrollRegion.js";
 import { useVoice } from "../../voice/index.js";
 
@@ -88,7 +88,7 @@ export function RecipeExportPickerView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <LoadingScope active={showSkeleton}>
-      <ContentStack>
+      <Col gap="m">
         {/* The toolbar stays rendered inside the scope while
             loading (#278): it reads the scope itself — its
             ghost Buttons as text bones, its SearchField as a
@@ -131,7 +131,7 @@ export function RecipeExportPickerView({
         >
           {exporting ? exportPendingLabel : exportLabel}
         </Button>
-      </ContentStack>
+      </Col>
     </LoadingScope>
   );
 }

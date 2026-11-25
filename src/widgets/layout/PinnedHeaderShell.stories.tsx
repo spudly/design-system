@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ScrollView, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { PinnedHeaderShell } from "./PinnedHeaderShell.js";
-import { SectionStack } from "./SectionStack.js";
 import { Tabs } from "../actions/Tabs.js";
 import { Text } from "../data/Text.js";
+import { Col } from "./Col.js";
 
 const meta: Meta<typeof PinnedHeaderShell> = {
   title: "Widgets/Layout & Structure/PinnedHeaderShell",
@@ -21,7 +21,9 @@ type Story = StoryObj<typeof PinnedHeaderShell>;
 // inside the frame, so nothing ever scrolled and the header
 // appeared to scroll away with the page.
 const lines = Array.from({ length: 30 }, (_, index) => (
-  <Text key={index}>Content line {index + 1} — scroll the content: the Meals header and tabs stay put.</Text>
+  <Text key={index}>
+    Content line {index + 1} — scroll the content: the Meals header and tabs stay put.
+  </Text>
 ));
 
 export const Default: Story = {
@@ -29,7 +31,7 @@ export const Default: Story = {
     <YStack maxWidth={430} height={480}>
       <PinnedHeaderShell
         header={
-          <SectionStack>
+          <Col gap="xxl">
             <Text variant="title">Meals</Text>
             <Tabs
               tabs={[
@@ -39,7 +41,7 @@ export const Default: Story = {
               value="meals"
               onValueChange={() => {}}
             />
-          </SectionStack>
+          </Col>
         }
       >
         {/*

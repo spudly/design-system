@@ -58,7 +58,7 @@ export type CardRowProps = CardRowOwnProps &
  * rows without styling them (#119); all content — title, meta
  * line, action label — is caller-supplied, so the row serves any
  * app's lists. The row carries no spacing outside its card:
- * separation between rows is the composing stack's (CardStack's
+ * separation between rows is the composing stack's (the Col's
  * gap), never the row's own padding.
  *
  * The press form's text block is a Tamagui view, not a React

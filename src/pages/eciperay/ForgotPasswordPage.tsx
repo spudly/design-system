@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { ForgotPasswordForm } from "../../views/eciperay/ForgotPasswordForm.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
@@ -20,7 +20,7 @@ import { useVoice } from "../../voice/index.js";
  *
  * The form itself is ForgotPasswordForm (#119): the page
  * composes the heading, the intro line, and the form as the
- * screen's sections (SectionStack's rhythm carries the
+ * screen's sections (the section Col's rhythm carries the
  * separations the app view's title and intro spacing render),
  * and the form owns the field, the submit handling, and the
  * back link.
@@ -58,7 +58,7 @@ export function ForgotPasswordPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="heading">{voice.forgotPasswordPage.heading}</Text>
           <Text variant="muted">{voice.forgotPasswordPage.description}</Text>
           <ForgotPasswordForm
@@ -70,7 +70,7 @@ export function ForgotPasswordPage({
             onSubmit={onSubmit}
             signInHref={signInHref}
           />
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

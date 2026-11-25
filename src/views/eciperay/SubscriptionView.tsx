@@ -1,7 +1,7 @@
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Center } from "../../widgets/layout/Center.js";
-import { CompactStack } from "../../widgets/layout/CompactStack.js";
 import { StartStack } from "../../widgets/layout/StartStack.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -94,7 +94,7 @@ export function SubscriptionView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-      <CompactStack>
+      <Col gap="s">
         {showSkeleton ? (
           // Loading (#278): text skeletons mirroring the
           // loaded lines — the plan line at xl size, the
@@ -147,7 +147,7 @@ export function SubscriptionView({
             ) : null}
           </StartStack>
         ) : null}
-      </CompactStack>
+      </Col>
     </SectionCard>
   );
 }

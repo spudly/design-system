@@ -1,10 +1,9 @@
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Card } from "../../widgets/layout/Card.js";
 import { CommentItem } from "./CommentItem.js";
-import { CompactStack } from "../../widgets/layout/CompactStack.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
 import { EndRow } from "../../widgets/layout/EndRow.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
@@ -125,7 +124,7 @@ export function RecipeCommentsView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <Card variant="bordered">
-      <ContentStack>
+      <Col gap="m">
         <Text variant="subheading">{title}</Text>
         {showSkeleton ? (
           // Loading (#278): skeleton CommentItems mirroring
@@ -174,7 +173,7 @@ export function RecipeCommentsView({
           ))
         )}
         {onPost ? (
-          <CompactStack>
+          <Col gap="s">
             <TextAreaField
               label={composerLabel}
               value={draft}
@@ -192,9 +191,9 @@ export function RecipeCommentsView({
                 {postLabel}
               </Button>
             </EndRow>
-          </CompactStack>
+          </Col>
         ) : null}
-      </ContentStack>
+      </Col>
     </Card>
   );
 }

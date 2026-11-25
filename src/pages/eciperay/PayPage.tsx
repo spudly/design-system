@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Spinner } from "../../widgets/feedback/Spinner.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
@@ -63,7 +63,7 @@ export function PayPage({
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
         <SectionCard title={copy.title} variant="elevated">
-          <SectionStack>
+          <Col gap="xxl">
             {status === "opening" ? (
               <>
                 <Spinner label={voice.payPage.openingLabel} />
@@ -84,7 +84,7 @@ export function PayPage({
                 ) : null}
               </>
             )}
-          </SectionStack>
+          </Col>
         </SectionCard>
       </ScreenContainer>
     </BigFooterShell>

@@ -6,21 +6,15 @@ import { AppTopBar } from "./AppTopBar.js";
 import { Card } from "./Card.js";
 import { CardGrid } from "./CardGrid.js";
 import { CardRow } from "./CardRow.js";
-import { CardStack } from "./CardStack.js";
 import { Center } from "./Center.js";
 import { Col } from "./Col.js";
-import { CompactStack } from "./CompactStack.js";
-import { ContentStack } from "./ContentStack.js";
-import { ProseStack } from "./ProseStack.js";
 import { Row } from "./Row.js";
 import { ScreenContainer } from "./ScreenContainer.js";
-import { SectionStack } from "./SectionStack.js";
-import { TightStack } from "./TightStack.js";
 
 /**
  * Composite story (#711): the layout & structure widgets rendered
  * together, so cross-widget inconsistencies — the gap scale reading
- * the same in Row, Col, and the named stacks; card treatments
+ * the same across Row and Col; card treatments
  * across Card, CardRow, and CardGrid; shell padding — are visible
  * at a glance instead of hidden by isolated stories.
  *
@@ -88,38 +82,38 @@ export const RowColMatrix: Story = {
   ),
 };
 
-/** The named stacks and card arrangements with identical content,
- * so each stack's rhythm and each card treatment compares
- * directly against its siblings. */
+/** The stack rhythms as Col configurations, and the card
+ * arrangements, with identical content, so each rhythm and each
+ * card treatment compares directly against its siblings. */
 export const StacksAndCards: Story = {
   render: () => (
     <YStack maxWidth={480} gap={24}>
-      <ContentStack>
-        <Text variant="subheading">ContentStack</Text>
+      <Col gap="m">
+        <Text variant="subheading">Col gap m stretch</Text>
         <Text>First block of content.</Text>
         <Text>Second block of content.</Text>
-      </ContentStack>
-      <SectionStack>
-        <Text variant="subheading">SectionStack</Text>
+      </Col>
+      <Col gap="xxl">
+        <Text variant="subheading">Col gap xxl stretch</Text>
         <Text>First block of content.</Text>
         <Text>Second block of content.</Text>
-      </SectionStack>
-      <CompactStack>
-        <Text variant="subheading">CompactStack</Text>
+      </Col>
+      <Col gap="s">
+        <Text variant="subheading">Col gap s stretch</Text>
         <Text>First block of content.</Text>
         <Text>Second block of content.</Text>
-      </CompactStack>
-      <TightStack>
-        <Text variant="subheading">TightStack</Text>
+      </Col>
+      <Col gap="xs">
+        <Text variant="subheading">Col gap xs stretch</Text>
         <Text>First block of content.</Text>
         <Text>Second block of content.</Text>
-      </TightStack>
-      <ProseStack>
-        <Text variant="subheading">ProseStack</Text>
+      </Col>
+      <Col gap="m">
+        <Text variant="subheading">Col gap m</Text>
         <Text>First block of content.</Text>
         <Text>Second block of content.</Text>
-      </ProseStack>
-      <CardStack>
+      </Col>
+      <Col gap="s">
         <Card>
           <Text variant="subheading">Card in a stack</Text>
           <Text variant="body">Default card treatment.</Text>
@@ -136,7 +130,7 @@ export const StacksAndCards: Story = {
           <Text variant="subheading">Elevated card</Text>
           <Text variant="body">Raised treatment.</Text>
         </Card>
-      </CardStack>
+      </Col>
       <Row gap="m">
         <YStack flex={1}>
           <CardRow

@@ -1,7 +1,7 @@
 ---
 component: CenteredText
 run_when:
-  - "src/widgets/actions/ButtonStack.tsx, src/widgets/content/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
+  - "src/widgets/layout/Col.tsx, src/widgets/content/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
   - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow)"
 ---
 
@@ -12,18 +12,18 @@ Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
-## ButtonStack & CenteredText
+## HomePage actions & CenteredText
 
-Open in `Widgets/ButtonStack`: Default;
+Open in `Pages/Eciperay/HomePage` (its stories);
 `Widgets/CenteredText`: Default.
 
-1. ButtonStack: the three buttons stretch full width at an
-   even 12px rhythm.
+1. HomePage actions: the three buttons stretch full width
+   at an even 12px rhythm (the Col at gap m in HomePage).
 2. CenteredText: the subtitle line centers (each wrapped line
    centered) in the muted ink; the plain line centers in the
    default ink.
 
-**Run when:** `src/widgets/actions/ButtonStack.tsx`,
+**Run when:** `src/widgets/layout/Col.tsx`,
 `src/widgets/content/CenteredText.tsx`, their stories, HomePage's
 header, or a changeset naming either.
 

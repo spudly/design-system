@@ -1,7 +1,7 @@
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { CompactRow } from "../../widgets/layout/CompactRow.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
 import { SectionMutedText } from "./SectionMutedText.js";
@@ -70,7 +70,7 @@ export function AccountDataView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-      <ContentStack>
+      <Col gap="m">
         <SectionMutedText loading={showSkeleton} text={description} />
         <CompactRow>
           {onExportData ? (
@@ -85,7 +85,7 @@ export function AccountDataView({
           ) : null}
         </CompactRow>
         {error && !showSkeleton ? <Text variant="error">{error}</Text> : null}
-      </ContentStack>
+      </Col>
     </SectionCard>
   );
 }

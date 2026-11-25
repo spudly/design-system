@@ -2,8 +2,8 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { AutocompletePicker } from "../../widgets/form/AutocompletePicker.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { FormStack } from "../../widgets/layout/FormStack.js";
 import { FormHeading } from "../../widgets/content/FormHeading.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { FormScreenLayout } from "../../widgets/layout/FormScreenLayout.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
 import { NumberStepper } from "../../widgets/form/NumberStepper.js";
@@ -229,7 +229,7 @@ export function MealFormPage({
           />
         </LabeledGroup>
         {selectedRecipes.map((recipe) => (
-          <FormStack key={recipe.id}>
+          <Col gap="m" key={recipe.id}>
             <NumberStepper
               label={`Servings to cook · ${recipe.label}`}
               value={servingsByRecipeId[recipe.id] ?? recipe.servings}
@@ -246,15 +246,15 @@ export function MealFormPage({
                 onServingsToEatChange?.(recipe.id, value);
               }}
             />
-          </FormStack>
+          </Col>
         ))}
         {onAddIngredient && onIngredientChange ? (
           <LabeledGroup label="Ingredients">
-            <FormStack>
+            <Col gap="m">
               {ingredients.map((ingredient, index) => {
                 const entryLabel = ingredient.name.trim() || `Ingredient ${index + 1}`;
                 return (
-                  <FormStack key={ingredient.id}>
+                  <Col gap="m" key={ingredient.id}>
                     <Text variant="subheading">{entryLabel}</Text>
                     <TextField
                       label={`${entryLabel} — Name`}
@@ -307,7 +307,7 @@ export function MealFormPage({
                         Remove ingredient
                       </Button>
                     ) : null}
-                  </FormStack>
+                  </Col>
                 );
               })}
               <Button
@@ -317,7 +317,7 @@ export function MealFormPage({
               >
                 Add ingredient
               </Button>
-            </FormStack>
+            </Col>
           </LabeledGroup>
         ) : null}
         {error ? <Alert severity="error" message={error} /> : null}

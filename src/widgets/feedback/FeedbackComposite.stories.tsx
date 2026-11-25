@@ -3,9 +3,8 @@ import { XStack, YStack } from "tamagui";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { BrandLink } from "../actions/BrandLink.js";
 import { TextLink } from "../actions/TextLink.js";
-import { ListStack } from "../data/ListStack.js";
 import { Text } from "../data/Text.js";
-import { CardStack } from "../layout/CardStack.js";
+import { Col } from "../layout/Col.js";
 import { Alert } from "./Alert.js";
 import { BannerRow } from "./BannerRow.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
@@ -103,16 +102,16 @@ export const LoadingFamily: Story = {
   render: () => (
     <YStack maxWidth={430} gap={20}>
       <LoadingScope active>
-        <ListStack>
+        <Col>
           <LoadingListItem />
           <LoadingListItem />
           <LoadingMediaRow />
           <LoadingMediaRow />
-        </ListStack>
-        <CardStack>
+        </Col>
+        <Col gap="s">
           <LoadingCardRow />
           <LoadingActionCardRow accessibilityLabel="Delete meal">Delete</LoadingActionCardRow>
-        </CardStack>
+        </Col>
         <YStack gap={12}>
           <CheckboxSkeletonRow description />
           <RadioSkeletonRow />

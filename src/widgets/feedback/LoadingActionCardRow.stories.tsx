@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { CardStack } from "../layout/CardStack.js";
 import { LoadingActionCardRow } from "./LoadingActionCardRow.js";
+import { Col } from "../layout/Col.js";
 
 const meta: Meta<typeof LoadingActionCardRow> = {
   title: "Widgets/Feedback & Loading/LoadingActionCardRow",
@@ -16,11 +16,11 @@ export const Default: Story = {
   render: () => (
     <YStack maxWidth={430}>
       <LoadingScope active>
-        <CardStack>
+        <Col gap="s">
           <LoadingActionCardRow accessibilityLabel="Delete meal">Delete</LoadingActionCardRow>
           <LoadingActionCardRow accessibilityLabel="Delete meal">Delete</LoadingActionCardRow>
           <LoadingActionCardRow accessibilityLabel="Delete meal">Delete</LoadingActionCardRow>
-        </CardStack>
+        </Col>
       </LoadingScope>
     </YStack>
   ),

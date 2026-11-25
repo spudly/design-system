@@ -12,10 +12,10 @@
  *   the built dist, and each auth page composes its form unit
  *   (the page keeps its prop surface — the b3cPages pins hold
  *   the declarations);
- * - the forms compose the shared FormStack (the #119 dedupe
- *   canonical form stack), which owns the 16px field rhythm —
- *   no form defines a local form stack — and the pages render
- *   no fields directly;
+ * - the forms compose the shared form stack — a Col at
+ *   gap "m" since #746 eliminated the #119 FormStack wrapper —
+ *   which owns the 12px field rhythm; no form defines a local
+ *   form stack — and the pages render no fields directly;
  * - each form's submit button is named for the label it
  *   renders in both its idle and loading states;
  * - SignUpForm keeps the legalNotice copy data between the submit
@@ -69,19 +69,19 @@ test("the auth pages compose their form units and render no fields directly", ()
   }
 });
 
-test("each form composes the shared FormStack and owns its submit handling", () => {
+test("each form composes the shared Col form stack and owns its submit handling", () => {
   for (const form of FORMS) {
     const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
       source,
-      /import \{ FormStack \} from "\.\.\/\.\.\/widgets\/layout\/FormStack\.js";/,
-      `${form} imports the shared FormStack`,
+      /import \{ Col \} from "\.\.\/\.\.\/widgets\/layout\/Col\.js";/,
+      `${form} imports the shared Col`,
     );
-    assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);
+    assert.match(source, /<Col gap="m">/, `${form} renders its sections in the Col form stack`);
     assert.doesNotMatch(
       source,
       /const StyledForm\b/,
-      `${form} defines no local form stack (FormStack owns the 16px field rhythm)`,
+      `${form} defines no local form stack (the Col gap owns the 12px field rhythm)`,
     );
     // SignInForm/SignUpForm declare the bare submit intent in
     // the shared EmailPasswordFormProps (#587 phase 3); the

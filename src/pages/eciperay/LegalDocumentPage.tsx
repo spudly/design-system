@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { BannerRow } from "../../widgets/feedback/BannerRow.js";
 import { BrandLink } from "../../widgets/actions/BrandLink.js";
 import { BulletList } from "../../widgets/data/BulletList.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ProseColumn } from "../../widgets/layout/ProseColumn.js";
-import { ProseStack } from "../../widgets/layout/ProseStack.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
@@ -63,7 +63,7 @@ import { useVoice } from "../../voice/index.js";
  * layout primitives are no longer page-local (#119 tranche 2):
  * the banner row is BannerRow, the prose column is
  * ProseColumn, the title block and each section are
- * ProseStack, and list blocks are BulletList — only the span
+ * a Col at gap m, and list blocks are BulletList — only the span
  * and block rendering stays in this page.
  *
  * Stays app-side: the legal text itself, routing, document
@@ -178,15 +178,15 @@ export function LegalDocumentPage({
           <TextLink href={signInHref}>{signInLabel}</TextLink>
         </BannerRow>
         <ProseColumn {...mainRoleProps}>
-          <ProseStack>
+          <Col gap="m">
             <Text variant="heading">{title}</Text>
             <Text variant="hint">{voice.legalDocumentPage.lastUpdatedLabel(lastUpdated)}</Text>
-          </ProseStack>
+          </Col>
           {sections.map((section) => (
-            <ProseStack key={section.title}>
+            <Col gap="m" key={section.title}>
               <Text variant="subheading">{section.title}</Text>
               {section.blocks.map((block, index) => renderBlock(block, index))}
-            </ProseStack>
+            </Col>
           ))}
         </ProseColumn>
       </ScreenContainer>

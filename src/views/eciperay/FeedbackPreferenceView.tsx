@@ -1,9 +1,8 @@
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { CenteredRow } from "../../widgets/layout/CenteredRow.js";
 import { Grow } from "../../widgets/layout/Grow.js";
 import { CompactRow } from "../../widgets/layout/CompactRow.js";
-import { CompactStack } from "../../widgets/layout/CompactStack.js";
-import { TightStack } from "../../widgets/layout/TightStack.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { Button } from "../../widgets/actions/Button.js";
@@ -125,13 +124,13 @@ export function FeedbackPreferenceView({
     // text, or error shows.
     return (
       <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-        <TightStack>
+        <Col gap="xs">
           <CenteredRow>
             <Center width={44} height={44}>
               <BoxSkeleton width={24} height={24} />
             </Center>
             <Grow>
-              <TightStack>
+              <Col gap="xs">
                 {/* The label bone sits centered in the
                   CheckboxField Label's own line box
                   (SIZABLE_TEXT_LINE_BOX, 27), and the
@@ -144,10 +143,10 @@ export function FeedbackPreferenceView({
                   <TextSkeleton size="md" lines={1} />
                 </Center>
                 <TextSkeleton size="sm" lines={2} />
-              </TightStack>
+              </Col>
             </Grow>
           </CenteredRow>
-          <CompactStack>
+          <Col gap="s">
             <TextSkeleton size="md" lines={1} />
             <LoadingScope active>
               <CompactRow>
@@ -159,8 +158,8 @@ export function FeedbackPreferenceView({
                 </Button>
               </CompactRow>
             </LoadingScope>
-          </CompactStack>
-        </TightStack>
+          </Col>
+        </Col>
       </SectionCard>
     );
   }
@@ -173,13 +172,13 @@ export function FeedbackPreferenceView({
         onCheckedChange={onShortcutEnabledChange}
         disabled={shortcutUnavailable}
       >
-        <CompactStack>
+        <Col gap="s">
           {shortcutUnavailable && unavailableHint ? (
             <Text variant="hint">{unavailableHint}</Text>
           ) : null}
           {consentStatusText ? <Text variant="body">{consentStatusText}</Text> : null}
           {consentPromptOpen ? (
-            <CompactStack>
+            <Col gap="s">
               <Text variant="body">{consentPromptText}</Text>
               <CompactRow>
                 <Button variant="secondary" size="sm" onPress={onDeclineConsent}>
@@ -189,7 +188,7 @@ export function FeedbackPreferenceView({
                   {acceptLabel}
                 </Button>
               </CompactRow>
-            </CompactStack>
+            </Col>
           ) : (
             <CompactRow>
               {consent !== true ? (
@@ -216,7 +215,7 @@ export function FeedbackPreferenceView({
             </Text>
           ) : null}
           {error ? <Alert severity="error" message={error} /> : null}
-        </CompactStack>
+        </Col>
       </CheckboxField>
     </SectionCard>
   );

@@ -12,7 +12,7 @@
  * as a link on both platforms (a real anchor on web, a
  * LinkOverlay carrying the composed label over decorative
  * texts on native), and the row carries no separation of its
- * own (CardStack owns the rhythm between rows).
+ * own (the composing Col owns the rhythm between rows).
  */
 import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -22,13 +22,19 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "content", "TextActionCardRow.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "content", "TextActionCardRow.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 // Since #587 phase 2 the title/subtitle rendering lives in the
 // shared RowTextContent block both card rows compose; the
 // decorative-hiding pin below reads that source, and this row's
 // own pin holds that its native form renders the block decorative.
-const rowTextSource = readFileSync(join(here, "../../..", "src", "widgets", "data", "RowTextContent.tsx"), "utf8");
+const rowTextSource = readFileSync(
+  join(here, "../../..", "src", "widgets", "data", "RowTextContent.tsx"),
+  "utf8",
+);
 const rowTextCode = rowTextSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -83,5 +89,8 @@ test("native renders decorative texts under a LinkOverlay with the composed labe
 
 test("the frame is the elevated Card in row form; the row owns no outer separation", () => {
   assert.match(code, /<Card variant="elevated" flexDirection="row" alignItems="center" gap="\$3">/);
-  assert.ok(!/paddingBlockEnd|margin/.test(code), "row separation belongs to CardStack (#119)");
+  assert.ok(
+    !/paddingBlockEnd|margin/.test(code),
+    "row separation belongs to the composing Col (#119, #746)",
+  );
 });

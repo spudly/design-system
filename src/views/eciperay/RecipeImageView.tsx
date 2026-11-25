@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
 import { DashedPlaceholder } from "../../widgets/content/DashedPlaceholder.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -139,7 +139,7 @@ export function RecipeImageView({
   return (
     <LoadingScope active={showSkeleton}>
       <LabeledGroup label={label} action={headerAction}>
-        <ContentStack>
+        <Col gap="m">
           {showSkeleton ? (
             imagePreviewUri ? (
               <BoxSkeleton aspectRatio={HERO_PREVIEW_ASPECT} />
@@ -187,7 +187,7 @@ export function RecipeImageView({
             ) : null}
           </ButtonRow>
           {error && !showSkeleton ? <Alert severity="error" message={error} /> : null}
-        </ContentStack>
+        </Col>
       </LabeledGroup>
     </LoadingScope>
   );

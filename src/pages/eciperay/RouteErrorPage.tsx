@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { useVoice } from "../../voice/index.js";
@@ -62,12 +62,12 @@ export function RouteErrorPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="heading">{title}</Text>
           <Text variant="body">{message}</Text>
           {action ? <Button onPress={action.onPress}>{action.label}</Button> : null}
           <TextLink href={homeHref}>{homeLabel}</TextLink>
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

@@ -1,12 +1,10 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { ButtonStack } from "../../widgets/actions/ButtonStack.js";
 import { CenteredText } from "../../widgets/content/CenteredText.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { LoadingCardRow } from "../../widgets/feedback/LoadingCardRow.js";
-import { ListStack } from "../../widgets/data/ListStack.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
 
@@ -24,7 +22,7 @@ import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
  * exactly 3 dummy rows, each a card holding title and subtitle
  * bones at the loaded rows' text sizes, inside a LoadingScope.
  * The dummy rows are the page's own composition in the shared
- * row's card shape. ListStack imposes no gap of its own and
+ * row's card shape. The list Col imposes no gap of its own and
  * the loaded rows carry the list's rhythm in themselves (each
  * row renders with its $3 bottom separation), so each dummy
  * row's wrapper carries the same $3 bottom padding — without
@@ -48,15 +46,15 @@ import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
  * above), and an empty list renders the host's empty message.
  *
  * De-styled for #119: the page composes DS components only —
- * the whole screen stacks in SectionStack at its uniform
+ * the whole screen stacks in a Col at gap xxl at its uniform
  * rhythm (the bespoke per-block separations the wrappers
  * carried are gone; the loading and empty states no longer
  * add their own extra top offset either), the title keeps
  * its pinned `heading` treatment (the pageTitleHeadings
  * exception) and the section title its `subheading` variant,
  * the subtitle and empty message render through CenteredText,
- * the three actions stack in ButtonStack, and the host's
- * rows stack in ListStack, which imposes no gap of its own —
+ * the three actions stack in a Col at gap m, and the host's
+ * rows stack in a plain Col, which imposes no gap of its own —
  * each row keeps the rhythm it renders with. This page is
  * the pinned exception to the `title` variant (its title is
  * a hero heading, not a screen title).
@@ -114,10 +112,10 @@ export function HomePage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="heading">{title}</Text>
           <CenteredText muted>{subtitle}</CenteredText>
-          <ButtonStack>
+          <Col gap="m">
             <Button variant="primary" href={browseHref}>
               {browseLabel}
             </Button>
@@ -127,26 +125,26 @@ export function HomePage({
             <Button variant="secondary" href={sharedWithMeHref}>
               {sharedWithMeLabel}
             </Button>
-          </ButtonStack>
+          </Col>
           <Text variant="subheading">{recipesTitle}</Text>
           {loading ? (
             <LoadingScope active>
-              <ListStack>
+              <Col>
                 {LOADING_ROW_KEYS.map((key) => (
                   <LoadingCardRow key={key} />
                 ))}
-              </ListStack>
+              </Col>
             </LoadingScope>
           ) : recipes.length === 0 ? (
             <CenteredText>{emptyMessage}</CenteredText>
           ) : (
-            <ListStack>
+            <Col>
               {recipes.map((recipe) => (
                 <RecipeRow key={recipe.id} item={recipe} onLogCookPress={onLogCookPress} />
               ))}
-            </ListStack>
+            </Col>
           )}
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

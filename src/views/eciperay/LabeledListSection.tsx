@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
+import { Col } from "../../widgets/layout/Col.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { CompactStack } from "../../widgets/layout/CompactStack.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
 import { Text } from "../../widgets/data/Text.js";
 
@@ -52,11 +52,7 @@ export function LabeledListSection({
         ) : null
       }
     >
-      {isEmpty ? (
-        <Text variant="muted">{emptyMessage}</Text>
-      ) : (
-        <CompactStack>{children}</CompactStack>
-      )}
+      {isEmpty ? <Text variant="muted">{emptyMessage}</Text> : <Col gap="s">{children}</Col>}
     </LabeledGroup>
   );
 }

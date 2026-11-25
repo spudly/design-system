@@ -2,7 +2,9 @@
  * Form-component contracts for the #119 form set the three
  * form pages compose: the dedupe set (LabeledField,
  * LabeledGroup, FieldLabel, RevertAction, ChangedListBanner,
- * FormStack, FormHeading), shipped once on main.
+ * FormHeading), shipped once on main. (FormStack, the set's
+ * form stack, was eliminated by #746 — forms compose a Col
+ * at gap "m" directly.)
  *
  * The forms tranche's wider set was split by disposition in the
  * adoption rounds: FieldLabelBlock and StepperGroup composed
@@ -54,7 +56,6 @@ const COMPONENTS = [
   "RevertAction",
   "ChangedListBanner",
   "EqualColumns",
-  "FormStack",
   "FormHeading",
 ];
 
@@ -181,18 +182,18 @@ test("SSR: ChangedListBanner offers its revert only when given one", async () =>
   const withoutRevert = await renderWithVoice(<ChangedListBanner label="3 changes" />);
   assert.ok(!withoutRevert.includes("Revert"), "no revert action renders without one");
 });
-test("SSR: FormHeading renders its title and optional subtitle; FormStack renders its children", async () => {
-  const { FormHeading, FormStack, Text } = await loadRuntime();
+test("SSR: FormHeading renders its title and optional subtitle; the form Col renders its children", async () => {
+  const { FormHeading, Col, Text } = await loadRuntime();
   const headingHtml = await renderToHtml(
     <FormHeading subtitle="Imported from a link">Recipe details</FormHeading>,
   );
   assert.ok(headingHtml.includes("Recipe details"), "the title renders");
   assert.ok(headingHtml.includes("Imported from a link"), "the subtitle renders");
   const stackHtml = await renderToHtml(
-    <FormStack>
+    <Col gap="m">
       <Text>First field</Text>
       <Text>Second field</Text>
-    </FormStack>,
+    </Col>,
   );
   assert.ok(stackHtml.includes("First field") && stackHtml.includes("Second field"));
 });

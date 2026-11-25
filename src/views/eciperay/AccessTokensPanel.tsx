@@ -1,7 +1,6 @@
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { CreatedSecretPanel } from "../../widgets/content/CreatedSecretPanel.js";
-import { ListStack } from "../../widgets/data/ListStack.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
@@ -115,7 +114,7 @@ export function AccessTokensPanel({
       {planNotice ? (
         <Alert severity="info">{planNotice}</Alert>
       ) : (
-        <ContentStack>
+        <Col gap="m">
           <TextField
             label={voice.accessTokensPanel.tokenNameLabel}
             value={tokenName}
@@ -129,7 +128,7 @@ export function AccessTokensPanel({
           >
             {voice.accessTokensPanel.createLabel}
           </Button>
-        </ContentStack>
+        </Col>
       )}
       {error ? <Alert severity="error" message={error} /> : null}
       {showSkeleton ? (
@@ -140,7 +139,7 @@ export function AccessTokensPanel({
         // known yet. Each non-revoked row keeps its Revoke
         // action (a noop for the dummies) so the Button
         // skeletonizes in its slot instead of dropping out.
-        <ListStack>
+        <Col>
           {(accessTokens.length > 0 ? accessTokens : LOADING_TOKENS).map((token) => (
             <TokenRow
               key={token.id}
@@ -161,11 +160,11 @@ export function AccessTokensPanel({
                   })}
             />
           ))}
-        </ListStack>
+        </Col>
       ) : accessTokens.length === 0 ? (
         <Text textAlign="center">{voice.accessTokensPanel.emptyMessage}</Text>
       ) : (
-        <ListStack>
+        <Col>
           {accessTokens.map((token) => (
             <TokenRow
               key={token.id}
@@ -183,7 +182,7 @@ export function AccessTokensPanel({
                   })}
             />
           ))}
-        </ListStack>
+        </Col>
       )}
     </SectionCard>
   );

@@ -50,7 +50,7 @@ export type TextActionCardRowProps = {
  * from the row's content (title, then subtitle).
  *
  * The row carries no separation of its own: lists stack rows
- * in CardStack, which owns the rhythm between them.
+ * in a Col at gap s, which owns the rhythm between them.
  */
 export function TextActionCardRow({
   title,

@@ -53,7 +53,7 @@ const code = readCode("src/pages/eciperay/LegalDocumentPage.tsx");
 // row likewise renders directly in the page since #473 retired
 // the DocumentHeader / DocumentFooter components. #119
 // tranche 2 moved the renderer's layout primitives into
-// widgets (BannerRow, ProseColumn, ProseStack, BulletList):
+// widgets (BannerRow, ProseColumn, Col, BulletList):
 // the model, rendering, and frame pins below scan the page
 // (`prose` is the page source), and the geometry pins scan
 // the widget sources the primitives now live in.

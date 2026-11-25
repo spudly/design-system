@@ -5,8 +5,7 @@ import { DetailRow } from "../../views/eciperay/DetailRow.js";
 import { ListItem } from "../../widgets/data/ListItem.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
-import { ListStack } from "../../widgets/data/ListStack.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -137,7 +136,7 @@ import { WeekDayColumn, WeekDayColumns } from "../../widgets/data/WeekDayColumn.
  * href, the unavailable suffix, and the disabled flag as
  * content), the goal rows are DetailRow views, the plan title
  * takes Text's `title` variant, the meta lines take its `hint`
- * variant, and the page's blocks stack in a SectionStack, which
+ * variant, and the page's blocks stack in a Col at gap xxl, which
  * owns every section separation.
  */
 
@@ -326,7 +325,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
       <BigFooterShell footer={props.footer}>
         <ScreenContainer>
           <LoadingScope active>
-            <SectionStack>
+            <Col gap="xxl">
               <TextSkeleton size="2xl" lines={1} />
               <TextSkeleton size="sm" lines={3} />
               <SectionCard title="Nutrition goals" loading>
@@ -339,7 +338,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                 </Button>
               </ButtonRow>
               <SectionCard title="Entries" loading>
-                <ListStack>
+                <Col>
                   {LOADING_ENTRY_KEYS.map((key) => (
                     <ListItem
                       key={key}
@@ -349,9 +348,9 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                       loading
                     />
                   ))}
-                </ListStack>
+                </Col>
               </SectionCard>
-            </SectionStack>
+            </Col>
           </LoadingScope>
         </ScreenContainer>
       </BigFooterShell>
@@ -444,7 +443,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   return (
     <BigFooterShell footer={props.footer}>
       <ScreenContainer>
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="title">{title}</Text>
           {notes ? <Text variant="hint">{notes}</Text> : null}
           {dateRangeLabel ? <Text variant="hint">{dateRangeLabel}</Text> : null}
@@ -485,7 +484,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                     {...(day.dateLabel ? { dateLabel: day.dateLabel } : {})}
                   >
                     {day.entries.length > 0 ? (
-                      <ListStack>{day.entries.map(renderEntry)}</ListStack>
+                      <Col>{day.entries.map(renderEntry)}</Col>
                     ) : (
                       <Text variant="hint">No entries</Text>
                     )}
@@ -499,10 +498,10 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                 ))}
               </WeekDayColumns>
             ) : (
-              <ListStack>{entries.map(renderEntry)}</ListStack>
+              <Col>{entries.map(renderEntry)}</Col>
             )}
           </SectionCard>
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

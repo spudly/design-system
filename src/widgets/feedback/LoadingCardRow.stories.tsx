@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { ListStack } from "../data/ListStack.js";
 import { LoadingCardRow } from "./LoadingCardRow.js";
+import { Col } from "../layout/Col.js";
 
 const meta: Meta<typeof LoadingCardRow> = {
   title: "Widgets/Feedback & Loading/LoadingCardRow",
@@ -16,11 +16,11 @@ export const Default: Story = {
   render: () => (
     <YStack maxWidth={430}>
       <LoadingScope active>
-        <ListStack>
+        <Col>
           <LoadingCardRow />
           <LoadingCardRow />
           <LoadingCardRow />
-        </ListStack>
+        </Col>
       </LoadingScope>
     </YStack>
   ),

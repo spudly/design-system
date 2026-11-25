@@ -20,9 +20,10 @@ export type PanelStackProps = Omit<StyledPanelStackProps, "padding" | "gap" | "a
  * inset and block separation are both spacing[4] (16px), owned by
  * the stack outright, so pages compose a panel by listing its
  * blocks (a hero, a stat band, action rows, a list) and never
- * space them by hand. Sibling of SectionStack (a page's sections
- * at 32px) and CardStack (a card list at 8px): each stack is
- * named for what it contains and owns its rhythm completely.
+ * space them by hand. Since #746 the plain rhythms are Col's
+ * (a page's sections at gap xxl, a card list at gap s);
+ * PanelStack remains a widget because it owns the panel
+ * surface's inset as well as its rhythm.
  */
 export function PanelStack({ ...rest }: PanelStackProps) {
   return <StyledPanelStack {...rest} />;

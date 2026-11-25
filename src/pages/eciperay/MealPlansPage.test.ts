@@ -37,7 +37,7 @@
  *    (its card layout, link area, and action treatment live
  *    there — pinned in src/widgets/layout/CardRow.test.ts; the page supplies
  *    the plan's href, the Delete label, and the danger tone as
- *    content), the list stacks in a CardStack,
+ *    content), the list stacks in a Col at gap s,
  *    the loading block centers its spinner in a Center, and the
  *    page renders no layout primitives and sets no styling props.
  *
@@ -195,10 +195,10 @@ test("the page carries no styling of its own (#119)", () => {
   ]) {
     assert.ok(
       !code.includes(banned),
-      `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / CardStack / Text since the #119 tranche-2 fix`,
+      `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / Col / Text since the #119 tranche-2 fix (#746: CardStack became a Col at gap s)`,
     );
   }
-  assert.match(code, /<CardStack>/, "the plan list must stack in a CardStack");
+  assert.match(code, /<Col gap="s">/, "the plan list must stack in a Col at gap s (#746)");
   assert.match(
     code,
     /LOADING_PLAN_KEYS\.map/,
