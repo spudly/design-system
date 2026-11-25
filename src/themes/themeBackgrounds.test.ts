@@ -1,18 +1,22 @@
 /**
- * Contract test for spudly/design-system#68: Warm Harvest and
- * Quiet Dawn must not share (nearly) the same body background.
+ * Contract test for the brand themes' body backgrounds.
  *
- * The contract:
- * 1. Warm Harvest keeps its warm cream #faf6f0; Quiet Dawn's
- *    background is a genuinely different color — RGB distance well
- *    beyond a rounding difference — with a cool/teal cast (green
- *    and blue channels at or above the red channel), where Warm
- *    Harvest is warm (red above blue).
+ * History: #68 required Warm Harvest and Quiet Dawn to carry
+ * genuinely distinct backgrounds (Quiet Dawn took a cool dawn tint
+ * so the two themes would not share near-identical warm
+ * off-whites). #849 (Stephen's brief-wins call, 2026-11-25)
+ * superseded that: the design brief's warm paper #faf8f2 is Quiet
+ * Dawn's correct background even though it sits close to Warm
+ * Harvest's #faf6f0.
+ *
+ * The contract now:
+ * 1. Each theme carries its exact brief background: Warm Harvest
+ *    #faf6f0, Quiet Dawn #faf8f2.
  * 2. Quiet Dawn's text and muted text keep WCAG AA contrast on its
- *    new background, and its white surface stays distinguishable
+ *    background, and its white surface stays distinguishable
  *    from the background.
  * 3. The registered Tamagui light theme for Quiet Dawn carries the
- *    new background value.
+ *    brief background value.
  *
  * Run against the built output: `npm run build` first (the `test`
  * script does both).
@@ -48,22 +52,16 @@ function contrast(a: any, b: any) {
   return (l1 + 0.05) / (l2 + 0.05);
 }
 
-test("the two brand themes have genuinely distinct body backgrounds", () => {
-  const warm = eciperayTheme.semantic.background;
-  const dawn = memorizeTheme.semantic.background;
-  assert.equal(warm, "#faf6f0", "Warm Harvest keeps its warm cream");
-  assert.notEqual(dawn, warm);
-  assert.ok(
-    distance(warm, dawn) >= 15,
-    `backgrounds must differ visibly, distance was ${distance(warm, dawn).toFixed(1)}`,
+test("each brand theme carries its exact brief background", () => {
+  assert.equal(eciperayTheme.semantic.background, "#faf6f0", "Warm Harvest keeps its warm cream");
+  assert.equal(
+    memorizeTheme.semantic.background,
+    "#faf8f2",
+    "Quiet Dawn carries the brief's warm paper (#849)",
   );
-  const [wr, , wb] = rgb(warm);
-  const [dr, dg, db] = rgb(dawn);
-  assert.ok(wr > wb, "Warm Harvest background is warm (red above blue)");
-  assert.ok(dg >= dr && db >= dr, `Quiet Dawn background must carry a cool cast, got ${dawn}`);
 });
 
-test("Quiet Dawn text keeps AA contrast on the new background", () => {
+test("Quiet Dawn text keeps AA contrast on the brief background", () => {
   const { background, surface, text, textMuted } = memorizeTheme.semantic;
   assert.ok(contrast(text, background) >= 7, `text contrast ${contrast(text, background)}`);
   assert.ok(
@@ -78,6 +76,5 @@ test("Quiet Dawn text keeps AA contrast on the new background", () => {
 
 test("the registered Quiet Dawn light theme carries the new background", () => {
   const config = createTamaguiConfig(memorizeTheme);
-  assert.equal(config.themes.light.background.val, memorizeTheme.semantic.background);
-  assert.notEqual(config.themes.light.background.val, eciperayTheme.semantic.background);
+  assert.equal(config.themes.light.background.val, "#faf8f2");
 });
