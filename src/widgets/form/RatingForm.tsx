@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { TextArea as TamaguiTextArea, XStack, YStack, styled } from "tamagui";
+import { TextArea as TamaguiTextArea, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { StarRatingInput } from "./StarRatingInput.js";
@@ -40,13 +42,12 @@ export type RatingFormProps = {
  */
 function DarkTintOverlay() {
   return (
-    <YStack
+    <Col
       position="absolute"
       pointerEvents="none"
-      top={0}
-      left={0}
-      right={0}
-      bottom={0}
+      // The edge insets ride the style channel: Col's subset
+      // omits the position-inset props.
+      style={{ top: 0, left: 0, right: 0, bottom: 0 }}
       borderRadius={tokens.radii.xl}
       backgroundColor="$surface"
       opacity={0.1}
@@ -118,7 +119,7 @@ export function RatingForm({
   };
 
   return (
-    <YStack
+    <Col
       borderRadius={tokens.radii.xl}
       width="100%"
       backgroundColor={isLight ? tokens.colors.gray.gray1 : undefined}
@@ -126,7 +127,7 @@ export function RatingForm({
       borderColor={isLight ? tokens.colors.gray.gray3 : undefined}
     >
       {isLight ? null : <DarkTintOverlay />}
-      <YStack padding="$6" gap="$4">
+      <Col p="xl" gap="l">
         <Text
           fontSize={tokens.typography.fontSize.xl}
           fontWeight={tokens.typography.fontWeight.semibold}
@@ -134,10 +135,10 @@ export function RatingForm({
         >
           {title}
         </Text>
-        <YStack alignItems="center">
+        <Col center>
           <StarRatingInput value={rating ?? 0} onChange={handleRatingChange} />
-        </YStack>
-        <YStack>
+        </Col>
+        <Col>
           {isLight ? null : <DarkTintOverlay />}
           <NotesArea
             multiline
@@ -150,13 +151,14 @@ export function RatingForm({
             borderColor={isLight ? tokens.colors.gray.gray4 : undefined}
             color={isLight ? tokens.colors.gray.gray10 : "$surface"}
           />
-        </YStack>
-        <XStack gap="$3">
-          <YStack
-            flex={1}
-            alignItems="center"
+        </Col>
+        <Row gap="m">
+          <Col
+            grow
+            shrink
+            center
             borderRadius={tokens.radii.xl}
-            paddingVertical={tokens.spacing[3]}
+            py="m"
             backgroundColor={isLight ? "$surface" : undefined}
             borderWidth={isLight ? 1 : undefined}
             borderColor={isLight ? tokens.colors.gray.gray3 : undefined}
@@ -174,12 +176,13 @@ export function RatingForm({
             >
               {secondaryLabel}
             </Text>
-          </YStack>
-          <YStack
-            flex={1}
-            alignItems="center"
+          </Col>
+          <Col
+            grow
+            shrink
+            center
             borderRadius={tokens.radii.xl}
-            paddingVertical={tokens.spacing[3]}
+            py="m"
             backgroundColor="$primary"
             opacity={isPending ? 0.5 : 1}
             {...platformAccessibilityProps({
@@ -197,9 +200,9 @@ export function RatingForm({
             >
               {voice.ratingForm.saveLabel}
             </Text>
-          </YStack>
-        </XStack>
-      </YStack>
-    </YStack>
+          </Col>
+        </Row>
+      </Col>
+    </Col>
   );
 }

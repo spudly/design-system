@@ -1,17 +1,7 @@
-import { XStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 
-const StyledFieldRow = styled(XStack, {
-  name: "FieldRow",
-
-  gap: tokens.spacing[2],
-  alignItems: "stretch",
-});
-
-type StyledFieldRowProps = GetProps<typeof StyledFieldRow>;
-
-export type FieldRowProps = Omit<StyledFieldRowProps, "gap" | "alignItems">;
+export type FieldRowProps = Omit<RowProps, "gap" | "stretch">;
 
 /**
  * A row of form fields and their action (#119): a field (given
@@ -30,7 +20,10 @@ export type FieldRowProps = Omit<StyledFieldRowProps, "gap" | "alignItems">;
  * no spacing props, by design. (SearchRow, which carried only
  * this stretch difference, was consolidated into this
  * component — #481.)
+ *
+ * #746 (Option B): the row renders Row directly — the 8px gap
+ * is gap "s", the stretch is Row's `stretch`. No styled root.
  */
 export function FieldRow({ ...rest }: FieldRowProps) {
-  return <StyledFieldRow {...rest} />;
+  return <Row gap="s" stretch {...rest} />;
 }

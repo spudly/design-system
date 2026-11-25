@@ -348,11 +348,13 @@ test("SearchField glyph is capped in its own fixed box; the row keeps minHeight"
   // Declarations are checked on comment-stripped text so prose in the
   // block's comments can neither satisfy nor trip them.
   const stripped = stripComments(file.text);
-  const glyphBox = styledBlock(stripped, "SearchFieldGlyphBox");
-  assert.ok(/height:\s*44/.test(glyphBox), "SearchFieldGlyphBox must declare height: 44");
+  // #746: the glyph box is a function component rendering Row —
+  // its fixed height and clipping are pinned on the Row props.
+  const glyphBox = stripped.slice(stripped.indexOf("function GlyphBox"));
+  assert.ok(/height=\{44\}/.test(glyphBox), "GlyphBox must render its Row at height 44");
   assert.ok(
-    /overflow:\s*"hidden"/.test(glyphBox),
-    'SearchFieldGlyphBox must declare overflow: "hidden" so an exploding glyph clips inside its own box',
+    /overflow="hidden"/.test(glyphBox),
+    'GlyphBox must render overflow "hidden" so an exploding glyph clips inside its own box',
   );
   const row = styledBlock(stripped, "SearchField");
   assert.ok(/minHeight:\s*44/.test(row), "SearchField container must declare minHeight: 44");
@@ -390,11 +392,16 @@ test("SearchField search icon is drawn shapes, not a text glyph, so it centers b
 });
 
 test("CheckboxField box clips its glyph with hidden overflow", () => {
-  const file = sources.find(({ posixPath }) => posixPath.endsWith("widgets/form/CheckboxField.tsx"));
+  const file = sources.find(({ posixPath }) =>
+    posixPath.endsWith("widgets/form/CheckboxField.tsx"),
+  );
   assert.ok(file, "src/widgets/form/CheckboxField.tsx not found");
-  const block = styledBlock(stripComments(file.text), "CheckboxBox");
+  // #746: the box is a function component rendering Row — the
+  // clipping is pinned on the Row's overflow prop.
+  const stripped = stripComments(file.text);
+  const block = stripped.slice(stripped.indexOf("function CheckboxBox"));
   assert.ok(
-    /overflow:\s*"hidden"/.test(block),
-    'CheckboxBox must declare overflow: "hidden" so its glyph cannot paint or measure outside the 24px box',
+    /overflow="hidden"/.test(block),
+    'CheckboxBox must render overflow "hidden" so its glyph cannot paint or measure outside the 24px box',
   );
 });

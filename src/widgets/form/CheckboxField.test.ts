@@ -20,7 +20,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "form", "CheckboxField.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "form", "CheckboxField.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("CheckboxField is exported from the built internal components barrel; CheckRow is retired", async () => {
@@ -34,7 +37,12 @@ test("CheckboxField is exported from the built internal components barrel; Check
 });
 
 test("the box is unfilled in both states with a $primary outline and a $primary glyph (#713)", () => {
-  assert.match(code, /<StyledBox borderColor="\$primary" backgroundColor="\$surface">/);
+  // #746: the box is a function component rendering Row — the
+  // unfilled/$primary treatment is pinned on its props.
+  assert.match(
+    code,
+    /<Row\s+middle\s+center\s+width=\{24\}\s+height=\{24\}\s+overflow="hidden"\s+borderWidth=\{2\}\s+borderRadius=\{tokens\.radii\.sm\}\s+borderColor="\$primary"\s+backgroundColor="\$surface"\s*>/,
+  );
   assert.match(code, /color: "\$primary",\s+fontSize: tokens\.typography\.fontSize\.sm,/);
   assert.ok(!code.includes("$onPrimary"), "the glyph is no longer white on a filled box");
   assert.ok(
@@ -92,10 +100,7 @@ test("the box aligns to the label's first line via a first-line-height container
   // first line's glyph center, not the line box's center (#713
   // fix round).
   assert.match(code, /const FIRST_LINE_BOX_CONTAINER_HEIGHT = FIRST_LINE_HEIGHT - 8;/);
-  assert.match(
-    code,
-    /<XStack\s+height=\{FIRST_LINE_BOX_CONTAINER_HEIGHT\}\s+alignItems="center"\s+justifyContent="center"\s+>/,
-  );
+  assert.match(code, /<Row\s+height=\{FIRST_LINE_BOX_CONTAINER_HEIGHT\}\s+middle\s+center\s*>/);
   assert.ok(!/paddingTop/.test(code), "no hand-tuned paddingTop offset (#713)");
   assert.ok(!/margin/.test(code), "CheckboxField must not carry margins (#119)");
 });

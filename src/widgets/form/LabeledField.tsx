@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { LabelRow } from "../data/LabelRow.js";
 import { Text } from "../data/Text.js";
 
@@ -41,16 +41,20 @@ export type LabeledFieldProps = {
  */
 export function LabeledField({ label, fieldId, action, error, children }: LabeledFieldProps) {
   return (
-    <YStack>
+    <Col>
       <LabelRow label={label} action={action} separation={1} htmlFor={fieldId} />
       {children}
       {error ? (
-        <YStack paddingBlockStart={tokens.spacing[2]}>
+        <Col>
+          {/* The form's 8px error separation: the inset sits
+            between the field and its error, so no parent gap
+            can own it — composed explicitly (#746). */}
+          <Spacer y="s" />
           <Text variant="error" {...(fieldId ? { id: `${fieldId}-error` } : {})}>
             {error}
           </Text>
-        </YStack>
+        </Col>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

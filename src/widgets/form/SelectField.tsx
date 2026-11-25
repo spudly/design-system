@@ -1,5 +1,6 @@
 import { useId } from "react";
-import { Adapt, Label, Select as TamaguiSelect, Sheet, YStack, styled } from "tamagui";
+import { Adapt, Label, Select as TamaguiSelect, Sheet, styled } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
@@ -105,7 +106,7 @@ export function SelectField({
   const errorId = `${id}-error`;
 
   return (
-    <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1, minWidth: 200 } : {})}>
+    <Col gap="xs" {...(grow ? { grow: true, shrink: true, minWidth: 200 } : {})}>
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}
@@ -179,6 +180,6 @@ export function SelectField({
           {error}
         </Text>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

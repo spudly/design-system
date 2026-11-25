@@ -616,11 +616,11 @@ describe("buttonWebAria", () => {
     assert.equal(rawLabels.length, 2, "only the two DS Button labels may remain as raw JSX props");
     assert.match(
       code,
-      /accessibilityLabel=\{decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)\}/,
+      /accessibilityLabel=\{\s+decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)\s+\}/,
     );
     assert.match(
       code,
-      /accessibilityLabel=\{increaseAccessibilityLabel \?\? \(label \? `Increase \$\{label\}` : "Increase value"\)\}/,
+      /accessibilityLabel=\{\s+increaseAccessibilityLabel \?\? \(label \? `Increase \$\{label\}` : "Increase value"\)\s+\}/,
     );
   });
   test("component-internal stack pressables route through the translator, never raw RN JSX props (#235)", () => {

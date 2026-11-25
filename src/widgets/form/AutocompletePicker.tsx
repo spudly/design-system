@@ -1,6 +1,8 @@
 import { useRef } from "react";
-import { XStack, YStack, isWeb, styled } from "tamagui";
+import { XStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";
 import { Alert } from "../feedback/Alert.js";
@@ -246,7 +248,7 @@ export function AutocompletePicker({
   };
 
   return (
-    <YStack gap={tokens.spacing[2]} position="relative">
+    <Col gap="s" position="relative">
       <StyledFieldFrame testID="autocomplete-picker-field">
         {selectedItems.map((item) => (
           <Badge
@@ -277,7 +279,7 @@ export function AutocompletePicker({
           disabled={disabled}
         />
       </StyledFieldFrame>
-      <YStack
+      <Col
         collapsable={false}
         {...politeLiveRegionProps}
         position="absolute"
@@ -287,12 +289,12 @@ export function AutocompletePicker({
         {...(isWeb ? { opacity: 0 } : {})}
       >
         {statusMessage ? <Text>{statusMessage}</Text> : null}
-      </YStack>
+      </Col>
       {hasSearchText ? (
         isSearching ? (
-          <YStack alignItems="center" padding={tokens.spacing[3]}>
+          <Col center p="m">
             <Spinner label={voice.autocompletePicker.searchingLabel} />
-          </YStack>
+          </Col>
         ) : visibleResults.length === 0 ? (
           searchError ? (
             // The visible Alert carries NO live semantics of its
@@ -316,7 +318,7 @@ export function AutocompletePicker({
             <Text variant="hint">{noResultsMessage}</Text>
           )
         ) : (
-          <YStack>
+          <Col>
             {visibleResults.map((result) => (
               <ListItem
                 key={result.id}
@@ -328,9 +330,9 @@ export function AutocompletePicker({
                 }}
               />
             ))}
-          </YStack>
+          </Col>
         )
       ) : null}
-    </YStack>
+    </Col>
   );
 }

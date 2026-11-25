@@ -1,4 +1,6 @@
-import { XStack, YStack, styled } from "tamagui";
+import type { ReactNode } from "react";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "../accessibility.js";
@@ -7,16 +9,24 @@ import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
-const SecretBox = styled(XStack, {
-  name: "SecretBox",
-
-  backgroundColor: "$surface",
-  borderWidth: 1,
-  borderColor: "$borderColor",
-  borderRadius: tokens.radii.md,
-  padding: tokens.spacing[3],
-  alignItems: "center",
-});
+/**
+ * The secret's bordered box (#746, Option B): a surface Row
+ * with the medium radius and 12px padding (p "m").
+ */
+function SecretBox({ children }: { children: ReactNode }) {
+  return (
+    <Row
+      middle
+      backgroundColor="$surface"
+      borderWidth={1}
+      borderColor="$borderColor"
+      borderRadius={tokens.radii.md}
+      p="m"
+    >
+      {children}
+    </Row>
+  );
+}
 
 export type SecretRevealPanelProps = {
   /** The secret value to display (shown once). */
@@ -71,22 +81,19 @@ export function SecretRevealPanel({
     // secret value itself never appears.
     return (
       <LoadingScope active>
-        <YStack
-          gap={tokens.spacing[3]}
-          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
-        >
-          <YStack width="55%">
+        <Col gap="m" {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+          <Col width="55%">
             <TextSkeleton size="xl" lines={1} />
-          </YStack>
-          <YStack width="75%">
+          </Col>
+          <Col width="75%">
             <TextSkeleton size="sm" lines={1} />
-          </YStack>
+          </Col>
           <SecretBox>
-            <YStack flex={1}>
+            <Col grow shrink>
               <TextSkeleton size="sm" lines={1} />
-            </YStack>
+            </Col>
           </SecretBox>
-          <XStack gap={tokens.spacing[2]}>
+          <Row gap="s">
             <Button variant="primary" size="sm" onPress={() => onCopy(secret)}>
               {resolvedCopyLabel}
             </Button>
@@ -95,13 +102,13 @@ export function SecretRevealPanel({
                 {voice.secretRevealPanel.dismissLabel}
               </Button>
             ) : null}
-          </XStack>
-        </YStack>
+          </Row>
+        </Col>
       </LoadingScope>
     );
   }
   return (
-    <YStack gap={tokens.spacing[3]} {...politeLiveRegionProps}>
+    <Col gap="m" {...politeLiveRegionProps}>
       <Text variant="subheading">{resolvedTitle}</Text>
       <Text variant="hint">{voice.secretRevealPanel.hint}</Text>
       <SecretBox>
@@ -117,16 +124,16 @@ export function SecretRevealPanel({
           {secret}
         </Text>
       </SecretBox>
-      <XStack gap={tokens.spacing[2]}>
+      <Row gap="s">
         <Button variant="primary" size="sm" onPress={() => onCopy(secret)}>
           {resolvedCopyLabel}
         </Button>
         {onDismiss ? (
           <Button variant="secondary" size="sm" onPress={onDismiss}>
-                {voice.secretRevealPanel.dismissLabel}
-              </Button>
+            {voice.secretRevealPanel.dismissLabel}
+          </Button>
         ) : null}
-      </XStack>
-    </YStack>
+      </Row>
+    </Col>
   );
 }

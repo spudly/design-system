@@ -1,6 +1,8 @@
 import { useId } from "react";
-import { RadioGroup as TamaguiRadioGroup, Label, XStack, YStack, styled } from "tamagui";
+import { RadioGroup as TamaguiRadioGroup, Label, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
 
@@ -62,7 +64,7 @@ export function RadioOptionGroup({
   const errorId = `${id}-error`;
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <Col gap="xs">
       {label ? (
         <Text id={groupLabelId} variant="body">
           {label}
@@ -84,14 +86,16 @@ export function RadioOptionGroup({
         aria-describedby={error ? errorId : undefined}
         {...rest}
       >
-        <YStack gap={tokens.spacing[1]}>
+        <Col gap="xs">
           {options.map((opt) => {
             const selected = opt.value === value;
             const optionLabelId = `${id}-option-${opt.value}`;
             return (
-              <XStack key={opt.value} alignItems="center" gap={tokens.spacing[2]}>
+              <Row key={opt.value} middle gap="s">
                 <StyledItem value={opt.value} disabled={disabled} aria-labelledby={optionLabelId}>
-                  <XStack
+                  <Row
+                    middle
+                    center
                     width={24}
                     height={24}
                     borderRadius={tokens.radii.full}
@@ -106,8 +110,6 @@ export function RadioOptionGroup({
                     // same ≥3:1 (WCAG 1.4.11) in both modes — see TextField.
                     borderColor={selected ? "$link" : "$textMuted"}
                     backgroundColor="$surface"
-                    alignItems="center"
-                    justifyContent="center"
                   >
                     {/* The Indicator itself is the dot: Tamagui sizes the
                         Indicator frame to 50% of the circle (10x10), so a
@@ -121,9 +123,9 @@ export function RadioOptionGroup({
                       borderRadius={tokens.radii.full}
                       backgroundColor="$link"
                     />
-                  </XStack>
+                  </Row>
                 </StyledItem>
-                <YStack flex={1} gap={tokens.spacing[1]}>
+                <Col grow shrink gap="xs">
                   <Label
                     id={optionLabelId}
                     onPress={
@@ -138,17 +140,17 @@ export function RadioOptionGroup({
                     {opt.label}
                   </Label>
                   {opt.description ? <Text variant="hint">{opt.description}</Text> : null}
-                </YStack>
-              </XStack>
+                </Col>
+              </Row>
             );
           })}
-        </YStack>
+        </Col>
       </TamaguiRadioGroup>
       {error ? (
         <Text variant="error" id={errorId}>
           {error}
         </Text>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

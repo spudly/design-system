@@ -1,7 +1,9 @@
 import { useId } from "react";
 import type { ReactNode } from "react";
-import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, styled } from "tamagui";
+import { Checkbox as TamaguiCheckbox, Label, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
@@ -13,7 +15,7 @@ import { Text } from "../data/Text.js";
  * that stretched SearchField's row to full screen height on Android
  * (spudly/eciperay#162; see the note in SearchField.tsx). With no
  * lineHeight prop the glyph takes the font's line height, and
- * StyledBox's fixed size + hidden overflow keep it inside the box.
+ * CheckboxBox's fixed size + hidden overflow keep it inside the box.
  */
 
 const StyledCheckbox = styled(TamaguiCheckbox, {
@@ -28,17 +30,29 @@ const StyledCheckbox = styled(TamaguiCheckbox, {
   borderWidth: 0,
 });
 
-const StyledBox = styled(XStack, {
-  name: "CheckboxBox",
-
-  width: 24,
-  height: 24,
-  overflow: "hidden",
-  borderWidth: 2,
-  borderRadius: tokens.radii.sm,
-  alignItems: "center",
-  justifyContent: "center",
-});
+/**
+ * The checkbox's visual box (#746, Option B): a 24px Row —
+ * the $primary outline and surface fill are the visual
+ * direction's constants, applied at the one use site before;
+ * they live here as the box's own props.
+ */
+function CheckboxBox({ children }: { children: ReactNode }) {
+  return (
+    <Row
+      middle
+      center
+      width={24}
+      height={24}
+      overflow="hidden"
+      borderWidth={2}
+      borderRadius={tokens.radii.sm}
+      borderColor="$primary"
+      backgroundColor="$surface"
+    >
+      {children}
+    </Row>
+  );
+}
 
 // The list shape's first-line height: the label renders at the md
 // size with the normal line height, so its first line box is
@@ -203,7 +217,7 @@ export function CheckboxField({
           supersedes the earlier WCAG 1.4.11 $textMuted-border
           treatment: the checked/unchecked distinction is carried
           by the glyph, per Stephen's direction.) */}
-      <StyledBox borderColor="$primary" backgroundColor="$surface">
+      <CheckboxBox>
         <TamaguiCheckbox.Indicator>
           <Text
             aria-hidden
@@ -216,30 +230,26 @@ export function CheckboxField({
             ✓
           </Text>
         </TamaguiCheckbox.Indicator>
-      </StyledBox>
+      </CheckboxBox>
     </StyledCheckbox>
   );
 
   if (listShape) {
     return (
-      <YStack gap={tokens.spacing[1]}>
-        <XStack
-          alignItems="flex-start"
-          gap={tokens.spacing[3]}
-          paddingVertical={tokens.spacing[3]}
+      <Col gap="xs">
+        <Row
+          top
+          gap="m"
+          py="m"
           {...(separator
             ? { borderBottomWidth: 1, borderBottomColor: tokens.colors.gray.gray2 }
             : {})}
           onPress={disabled ? undefined : toggle}
           cursor={disabled ? undefined : "pointer"}
         >
-          <XStack
-            height={FIRST_LINE_BOX_CONTAINER_HEIGHT}
-            alignItems="center"
-            justifyContent="center"
-          >
+          <Row height={FIRST_LINE_BOX_CONTAINER_HEIGHT} middle center>
             {checkbox}
-          </XStack>
+          </Row>
           <Text
             flex={1}
             {...(struck ? { color: "$textMuted" } : {})}
@@ -258,34 +268,34 @@ export function CheckboxField({
               </Text>
             ) : null}
           </Text>
-        </XStack>
+        </Row>
         {children}
         {error ? (
           <Text variant="error" id={errorId}>
             {error}
           </Text>
         ) : null}
-      </YStack>
+      </Col>
     );
   }
 
   return (
-    <YStack gap={tokens.spacing[1]}>
-      <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+    <Col gap="xs">
+      <Row middle gap="m" minHeight={44}>
         {checkbox}
-        <YStack flex={1} gap={tokens.spacing[1]}>
+        <Col grow shrink gap="xs">
           <Label id={labelId} onPress={toggle} fontSize={tokens.typography.fontSize.md}>
             {label}
           </Label>
           {description ? <Text variant="hint">{description}</Text> : null}
-        </YStack>
-      </XStack>
+        </Col>
+      </Row>
       {children}
       {error ? (
         <Text variant="error" id={errorId}>
           {error}
         </Text>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

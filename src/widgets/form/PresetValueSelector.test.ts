@@ -70,8 +70,8 @@ test("the custom slot keeps the widened share that keeps its label on one line (
   // which wrapped mid-word and made the button taller than the
   // preset row. The widened share is the fix; shrinking it back
   // reintroduces the wrap.
-  assert.match(code, /<XStack flex=\{0\.35\}>/);
-  assert.match(code, /<XStack flex=\{1\} gap=/, "the preset row keeps the remaining share");
+  assert.match(code, /<Row grow=\{0\.35\} shrink style=\{\{ flexBasis: 0 \}\}>/);
+  assert.match(code, /<Row grow shrink gap=/, "the preset row keeps the remaining share");
 });
 
 test("disabled declares, dims, and disables presets, the custom slot, and its editor (#801)", () => {
