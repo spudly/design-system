@@ -259,7 +259,13 @@ function assertBaselinesDerivable(scope: any, baselineFiles: any) {
   const narrow = new Set(scope.narrow);
   for (const files of baselineFiles.values()) {
     for (const file of files) {
-      if (file.endsWith("-narrow.png")) {
+      if (file.endsWith("-narrow.png") && !standard.has(file.slice(0, -".png".length))) {
+        // A story whose own name ends in Narrow (e.g. the
+        // MealsHubPage PlansTabLongListNarrow regression cases)
+        // has a STANDARD baseline whose file name also ends in
+        // "-narrow.png" — the exact standard match above wins;
+        // only a file with no standard story of that name is a
+        // narrow-variant baseline.
         assert.ok(narrow.has(file.slice(0, -"-narrow.png".length)), `narrow baseline ${file}`);
       } else {
         assert.ok(standard.has(file.slice(0, -".png".length)), `baseline ${file}`);
