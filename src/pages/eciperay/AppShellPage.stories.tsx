@@ -13,16 +13,19 @@ import { eciperayFooterFixture } from "../shared/fixtures.js";
  * nav — Home, Recipes, Meals, Shared with me, Add, Tags,
  * Profile — each an icon name + label + route); the page
  * surface is a static stand-in composed from DS components, the
- * way the app slots a DS page into the frame. The frame is a
- * wide viewport (1024×844 — the shell's centered content
- * column) pinned so Chromatic screenshots are deterministic,
- * theme pinned to Warm Harvest, Eciperay's brand.
+ * way the app slots a DS page into the frame. The frame is the
+ * full fluid width (#854, Stephen's direction: the page itself
+ * is centered — its content column caps at 1200px and centers
+ * via PageContentColumn — with the footer full-width), so
+ * Chromatic captures show the shell's true desktop layout
+ * instead of a pinned 1024px left-aligned frame; theme pinned
+ * to Warm Harvest, Eciperay's brand.
  */
 const meta: Meta<typeof AppShellPage> = {
   title: "Pages/Eciperay/AppShellPage",
   component: AppShellPage,
   globals: { theme: "light_warmHarvest" },
-  parameters: { dsViewport: "wide" },
+  parameters: { dsViewport: "full" },
 };
 
 export default meta;

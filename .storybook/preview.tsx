@@ -210,6 +210,14 @@ const preview: Preview = {
                 maxWidth="100%"
                 height={frameHeight}
                 position="relative"
+                // #854: center a fixed-width page frame in the
+                // Storybook canvas — a pinned frame (e.g. the old
+                // 1024px AppShellPage pin) otherwise hugs the left
+                // edge and masquerades as a shell layout defect.
+                // The page itself centers its content column
+                // (PageContentColumn, #628) and its footer stays
+                // full-width inside the frame.
+                style={{ marginLeft: "auto", marginRight: "auto" }}
               >
                 <Story />
             </View>
