@@ -191,22 +191,22 @@ export function ProfilePage({
             Component Showcase
           </Button>
         ) : null}
-        {subscription ? <SubscriptionView {...subscription} loading={loading || subscription.loading} /> : null}
-        {nutritionGoals ? <NutritionGoalsForm {...nutritionGoals} loading={loading || nutritionGoals.loading} /> : null}
-        {accessTokens ? <AccessTokensPanel {...accessTokens} loading={loading || accessTokens.loading} /> : null}
+        {subscription ? <SubscriptionView {...subscription} loading={!!(loading || subscription.loading)} /> : null}
+        {nutritionGoals ? <NutritionGoalsForm {...nutritionGoals} loading={!!(loading || nutritionGoals.loading)} /> : null}
+        {accessTokens ? <AccessTokensPanel {...accessTokens} loading={!!(loading || accessTokens.loading)} /> : null}
         {tagsHref ? (
           <Button variant="secondary" href={tagsHref}>
             Manage Tags
           </Button>
         ) : null}
-        {showLess ? <ShowLessView {...showLess} loading={loading || showLess.loading} /> : null}
-        {authorDisplay ? <AuthorDisplayView {...authorDisplay} loading={loading || authorDisplay.loading} /> : null}
-        {familySharing ? <FamilySharingView {...familySharing} loading={loading || familySharing.loading} /> : null}
+        {showLess ? <ShowLessView {...showLess} loading={!!(loading || showLess.loading)} /> : null}
+        {authorDisplay ? <AuthorDisplayView {...authorDisplay} loading={!!(loading || authorDisplay.loading)} /> : null}
+        {familySharing ? <FamilySharingView {...familySharing} loading={!!(loading || familySharing.loading)} /> : null}
         {feedbackPreferenceSection ? (
-          <FeedbackPreferenceView {...feedbackPreferenceSection} loading={loading || feedbackPreferenceSection.loading} />
+          <FeedbackPreferenceView {...feedbackPreferenceSection} loading={!!(loading || feedbackPreferenceSection.loading)} />
         ) : null}
-        {transfer ? <TransferRecipesView {...transfer} loading={loading || transfer.loading} /> : null}
-        {accountData ? <AccountDataView {...accountData} loading={loading || accountData.loading} /> : null}
+        {transfer ? <TransferRecipesView {...transfer} loading={!!(loading || transfer.loading)} /> : null}
+        {accountData ? <AccountDataView {...accountData} loading={!!(loading || accountData.loading)} /> : null}
         <LegalSection title="Legal">
           <Col gap="s">
             {(legalLinks ?? []).map((link) => (
