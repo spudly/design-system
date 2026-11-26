@@ -6,16 +6,40 @@ import { CardGrid } from "../../widgets/layout/CardGrid.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { StackedButtonRow } from "../../widgets/actions/StackedButtonRow.js";
 import { Text } from "../../widgets/data/Text.js";
+import {
+  ConsentBannerView,
+  type ConsentBannerViewProps,
+} from "../../views/shared/ConsentBannerView.js";
+import {
+  InstallBannerView,
+  type InstallBannerViewProps,
+} from "../../views/shared/InstallBannerView.js";
 
 /**
  * LandingPage (#171, B7/C11): the signed-out marketing landing —
  * the content view of Eciperay's `/` surface for signed-out
  * visitors. The web host keeps the routing branch (signed-out
- * visitors land here; signed-in users get the DS-adopted home),
- * the public chrome (the shared public frame is a DS building
+ * visitors land here; signed-in users get the DS-adopted home)
+ * and the public chrome (the shared public frame is a DS building
  * block the host composes around this view, per the ownership
- * model Stephen confirmed on #171), and the analytics consent
- * banner.
+ * model Stephen confirmed on #171).
+ *
+ * Banners (#879 — supersedes the earlier note that the host
+ * keeps the analytics consent banner): this page renders the
+ * consent banner and the mobile-app install banner itself,
+ * like the shell pages — the host passes each banner's state
+ * as DATA (`consentBanner` / `installBanner`, the banner
+ * views' own prop shapes): presence is visibility, copy and
+ * labels cross as data (the views' label props fall back to
+ * the voice defaults), and accept / decline / dismiss are
+ * bare callbacks. The consent record, the analytics wiring,
+ * and the install dismissal state stay host-side; the views
+ * are NOT exported for hosts to mount. The banners render
+ * after the feature cards, exactly where hosts mount their
+ * local banners today (each view pins itself to its screen
+ * edge: install to the top, consent to the bottom), so there
+ * is no visual change. Omit a prop (or pass null) and that
+ * banner does not render.
  *
  * The copy crosses as props (the HomePage precedent): the
  * strings and hrefs are the app's content constants, so the
@@ -76,9 +100,36 @@ export type LandingPageFeature = {
   description: string;
 };
 
+/** The consent banner as data (#879): the ConsentBannerView prop shape, aliased per the page-prop rule. */
+export type LandingPageConsentBanner = ConsentBannerViewProps;
+
+/** The install banner as data (#879): the InstallBannerView prop shape, aliased per the page-prop rule. */
+export type LandingPageInstallBanner = InstallBannerViewProps;
+
 export type LandingPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /**
+   * The analytics consent banner as data (#879): when present,
+   * the page renders ConsentBannerView itself (bottom-pinned)
+   * after the feature cards. Copy crosses as data; the accept /
+   * decline labels default to the voice object's
+   * consentBannerView labels when omitted. The consent state
+   * and its side effects stay host-side — only the accept /
+   * decline intents cross. Omit (or pass null) while consent
+   * is not outstanding and no banner renders.
+   */
+  consentBanner?: LandingPageConsentBanner | null;
+  /**
+   * The mobile-app install banner as data (#879): when
+   * present, the page renders InstallBannerView itself
+   * (top-pinned) after the feature cards. The message and the
+   * app-store links cross as data (hrefs, per #248); dismissal
+   * is a bare callback and the dismissal state stays
+   * host-side. Omit (or pass null) once dismissed and no
+   * banner renders.
+   */
+  installBanner?: LandingPageInstallBanner | null;
   heroTitle: string;
   heroSubtitle: string;
   discoverCta: LandingPageCta;
@@ -99,6 +150,8 @@ export function LandingPage({
   featureTwo,
   featureThree,
   footer,
+  consentBanner,
+  installBanner,
 }: LandingPageProps) {
   return (
     <BigFooterShell footer={footer}>
@@ -130,6 +183,8 @@ export function LandingPage({
             </Card>
           ))}
         </CardGrid>
+        {installBanner ? <InstallBannerView {...installBanner} /> : null}
+        {consentBanner ? <ConsentBannerView {...consentBanner} /> : null}
       </ScreenContainer>
     </BigFooterShell>
   );

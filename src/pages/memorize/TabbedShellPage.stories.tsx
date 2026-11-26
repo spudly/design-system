@@ -242,6 +242,58 @@ export const WithNoticeAction: Story = {
   ),
 };
 
+/** Consent banner data (#879): the analytics-consent copy as the host passes it. */
+const consentBannerFixture = {
+  messageBeforeLink: "We use cookies and analytics as described in our",
+  linkLabel: "privacy policy",
+  linkHref: "/privacy",
+  messageAfterLink: ".",
+  onAccept: () => {},
+  onDecline: () => {},
+};
+
+/** Install banner data (#879): the mobile-app prompt as the host passes it. */
+const installBannerFixture = {
+  message: "Get the Memorize app for daily review reminders.",
+  links: [
+    { label: "Download on the App Store", href: "/get-the-app" },
+    { label: "Get it on Google Play", href: "/get-the-app" },
+  ],
+  onDismiss: () => {},
+};
+
+/** Consent outstanding (#879): the shell renders the bottom-pinned consent banner itself. */
+export const WithConsentBanner: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        consentBanner={consentBannerFixture}
+      />
+    </>
+  ),
+};
+
+/** Install prompt not yet dismissed (#879): the shell renders the top-pinned install banner itself. */
+export const WithInstallBanner: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        installBanner={installBannerFixture}
+      />
+    </>
+  ),
+};
+
 /** The link form: tabs navigate (real hrefs); the host renders the current page as children. */
 export const LinkTabs: Story = {
   render: () => (

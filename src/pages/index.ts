@@ -67,6 +67,8 @@ export {
 } from "./eciperay/MealPlanDetailPage.js";
 export {
   TabbedShellPage,
+  type TabbedShellPageConsentBanner,
+  type TabbedShellPageInstallBanner,
   type TabbedShellPageLinkTab,
   type TabbedShellPageProps,
   type TabbedShellPageTab,
@@ -74,6 +76,8 @@ export {
 export {
   AppShellPage,
   type AppShellPageAction,
+  type AppShellPageConsentBanner,
+  type AppShellPageInstallBanner,
   type AppShellPageNavItem,
   type AppShellPageProps,
   type AppShellPageSearch,
@@ -137,8 +141,10 @@ export { HomePage, type HomePageProps, type HomePageRecipe } from "./eciperay/Ho
 export {
   LandingPage,
   type LandingPageProps,
+  type LandingPageConsentBanner,
   type LandingPageCta,
   type LandingPageFeature,
+  type LandingPageInstallBanner,
 } from "./eciperay/LandingPage.js";
 export {
   TagsPage,

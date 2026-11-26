@@ -52,6 +52,8 @@ test("TabbedShellPage is exported from the built pages barrel", async () => {
   assert.match(types, /type TabbedShellPageProps/);
   assert.match(types, /type TabbedShellPageTab/);
   assert.match(types, /type TabbedShellPageLinkTab/);
+  assert.match(types, /type TabbedShellPageConsentBanner/);
+  assert.match(types, /type TabbedShellPageInstallBanner/);
 });
 
 test("the shell is BigFooterShell in content scroll mode around the plain ScreenContainer", async () => {
@@ -357,4 +359,60 @@ test("SSR: a notice renders its message and action above the content; content st
   assert.match(html, /Try again/, "the notice action label renders");
   assert.match(html, /role="status"/, "the notice keeps the polite live-region semantics");
   assert.match(html, /VERSES SURFACE/, "the tab content stays mounted under the notice");
+});
+test("banners (#879): absent by default; when present the shell renders the banner views with the host data forwarded", async () => {
+  const { React, TabbedShellPage, distViews } = await loadRuntime();
+  const bare = TabbedShellPage({
+    title: "Memorize",
+    tabs: sentinelTabs(React),
+    activeTabId: "verses",
+    onTabSelect: () => {},
+  });
+  const bareChildren = bare.props.children.props.children;
+  assert.equal(bareChildren[4], null, "no install banner data — no install banner renders");
+  assert.equal(bareChildren[5], null, "no consent banner data — no consent banner renders");
+  let accepts = 0;
+  let dismissals = 0;
+  const consentBanner = {
+    messageBeforeLink: "We use cookies as described in our",
+    linkLabel: "privacy policy",
+    linkHref: "/privacy",
+    messageAfterLink: ".",
+    onAccept: () => {
+      accepts += 1;
+    },
+    onDecline: () => {},
+  };
+  const installBanner = {
+    message: "Get the app for the best experience.",
+    links: [{ label: "App Store", href: "https://apps.example.test/install" }],
+    onDismiss: () => {
+      dismissals += 1;
+    },
+  };
+  const withBanners = TabbedShellPage({
+    title: "Memorize",
+    tabs: sentinelTabs(React),
+    activeTabId: "verses",
+    onTabSelect: () => {},
+    consentBanner,
+    installBanner,
+  });
+  const children = withBanners.props.children.props.children;
+  assert.equal(
+    children[4].type,
+    distViews.InstallBannerView,
+    "the install banner renders through InstallBannerView",
+  );
+  assert.deepEqual(children[4].props, installBanner, "the install banner data crosses unchanged");
+  assert.equal(
+    children[5].type,
+    distViews.ConsentBannerView,
+    "the consent banner renders through ConsentBannerView",
+  );
+  assert.deepEqual(children[5].props, consentBanner, "the consent banner data crosses unchanged");
+  children[5].props.onAccept();
+  children[4].props.onDismiss();
+  assert.equal(accepts, 1, "the accept callback fires");
+  assert.equal(dismissals, 1, "the dismiss callback fires");
 });
