@@ -27,13 +27,15 @@ export type RecipeInstructionRowViewProps = {
    * recipeInstructionRowView formatters (#539). */
   index: number;
   /**
-   * The host's drag handle for this row, bound by the host's
-   * drag container (Stephen's 2026-11-09 boundary on #130:
-   * hosts keep their drag containers — dnd-kit on web,
-   * DraggableFlatList on native — and bind the handle into
-   * the DS row). The design system renders no handle of its
-   * own and takes no drag dependency; omitted, the row
-   * renders without a handle (a read-only-order context).
+   * The drag handle for this row. Stephen's 2026-11-26
+   * boundary revision on #878: the design system owns the
+   * handle visual (DragHandleView's grip) and hosts keep
+   * drag behavior — no drag library enters the DS. The list
+   * view passes the DS grip by default, or the host's own
+   * handle when the host binds one through its drag
+   * container (dnd-kit on web, DraggableFlatList on native).
+   * Omitted on a directly rendered row, the row renders
+   * without a handle (a read-only-order context).
    */
   dragHandle?: ReactNode;
   /** Body-change intent: the row's key and the new text. The
@@ -47,7 +49,8 @@ export type RecipeInstructionRowViewProps = {
 /**
  * RecipeInstructionRowView (#130, tranche T4): one editable
  * instruction step as a view — the step number, the body
- * field, the host-bound drag handle, and the remove action,
+ * field, the drag handle (the DS grip by default through
+ * the list view, or host-bound), and the remove action,
  * composed from the DS fields so hosts no longer build the
  * row from raw inputs beside their drag containers.
  *

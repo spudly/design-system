@@ -108,3 +108,30 @@ export const LoadingOverlay: Story = {
     </StoryFrame>
   ),
 };
+
+export const NoConsent: Story = {
+  render: () => (
+    <StoryFrame variant="panel">
+      <FeedbackPreferenceView
+        shortcutEnabled
+        onShortcutEnabledChange={() => undefined}
+        choicesHref="/privacy/consent"
+      />
+    </StoryFrame>
+  ),
+};
+
+export const LongLabels: Story = {
+  render: () => (
+    <StoryFrame variant="panel">
+      <FeedbackPreferenceView
+        shortcutEnabled={false}
+        consent={false}
+        consentStatusText="Analytics consent: Declined"
+        acceptLongLabel="Accept analytics consent"
+        declineLongLabel="Decline analytics consent"
+        {...actions}
+      />
+    </StoryFrame>
+  ),
+};

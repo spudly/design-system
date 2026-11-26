@@ -57,16 +57,19 @@ const ICONS: [string, string | null][] = [
   ["AddIcon", null],
   ["BackIcon", "12 19 5 12 12 5"],
   ["CollapsedIcon", "6 9 12 15 18 9"],
+  ["ErrorIcon", null],
   ["ExpandedIcon", "18 15 12 9 6 15"],
   ["FeedbackIcon", "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"],
   ["HelpIcon", "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"],
   ["HomeIcon", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"],
+  ["InfoIcon", null],
   ["MealsIcon", "M2.62 13.5 A9.5 9.5 0 0 0 21.38 13.5 Z"],
   ["PrintIcon", "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"],
   ["ProfileIcon", "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"],
   ["RecipesIcon", "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"],
   ["ShareIcon", null],
   ["SharedIcon", "M23 21v-2a4 4 0 0 0-3-3.87"],
+  ["SuccessIcon", "M22 11.08V12a10 10 0 1 1-5.93-9.14"],
   ["TagsIcon", "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"],
   ["WarningIcon", "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94"],
 ];
@@ -109,12 +112,34 @@ test("each icon carries its glyph's data (official Feather, except the custom Me
   for (const [name, literal] of ICONS) {
     if (!literal) continue;
     const data = await dataOf(name);
-    assert.ok(data.includes(literal), `${name} is missing its glyph data (${literal.slice(0, 40)}…)`);
+    assert.ok(
+      data.includes(literal),
+      `${name} is missing its glyph data (${literal.slice(0, 40)}…)`,
+    );
   }
   // plus is two bare lines with no path data: pin its line endpoints.
+  // alert-circle and info are circles with bare lines (#856): pin
+  // their line endpoints the same way as plus.
+  const errorData = await dataOf("ErrorIcon");
+  assert.ok(errorData.includes('"cx":"12","cy":"12","r":"10"'), "ErrorIcon lost its circle");
+  assert.ok(
+    errorData.includes('"x1":"12","y1":"8","x2":"12","y2":"12"'),
+    "ErrorIcon lost its stem",
+  );
+  const infoData = await dataOf("InfoIcon");
+  assert.ok(infoData.includes('"cx":"12","cy":"12","r":"10"'), "InfoIcon lost its circle");
+  assert.ok(infoData.includes('"x1":"12","y1":"16","x2":"12","y2":"12"'), "InfoIcon lost its stem");
+  const successData = await dataOf("SuccessIcon");
+  assert.ok(successData.includes("22 4 12 14.01 9 11.01"), "SuccessIcon lost its check polyline");
   const add = await dataOf("AddIcon");
-  assert.ok(add.includes('"x1":"12","y1":"5","x2":"12","y2":"19"'), "AddIcon lost its vertical line");
-  assert.ok(add.includes('"x1":"5","y1":"12","x2":"19","y2":"12"'), "AddIcon lost its horizontal line");
+  assert.ok(
+    add.includes('"x1":"12","y1":"5","x2":"12","y2":"19"'),
+    "AddIcon lost its vertical line",
+  );
+  assert.ok(
+    add.includes('"x1":"5","y1":"12","x2":"19","y2":"12"'),
+    "AddIcon lost its horizontal line",
+  );
 });
 
 test("no icon carries another icon's glyph (#246)", async () => {
@@ -135,10 +160,7 @@ test("MealsIcon is the custom divided plate, not Feather's coffee glyph", async 
   const data = JSON.stringify(elements);
   // No rim: the plate is its three portions alone, enlarged to
   // fill the frame, so there is no circle element at all.
-  assert.ok(
-    !elements.some((el) => el.kind === "circle"),
-    "MealsIcon still carries the plate rim",
-  );
+  assert.ok(!elements.some((el) => el.kind === "circle"), "MealsIcon still carries the plate rim");
   // Two quarter portions across the top, their arcs concentric
   // about the grid center (radius 9.5 about 12,12).
   assert.ok(
@@ -165,9 +187,18 @@ test("printer and share-2 use the official Feather element data (#187)", async (
   );
   const share = await dataOf("ShareIcon");
   // share-2: three circles joined by two lines.
-  assert.ok(share.includes('"kind":"circle","cx":"18","cy":"5","r":"3"'), "ShareIcon lost its top circle");
-  assert.ok(share.includes('"kind":"circle","cx":"6","cy":"12","r":"3"'), "ShareIcon lost its middle circle");
-  assert.ok(share.includes('"kind":"circle","cx":"18","cy":"19","r":"3"'), "ShareIcon lost its bottom circle");
+  assert.ok(
+    share.includes('"kind":"circle","cx":"18","cy":"5","r":"3"'),
+    "ShareIcon lost its top circle",
+  );
+  assert.ok(
+    share.includes('"kind":"circle","cx":"6","cy":"12","r":"3"'),
+    "ShareIcon lost its middle circle",
+  );
+  assert.ok(
+    share.includes('"kind":"circle","cx":"18","cy":"19","r":"3"'),
+    "ShareIcon lost its bottom circle",
+  );
   assert.ok(
     share.includes('"x1":"8.59","y1":"13.51","x2":"15.42","y2":"17.49"'),
     "ShareIcon lost its lower connector line",
@@ -212,7 +243,11 @@ test("CollapsibleIcon is one chevron-right glyph that rotates 90deg when open (#
     // Rotation is derived from isOpen: pointing right while closed,
     // rotated down while open, animated on the DS "fast" transition
     // (the `animation` prop never animates on web, #457).
-    assert.equal(element?.props?.rotate, rotate, `CollapsibleIcon rotate is wrong for isOpen=${isOpen}`);
+    assert.equal(
+      element?.props?.rotate,
+      rotate,
+      `CollapsibleIcon rotate is wrong for isOpen=${isOpen}`,
+    );
     assert.equal(element?.props?.transition, "fast", "CollapsibleIcon lost its fast transition");
     const child = element?.props?.children;
     assert.equal(child?.type, Icon, "CollapsibleIcon does not render through the base Icon");

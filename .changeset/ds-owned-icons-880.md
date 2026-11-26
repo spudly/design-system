@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+DS surfaces now select their own icons (#880): hosts no longer pass icon names to the tabbed shell or the top bar. On TabbedShellPage, the tab `icon` prop is removed — the page maps each tab's `id` to its own glyph, so a tab with a known section id (home, meals, recipes, profile, tags, shared, add, feedback) renders the same glyph the host previously named for it, and a tab with any other id renders label-only with no icon. On AppTopBar (and AppShellPage, whose nav items are the top bar's), the nav item `icon` prop is replaced by a semantic `kind` (home, recipes, meals, shared, add, tags, profile, feedback) that the bar maps to its own glyph; an item with no kind renders label-only. No icon name or component is exported from the package root. Verify after adopting: a shell whose tabs/nav items use the known section identities shows the same glyphs beside the same labels as before, a tab or nav item with an unrecognized identity shows its label with no glyph, and passing an icon name no longer compiles.

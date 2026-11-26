@@ -12,12 +12,17 @@ describe("textFontContext", () => {
     return readFileSync(join(srcDir, rel), "utf8");
   }
 
-  test("Text passes fontFamily as an instance prop for both roles (#69)", () => {
+  test("Text passes fontFamily as an instance prop for each role (#69, #851)", () => {
     const source = readSrc("widgets/data/Text.tsx");
     assert.match(
       source,
-      /fontFamily=\{variant === "verse" \|\| variant === "display" \? "verse" : "body"\}/,
-      'Text must pass fontFamily={variant === "verse" || variant === "display" ? "verse" : "body"} as an instance prop (the display variant is serif too, #721)',
+      /variant === "verse"\s+\? "verse"/,
+      'Text must pass the verse role as fontFamily="verse" for the verse variant (#69)',
+    );
+    assert.match(
+      source,
+      /variant === "heading" \|\|[\s\S]*?variant === "display"\s+\? "display"\s+: "body"/,
+      'Text must pass fontFamily="display" for the title-bearing variants (heading/title/formTitle/subheading/display, #851) and "body" otherwise, as an instance prop',
     );
   });
 
@@ -93,7 +98,7 @@ describe("textVariants", () => {
   test("the formTitle variant is the 2xl bold form-flow title", () => {
     assert.match(
       code,
-      /formTitle: \{\s+fontSize: tokens\.typography\.fontSize\["2xl"\],\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\},/,
+      /formTitle: \{\s+fontSize: tokens\.typography\.fontSize\["2xl"\],\s+fontWeight: "\$4",\s+fontFamily: "\$display",\s+\},/,
     );
   });
 
@@ -110,10 +115,10 @@ describe("textVariants", () => {
     );
   });
 
-  test("the display variant is the 3xl bold serif display title (#721)", () => {
+  test("the display variant is the 3xl bold display title (#721, #851)", () => {
     assert.match(
       code,
-      /display: \{\s+fontSize: tokens\.typography\.fontSize\["3xl"\],\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\},/,
+      /display: \{\s+fontSize: tokens\.typography\.fontSize\["3xl"\],\s+fontWeight: "\$4",\s+fontFamily: "\$display",\s+\},/,
     );
     assert.match(code, /"display"/, "display must be in the public TextProps union");
   });

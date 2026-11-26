@@ -108,6 +108,15 @@ test("the heading carries the due count from the list; the empty state matches t
     "Nice work.",
     "the nothing-due copy matches the app verbatim",
   );
+  // #856: no host href -> no action; with browseHref the empty state
+  // carries the success icon and the link-form Browse action.
+  assert.equal(emptyState.props.actionHref, undefined);
+  assert.equal(emptyState.props.icon, "success");
+  const [, withAction] = screenChildren(
+    MemorizeReviewPage(baseProps({ verses: [], browseHref: "/verses" })),
+  );
+  assert.equal(withAction.props.actionLabel, "Browse verses");
+  assert.equal(withAction.props.actionHref, "/verses");
 });
 
 test("the due list renders through the shared BoundedList in the plain shell", async () => {

@@ -7,6 +7,9 @@ import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
 import { BoundedList } from "../shared/BoundedList.js";
+import { LoadingScope } from "../../contexts/LoadingScope.js";
+import { LoadingCardRow } from "../../widgets/feedback/LoadingCardRow.js";
+import { Col } from "../../widgets/layout/Col.js";
 
 /**
  * MyVersesPage (#49): Memorize's "My verses" screen as a
@@ -35,9 +38,17 @@ import { BoundedList } from "../shared/BoundedList.js";
  *   screen is the heading and the app's empty state, title and
  *   body verbatim ("No verses yet" / "Find one in the Search tab
  *   to get started."). The branch keys off the list being empty,
- *   as the app's does — this screen has no loading state (the
- *   app gates on store readiness before any tab renders), so
- *   there is deliberately no spinner and no state union.
+ *   as the app's does.
+ * - Loading (#874, following the #278 pattern): while
+ *   `loading`, the heading stays and the list region renders
+ *   skeleton rows — exactly 3 LoadingCardRows inside a
+ *   LoadingScope — instead of the empty state or the list.
+ *   The app used to gate on store readiness before any tab
+ *   renders; with this state it can mount the page and let
+ *   the skeleton carry the wait. There is still deliberately
+ *   no spinner and no state union: `loading` is an optional
+ *   prop, and hosts that never pass it render exactly as
+ *   before.
  * - Rows are plain cards: reference (subheading), a status
  *   badge, the verse text (verse variant), an optional next
  *   review line (hint), and a Drill / Remove button pair. The
@@ -114,8 +125,18 @@ export type MyVersesPageProps = {
   header?: BigFooterShellHeader;
   /** The app's memorize list, in the app's order. */
   verses: MyVersesPageItem[];
+  /** Loading state (#874): the list region renders skeleton
+   * rows (see the header's loading note) and neither the
+   * verses nor the empty state render. */
+  loading?: boolean;
   /** Row action: remove this verse from the app's list. */
   onRemoveVerse: (verseId: string) => void;
+  /** Optional empty-state recovery link (#856): the host's search
+   * destination (host owns the destination, the drillHref rule
+   * #425), rendered as the no-verses EmptyState's link-form action
+   * ("Search verses") when supplied. Optional — a host that
+   * supplies nothing renders the empty state exactly as before. */
+  searchHref?: string;
 };
 
 function MyVerseRow({
@@ -149,13 +170,38 @@ function MyVerseRow({
  * Controlled — see the file header for the contract and the
  * screen inventory it mirrors.
  */
-export function MyVersesPage({ verses, onRemoveVerse, footer, header }: MyVersesPageProps) {
+// The dummy skeleton rows for the loading list (#874):
+// exactly 3, from a frozen module-level constant — never
+// generated per render (the CheckboxSelectList convention).
+const LOADING_ROW_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
+export function MyVersesPage({
+  verses,
+  onRemoveVerse,
+  searchHref,
+  footer,
+  header,
+  loading = false,
+}: MyVersesPageProps) {
   return (
     <BigFooterShell footer={footer} header={header} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">My verses</Text>
-        {verses.length === 0 ? (
-          <EmptyState title="No verses yet" body="Find one in the Search tab to get started." />
+        {loading ? (
+          <LoadingScope active>
+            <Col>
+              {LOADING_ROW_KEYS.map((key) => (
+                <LoadingCardRow key={key} />
+              ))}
+            </Col>
+          </LoadingScope>
+        ) : verses.length === 0 ? (
+          <EmptyState
+            title="No verses yet"
+            body="Find one in the Search tab to get started."
+            icon="recipes"
+            {...(searchHref ? { actionLabel: "Search verses", actionHref: searchHref } : {})}
+          />
         ) : (
           <BoundedList
             data={verses}

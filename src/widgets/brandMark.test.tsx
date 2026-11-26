@@ -6,8 +6,9 @@
  * element (Stephen's 2026-11-19 logos ruling).
  *
  * The pins: (a) the mark renders for the Eciperay identity — the
- * DS's own artwork, ported from the eciperay logo geometry
- * (option A, approved by Stephen 2026-11-20); (b) no mark (and
+ * DS's own artwork, the "Ecipe-ray" mark Stephen picked under
+ * #861 (round 3, concept 2, 2026-11-25), traced from the
+ * concept's measured geometry; (b) no mark (and
  * no empty slot) for a brand that names none — Memorize renders
  * its wordmark exactly as before; (c) the brand link's
  * accessible name is unchanged — the mark is decorative and the
@@ -43,17 +44,28 @@ const topBar = codeOf("src/widgets/layout/AppTopBar.tsx");
 const shellPage = codeOf("src/pages/eciperay/AppShellPage.tsx");
 const footer = codeOf("src/widgets/content/BigFooter.tsx");
 
-test("BrandMark carries the Eciperay mark geometry, ported from the logo (#726)", () => {
+test("BrandMark carries the Eciperay Ecipe-ray geometry, traced from the approved concept (#861)", () => {
   assert.match(brandMark, /export type BrandMarkName = "eciperay" \| "memorize";/);
   assert.match(brandMark, /export function BrandMark\(/);
   assert.match(brandMark, /viewBox="0 0 256 256"/, "the logo's own 256 grid");
-  assert.match(brandMark, /fill=\{ECIPERAY_MARK_FIELD\}/, "the blue app-icon field");
-  // A distinctive fragment of the spoon glyph from the eciperay
-  // logo's minimal variant — the ported geometry itself.
+  assert.match(brandMark, /fill=\{ECIPERAY_MARK_PAPER\}/, "the warm-paper field");
+  assert.match(brandMark, /fill=\{ECIPERAY_MARK_SUN\}/, "the terracotta sun and rays");
+  assert.match(brandMark, /fill=\{ECIPERAY_MARK_CARD\}/, "the sage recipe card");
+  // Distinctive fragments of the traced geometry itself: the
+  // centre ray of the eleven-ray fan and the card's block E.
   assert.ok(
-    brandMark.includes("M126.228 207.647c-2.746-.355-5.646-1.646-7.695-3.434"),
-    "BrandMark is missing the ported spoon geometry",
+    brandMark.includes("M125.1 57.0 L125.1 36.0 L131.1 36.0 L131.1 57.0 Z"),
+    "BrandMark is missing the traced ray fan",
   );
+  assert.ok(
+    brandMark.includes("M110.1 131.6 L160.4 131.6 L160.4 144.6 L124.9 144.6"),
+    "BrandMark is missing the recipe card's E",
+  );
+  assert.ok(
+    brandMark.includes("ECIPERAY_CARD_HOLE_CYS = [127.1, 146.0, 165.0, 184.0, 202.9]"),
+    "BrandMark is missing the card's five binder holes",
+  );
+  assert.ok(!brandMark.includes("ECIPERAY_SPOON_PATH"), "the retired blue spoon mark is gone");
   assert.match(brandMark, /aria-hidden=\{true\}/, "the mark is decorative");
   assert.ok(!brandMark.includes("<img"), "the mark is DS artwork, never a host image");
 });

@@ -13,7 +13,8 @@ release's changed components. The full index lives in
 
 ## LandingPage
 
-Open in `Pages/Eciperay/LandingPage`: Default, Wide.
+Open in `Pages/Eciperay/LandingPage`: Default, Wide,
+WithConsentBanner, WithBanners.
 
 1. The headline renders centered as the level-1 heading, with
    the muted subtitle centered under it and breathing room
@@ -30,6 +31,15 @@ Open in `Pages/Eciperay/LandingPage`: Default, Wide.
    description under it; in Default (the 430px phone viewport)
    they wrap onto further rows at their 260px basis instead
    of squeezing — three-across cannot fit there.
+4. Banners (#879): WithConsentBanner — the consent banner
+   pins to the bottom of the viewport with its message, its
+   privacy-policy link (a real link), and Decline / Accept
+   buttons that fire the host's callbacks. WithBanners — the
+   install banner also renders, pinned to the top of the
+   viewport, with its message, its app-store links (real
+   links), and a dismiss button that fires the host's
+   callback. Without banner data supplied, neither banner
+   renders.
 
 **Run when:** `src/pages/eciperay/LandingPage.tsx`, its stories,
 Button's href form, or a changeset naming LandingPage.

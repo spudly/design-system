@@ -75,6 +75,8 @@ test("LandingPage is exported from the built pages barrel", async () => {
   assert.match(types, /type LandingPageProps/);
   assert.match(types, /type LandingPageCta/);
   assert.match(types, /type LandingPageFeature/);
+  assert.match(types, /type LandingPageConsentBanner/);
+  assert.match(types, /type LandingPageInstallBanner/);
 });
 
 test("the shell is BigFooterShell around the plain ScreenContainer; sections in order", async () => {
@@ -307,4 +309,53 @@ test("SSR: sections render in frame order — hero, CTAs, then the feature slots
   ]) {
     assert.ok(html.includes(description), `feature description "${description}" must render`);
   }
+});
+
+test("banners (#879): absent by default; when present the page renders the banner views with the host data forwarded", async () => {
+  const { LandingPage } = await loadRuntime();
+  const consentModule: Record<string, any> =
+    await import("../../../dist/views/shared/ConsentBannerView.js");
+  const installModule: Record<string, any> =
+    await import("../../../dist/views/shared/InstallBannerView.js");
+  const bare = LandingPage({ ...sentinelProps });
+  assert.equal(
+    findAllByType(bare, consentModule.ConsentBannerView).length,
+    0,
+    "no consent banner data — no consent banner renders",
+  );
+  assert.equal(
+    findAllByType(bare, installModule.InstallBannerView).length,
+    0,
+    "no install banner data — no install banner renders",
+  );
+  let accepts = 0;
+  let dismissals = 0;
+  const consentBanner = {
+    messageBeforeLink: "We use cookies as described in our",
+    linkLabel: "privacy policy",
+    linkHref: "/privacy",
+    messageAfterLink: ".",
+    onAccept: () => {
+      accepts += 1;
+    },
+    onDecline: () => {},
+  };
+  const installBanner = {
+    message: "Get the app for the best experience.",
+    links: [{ label: "App Store", href: "https://apps.example.test/install" }],
+    onDismiss: () => {
+      dismissals += 1;
+    },
+  };
+  const withBanners = LandingPage({ ...sentinelProps, consentBanner, installBanner });
+  const consentEls = findAllByType(withBanners, consentModule.ConsentBannerView);
+  const installEls = findAllByType(withBanners, installModule.InstallBannerView);
+  assert.equal(consentEls.length, 1, "the consent banner renders through ConsentBannerView");
+  assert.deepEqual(consentEls[0].props, consentBanner, "the consent banner data crosses unchanged");
+  assert.equal(installEls.length, 1, "the install banner renders through InstallBannerView");
+  assert.deepEqual(installEls[0].props, installBanner, "the install banner data crosses unchanged");
+  consentEls[0].props.onAccept();
+  installEls[0].props.onDismiss();
+  assert.equal(accepts, 1, "the accept callback fires");
+  assert.equal(dismissals, 1, "the dismiss callback fires");
 });

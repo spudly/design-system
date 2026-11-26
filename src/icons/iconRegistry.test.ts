@@ -42,9 +42,11 @@ import { test } from "node:test";
 /** Icon name -> the per-icon component module it must resolve to. */
 const NAMES: [string, string][] = [
   ["add", "AddIcon"],
+  ["error", "ErrorIcon"],
   ["feedback", "FeedbackIcon"],
   ["help", "HelpIcon"],
   ["home", "HomeIcon"],
+  ["info", "InfoIcon"],
   ["list", "ListIcon"],
   ["meals", "MealsIcon"],
   ["more", "MoreIcon"],
@@ -53,16 +55,17 @@ const NAMES: [string, string][] = [
   ["recipes", "RecipesIcon"],
   ["share", "ShareIcon"],
   ["shared", "SharedIcon"],
+  ["success", "SuccessIcon"],
   ["tags", "TagsIcon"],
   ["warning", "WarningIcon"],
 ];
 
-test("runtime: the registry's name set is exactly the dispositioned fourteen, in order", async () => {
+test("runtime: the registry's name set is exactly the dispositioned seventeen, in order", async () => {
   const loaded: Record<string, any> = await import("../../dist/icons/iconRegistry.js");
   assert.deepEqual(
     [...loaded.iconNames],
     NAMES.map(([name]) => name),
-    "the name set is exactly the dispositioned fourteen, in order",
+    "the name set is exactly the dispositioned seventeen, in order",
   );
   assert.deepEqual(
     Object.keys(loaded.iconsByName).sort(),

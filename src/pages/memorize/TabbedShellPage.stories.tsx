@@ -99,7 +99,7 @@ export const TabbedShell: Story = {
   ),
 };
 
-/** Tabs may carry an icon NAME (data) — the glyph renders left of the label. */
+/** Tabs whose ids the page knows render the page's own glyph left of the label (#880). */
 function IconTabsDemo() {
   const [activeTabId, setActiveTabId] = useState<string | null>("home");
   return (
@@ -107,10 +107,10 @@ function IconTabsDemo() {
       title="Tabbed app"
       tabsLabel="App sections"
       tabs={[
-        { id: "home", label: "Home", icon: "home", content: <VersesContent /> },
-        { id: "meals", label: "Meals", icon: "meals", content: <SearchContent /> },
-        { id: "recipes", label: "Recipes", icon: "recipes", content: <ReviewContent /> },
-        { id: "profile", label: "Profile", icon: "profile", content: <SettingsContent /> },
+        { id: "home", label: "Home", content: <VersesContent /> },
+        { id: "meals", label: "Meals", content: <SearchContent /> },
+        { id: "recipes", label: "Recipes", content: <ReviewContent /> },
+        { id: "profile", label: "Profile", content: <SettingsContent /> },
       ]}
       activeTabId={activeTabId}
       onTabSelect={setActiveTabId}
@@ -237,6 +237,58 @@ export const WithNoticeAction: Story = {
           message: "Your verses could not be refreshed.",
           action: { label: "Try again", onPress: () => {} },
         }}
+      />
+    </>
+  ),
+};
+
+/** Consent banner data (#879): the analytics-consent copy as the host passes it. */
+const consentBannerFixture = {
+  messageBeforeLink: "We use cookies and analytics as described in our",
+  linkLabel: "privacy policy",
+  linkHref: "/privacy",
+  messageAfterLink: ".",
+  onAccept: () => {},
+  onDecline: () => {},
+};
+
+/** Install banner data (#879): the mobile-app prompt as the host passes it. */
+const installBannerFixture = {
+  message: "Get the Memorize app for daily review reminders.",
+  links: [
+    { label: "Download on the App Store", href: "/get-the-app" },
+    { label: "Get it on Google Play", href: "/get-the-app" },
+  ],
+  onDismiss: () => {},
+};
+
+/** Consent outstanding (#879): the shell renders the bottom-pinned consent banner itself. */
+export const WithConsentBanner: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        consentBanner={consentBannerFixture}
+      />
+    </>
+  ),
+};
+
+/** Install prompt not yet dismissed (#879): the shell renders the top-pinned install banner itself. */
+export const WithInstallBanner: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        installBanner={installBannerFixture}
       />
     </>
   ),

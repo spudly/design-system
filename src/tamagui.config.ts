@@ -208,6 +208,31 @@ type BrandFontFamily = {
   verseNative?: string | undefined;
   /** Verse Android family: a SINGLE font name. */
   verseNativeAndroid?: string | undefined;
+  /** Display/title web family: a full CSS fallback stack (mirrors the `sans` stack when a theme declares none; the serif stack under Warm Harvest, #851). */
+  display?: string | undefined;
+  /** Display iOS family: a SINGLE font name. */
+  displayNative?: string | undefined;
+  /** Display iOS per-weight face names (weight → font name). */
+  displayNativeFaces?: Record<string, string> | undefined;
+  /** Display Android family: a SINGLE font name. */
+  displayNativeAndroid?: string | undefined;
+  /** Display Android per-weight face names (weight → font name). */
+  displayNativeAndroidFaces?: Record<string, string> | undefined;
+};
+
+/**
+ * Display-role title weight steps a brand theme may override, as
+ * CSS weight values: the registered `display` font's weight scale
+ * takes these for its semibold/bold slots (the steps the
+ * title-bearing Text variants reference) instead of the theme's
+ * `displayFontWeight` token defaults. A number is a literal weight;
+ * the Storybook config passes `var(--dsDisplayWeight…, fallback)`
+ * strings so its preview can switch the steps per brand, exactly
+ * as it switches the display family stack.
+ */
+type BrandDisplayFontWeight = {
+  semibold?: string | number | undefined;
+  bold?: string | number | undefined;
 };
 
 /** Platforms whose font resolution differs. */
@@ -290,7 +315,7 @@ export function resolveFontFamily(
  * size/lineHeight mirror the DS type scale (lineHeight = size × 1.5, the
  * `normal` multiplier).
  */
-function buildBrandFonts(fontFamily: BrandFontFamily) {
+function buildBrandFonts(fontFamily: BrandFontFamily, displayFontWeight?: BrandDisplayFontWeight) {
   // One scale for every registered font: size/lineHeight/weight mirror
   // the DS type scale (lineHeight = size × 1.5, the `normal`
   // multiplier), whatever family the font carries.
@@ -346,16 +371,54 @@ function buildBrandFonts(fontFamily: BrandFontFamily) {
     ...(verseResolved.face ? { face: verseResolved.face } : {}),
     ...scale,
   });
-  // Headings use the same stack: hierarchy in this system is carried by
-  // size/weight (the DS Text heading variants set no family of their own).
-  return { body: font, heading: font, verse };
+  // The display font (#851): same registration mechanism, resolved
+  // from the theme's `display` role — the base role mirrors the
+  // `sans` stack, and Warm Harvest overrides it to the serif stack,
+  // so Eciperay page/recipe titles render serif while every other
+  // brand's titles keep the UI sans. The title-bearing Text
+  // variants reference it as `$display`, and Tamagui's `heading`
+  // font IS the display font, so headed primitives follow the
+  // brand's title treatment too.
+  const displayResolved = resolveFontFamily(
+    {
+      sans: fontFamily.display ?? tokens.typography.fontFamily.display,
+      sansNative: fontFamily.displayNative,
+      sansNativeFaces: fontFamily.displayNativeFaces,
+      sansNativeAndroid: fontFamily.displayNativeAndroid,
+      sansNativeAndroidFaces: fontFamily.displayNativeAndroidFaces,
+    },
+    fontPlatform,
+  );
+  const display = createFont({
+    family: displayResolved.family,
+    ...(displayResolved.face ? { face: displayResolved.face } : {}),
+    ...scale,
+    // The display font's weight scale is the one scale that may
+    // depart from the shared steps: its semibold/bold slots (the
+    // steps the title-bearing Text variants reference) come from
+    // the brand's `displayFontWeight` tokens, so a brand whose
+    // display family renders the standard steps too heavily (Warm
+    // Harvest's Georgia serif, #851) carries lighter title weights
+    // in its tokens and the titles follow — no component names a
+    // per-theme weight. The regular/medium slots and every other
+    // font keep the shared scale.
+    weight: {
+      1: String(tokens.typography.fontWeight.regular),
+      2: String(tokens.typography.fontWeight.medium),
+      3: String(displayFontWeight?.semibold ?? tokens.typography.displayFontWeight.semibold),
+      4: String(displayFontWeight?.bold ?? tokens.typography.displayFontWeight.bold),
+    },
+  });
+  return { body: font, heading: display, verse, display };
 }
 
 export function createTamaguiConfig(theme: {
   semantic: SemanticColors;
   tagColors?: TagColorValues;
   tagColorShades?: TagColorShades;
-  tokens?: { typography: { fontFamily: BrandFontFamily } };
+  tokens?: {
+    typography: { fontFamily: BrandFontFamily; displayFontWeight?: BrandDisplayFontWeight };
+  };
 }) {
   return createTamagui({
     animations,
@@ -363,17 +426,28 @@ export function createTamaguiConfig(theme: {
     // theme (the factory's original input shape) get the base font stack
     // instead of a dereference error. The native fields fall back the
     // same way (resolveFontFamily's generic when a theme declares none).
-    fonts: buildBrandFonts({
-      sans:
-        theme.tokens?.typography?.fontFamily?.sans ?? baseTheme.tokens.typography.fontFamily.sans,
-      sansNative: theme.tokens?.typography?.fontFamily?.sansNative,
-      sansNativeFaces: theme.tokens?.typography?.fontFamily?.sansNativeFaces,
-      sansNativeAndroid: theme.tokens?.typography?.fontFamily?.sansNativeAndroid,
-      sansNativeAndroidFaces: theme.tokens?.typography?.fontFamily?.sansNativeAndroidFaces,
-      verse: theme.tokens?.typography?.fontFamily?.verse,
-      verseNative: theme.tokens?.typography?.fontFamily?.verseNative,
-      verseNativeAndroid: theme.tokens?.typography?.fontFamily?.verseNativeAndroid,
-    }),
+    fonts: buildBrandFonts(
+      {
+        sans:
+          theme.tokens?.typography?.fontFamily?.sans ?? baseTheme.tokens.typography.fontFamily.sans,
+        sansNative: theme.tokens?.typography?.fontFamily?.sansNative,
+        sansNativeFaces: theme.tokens?.typography?.fontFamily?.sansNativeFaces,
+        sansNativeAndroid: theme.tokens?.typography?.fontFamily?.sansNativeAndroid,
+        sansNativeAndroidFaces: theme.tokens?.typography?.fontFamily?.sansNativeAndroidFaces,
+        verse: theme.tokens?.typography?.fontFamily?.verse,
+        verseNative: theme.tokens?.typography?.fontFamily?.verseNative,
+        verseNativeAndroid: theme.tokens?.typography?.fontFamily?.verseNativeAndroid,
+        display: theme.tokens?.typography?.fontFamily?.display,
+        displayNative: theme.tokens?.typography?.fontFamily?.displayNative,
+        displayNativeFaces: theme.tokens?.typography?.fontFamily?.displayNativeFaces,
+        displayNativeAndroid: theme.tokens?.typography?.fontFamily?.displayNativeAndroid,
+        displayNativeAndroidFaces: theme.tokens?.typography?.fontFamily?.displayNativeAndroidFaces,
+      },
+      // The brand's display title weight steps (#851): the theme's
+      // displayFontWeight tokens, forwarded so the registered
+      // display font's weight scale carries them.
+      theme.tokens?.typography?.displayFontWeight,
+    ),
     tokens: tamaguiTokens,
     themes: buildTamaguiThemes(theme),
   });
@@ -441,6 +515,19 @@ export function createStorybookTamaguiConfig() {
       // sets `--dsVerseFontStack` from the selected brand (Alegreya
       // under Quiet Dawn, the base serif stack otherwise).
       verse: `var(--dsVerseFontStack, ${baseTheme.tokens.typography.fontFamily.verse})`,
+      // Same CSS-var mechanism for the display font (#851): the
+      // preview sets `--dsDisplayFontStack` from the selected brand
+      // (the serif stack under Warm Harvest, the sans stack
+      // otherwise).
+      display: `var(--dsDisplayFontStack, ${baseTheme.tokens.typography.fontFamily.display})`,
+    }, {
+      // Same CSS-var mechanism for the display font's title weight
+      // steps (#851): the preview sets `--dsDisplayWeightSemibold` /
+      // `--dsDisplayWeightBold` from the selected brand's
+      // displayFontWeight tokens (the lighter steps under Warm
+      // Harvest, the standard steps otherwise).
+      semibold: `var(--dsDisplayWeightSemibold, ${tokens.typography.displayFontWeight.semibold})`,
+      bold: `var(--dsDisplayWeightBold, ${tokens.typography.displayFontWeight.bold})`,
     }),
     tokens: tamaguiTokens,
     themes: {
@@ -496,6 +583,19 @@ export function createOnDeviceStorybookTamaguiConfig() {
       verse: memorizeTheme.tokens.typography.fontFamily.verse,
       verseNative: memorizeTheme.tokens.typography.fontFamily.verseNative,
       verseNativeAndroid: memorizeTheme.tokens.typography.fontFamily.verseNativeAndroid,
+      // Display: fonts are config-global, so the on-device config
+      // registers the BASE display role (the UI sans, with its
+      // static faces and its base title weight steps) for every
+      // brand — the same documented deviation class as verse
+      // below, in the safe direction:
+      // Warm Harvest titles render sans on device Storybook where
+      // the Eciperay app config resolves them serif (#851), and no
+      // brand's titles take another brand's serif.
+      display: baseTheme.tokens.typography.fontFamily.display,
+      displayNative: baseTheme.tokens.typography.fontFamily.displayNative,
+      displayNativeFaces: baseTheme.tokens.typography.fontFamily.displayNativeFaces,
+      displayNativeAndroid: baseTheme.tokens.typography.fontFamily.displayNativeAndroid,
+      displayNativeAndroidFaces: baseTheme.tokens.typography.fontFamily.displayNativeAndroidFaces,
     }),
     tokens: tamaguiTokens,
     themes: {

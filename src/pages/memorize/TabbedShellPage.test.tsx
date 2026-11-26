@@ -6,16 +6,17 @@
  * The contracts pinned here:
  * 1. The frame is exported from the pages barrel; its props and
  *    tab data are type aliases (the repo-wide rule, #214). Tabs
- *    cross as DATA: button-form tabs carry id + label + optional
- *    icon NAME + slotted content; link-form tabs carry id +
- *    label + href and NO content or icon (the navigation rule's
- *    two forms, mirroring Tabs and Button).
+ *    cross as DATA: button-form tabs carry id + label + slotted
+ *    content; link-form tabs carry id + label + href and NO
+ *    content (the navigation rule's two forms, mirroring Tabs
+ *    and Button). Hosts never select icons (#880): the page maps
+ *    a button-form tab's id to its own glyph internally — a
+ *    known id renders its glyph, an unknown id renders none.
  * 2. The page composes DS components only — no direct Tamagui
  *    imports (#297's rule), no styling props, and NO
  *    ChunkErrorBoundary: lazy content renders through the
  *    internal LazySlot view, so hosts never import the boundary.
- *    The icon NAME type is referenced from the internal registry;
- *    no icon component is imported.
+ *    No icon component is imported.
  * 3. Behavior (element tree + SSR): the active tab's content —
  *    and only it — renders through the slot; the slot is keyed
  *    by the active surface (the boundary's keyed-remount
@@ -52,6 +53,8 @@ test("TabbedShellPage is exported from the built pages barrel", async () => {
   assert.match(types, /type TabbedShellPageProps/);
   assert.match(types, /type TabbedShellPageTab/);
   assert.match(types, /type TabbedShellPageLinkTab/);
+  assert.match(types, /type TabbedShellPageConsentBanner/);
+  assert.match(types, /type TabbedShellPageInstallBanner/);
 });
 
 test("the shell is BigFooterShell in content scroll mode around the plain ScreenContainer", async () => {
@@ -122,10 +125,9 @@ const sentinelTabs = (React: any) => [
     content: <span>VERSES SURFACE</span>,
   },
   {
-    id: "search",
-    label: "Search",
-    icon: "tags",
-    content: <span>SEARCH SURFACE</span>,
+    id: "tags",
+    label: "Tags",
+    content: <span>TAGS SURFACE</span>,
   },
 ];
 test("the slot renders only the active tab's content, keyed by the active surface", async () => {
@@ -135,7 +137,7 @@ test("the slot renders only the active tab's content, keyed by the active surfac
     title: "Memorize",
     tabsLabel: "Memorize sections",
     tabs: sentinelTabs(React),
-    activeTabId: "search",
+    activeTabId: "tags",
     onTabSelect,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
@@ -147,27 +149,29 @@ test("the slot renders only the active tab's content, keyed by the active surfac
     label: "Memorize",
   });
   // The tab bar receives the tabs mapped to the Tabs contract:
-  // id → value, icon name carried through as data.
+  // id → value, and the page's own icon selection (#880) — the
+  // known "tags" id carries its glyph as data, the unknown
+  // "verses" id carries none.
   assert.deepEqual(tabBar.props.tabs, [
     {
       value: "verses",
       label: "My verses",
     },
     {
-      value: "search",
-      label: "Search",
+      value: "tags",
+      label: "Tags",
       icon: "tags",
     },
   ]);
-  assert.equal(tabBar.props.value, "search");
+  assert.equal(tabBar.props.value, "tags");
   assert.equal(tabBar.props.onValueChange, onTabSelect);
   assert.equal(tabBar.props.label, "Memorize sections");
   // The content region is the internal LazySlot, keyed by the
   // active surface so switching tabs remounts it (a failure on
   // one surface clears when another is selected).
   assert.equal(slot.type, distViews.LazySlot);
-  assert.equal(slot.key, "search");
-  assert.equal(slot.props.children.props.children, "SEARCH SURFACE");
+  assert.equal(slot.key, "tags");
+  assert.equal(slot.props.children.props.children, "TAGS SURFACE");
 });
 test("an override surface replaces tab content with no tab selected; contentKey wins", async () => {
   const { React, TabbedShellPage } = await loadRuntime();
@@ -357,4 +361,60 @@ test("SSR: a notice renders its message and action above the content; content st
   assert.match(html, /Try again/, "the notice action label renders");
   assert.match(html, /role="status"/, "the notice keeps the polite live-region semantics");
   assert.match(html, /VERSES SURFACE/, "the tab content stays mounted under the notice");
+});
+test("banners (#879): absent by default; when present the shell renders the banner views with the host data forwarded", async () => {
+  const { React, TabbedShellPage, distViews } = await loadRuntime();
+  const bare = TabbedShellPage({
+    title: "Memorize",
+    tabs: sentinelTabs(React),
+    activeTabId: "verses",
+    onTabSelect: () => {},
+  });
+  const bareChildren = bare.props.children.props.children;
+  assert.equal(bareChildren[4], null, "no install banner data — no install banner renders");
+  assert.equal(bareChildren[5], null, "no consent banner data — no consent banner renders");
+  let accepts = 0;
+  let dismissals = 0;
+  const consentBanner = {
+    messageBeforeLink: "We use cookies as described in our",
+    linkLabel: "privacy policy",
+    linkHref: "/privacy",
+    messageAfterLink: ".",
+    onAccept: () => {
+      accepts += 1;
+    },
+    onDecline: () => {},
+  };
+  const installBanner = {
+    message: "Get the app for the best experience.",
+    links: [{ label: "App Store", href: "https://apps.example.test/install" }],
+    onDismiss: () => {
+      dismissals += 1;
+    },
+  };
+  const withBanners = TabbedShellPage({
+    title: "Memorize",
+    tabs: sentinelTabs(React),
+    activeTabId: "verses",
+    onTabSelect: () => {},
+    consentBanner,
+    installBanner,
+  });
+  const children = withBanners.props.children.props.children;
+  assert.equal(
+    children[4].type,
+    distViews.InstallBannerView,
+    "the install banner renders through InstallBannerView",
+  );
+  assert.deepEqual(children[4].props, installBanner, "the install banner data crosses unchanged");
+  assert.equal(
+    children[5].type,
+    distViews.ConsentBannerView,
+    "the consent banner renders through ConsentBannerView",
+  );
+  assert.deepEqual(children[5].props, consentBanner, "the consent banner data crosses unchanged");
+  children[5].props.onAccept();
+  children[4].props.onDismiss();
+  assert.equal(accepts, 1, "the accept callback fires");
+  assert.equal(dismissals, 1, "the dismiss callback fires");
 });

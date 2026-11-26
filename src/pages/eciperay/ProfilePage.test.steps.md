@@ -6,6 +6,7 @@ run_when:
   - "src/views/eciperay/FeedbackPreferenceView.tsx, its stories, ProfilePage, or a changeset naming FeedbackPreferenceView."
   - "src/views/eciperay/TransferRecipesView.tsx, src/views/eciperay/RecipeExportPickerView.tsx, their stories, ProfilePage, or a changeset naming either view."
   - "src/views/eciperay/AccountDataView.tsx, its stories, ProfilePage, or a changeset naming AccountDataView."
+  - "src/views/eciperay/ShowLessView.tsx, src/views/eciperay/AuthorDisplayView.tsx, src/views/eciperay/FamilySharingView.tsx, their stories, ProfilePage, or a changeset naming any of the three views."
 ---
 
 # ProfilePage — manual test steps
@@ -25,6 +26,11 @@ Open in `Pages/Eciperay/ProfilePage`: WithCoverageSections
    Preferences card; Transfer recipes (picker with one selected
    recipe and "Export selected (1)") and Your data (Download /
    Delete account) after it; Legal and Sign Out close the page.
+2. The #873 sections render in their host order directly
+   before the feedback Preferences card: Show less like this
+   (two entries with Undo buttons), Author name on public
+   recipes (name field + checked show-my-name checkbox), then
+   Family sharing (one grant row with a Remove button).
 
 **Run when:** `src/pages/eciperay/ProfilePage.tsx`, its stories, the
 four section views below, or a changeset naming ProfilePage.

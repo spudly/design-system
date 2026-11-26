@@ -7,11 +7,20 @@ import {
   AppTopBar,
   type AppTopBarAction,
   type AppTopBarNavItem,
+  type AppTopBarNavItemKind,
   type AppTopBarSearch,
 } from "../../widgets/layout/AppTopBar.js";
 import { LazySlot } from "../../views/shared/LazySlot.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { StatusMessage } from "../../views/shared/StatusMessage.js";
+import {
+  ConsentBannerView,
+  type ConsentBannerViewProps,
+} from "../../views/shared/ConsentBannerView.js";
+import {
+  InstallBannerView,
+  type InstallBannerViewProps,
+} from "../../views/shared/InstallBannerView.js";
 
 /**
  * AppShellPage (#437): the routed app shell as a design-system
@@ -33,13 +42,14 @@ import { StatusMessage } from "../../views/shared/StatusMessage.js";
  *   BrandLink home (the wordmark always navigates home, a
  *   canonical destination, so it is always a real link —
  *   Stephen's link-naming rule).
- * - Nav items as DATA: `{ id, label, href, icon? }[]` plus
+ * - Nav items as DATA: `{ id, label, href, kind? }[]` plus
  *   `activeItemId` — every nav item navigates, so every item is
  *   a link with an href (#248's navigation rule); the active
  *   item (the host derives it from its route) carries the
- *   primary-filled treatment. Icons are registry NAMES only
- *   (#438 Part 4) — the host never passes a component, which is
- *   what lets eciperay retire its temporary host-sourced icon
+ *   primary-filled treatment. Hosts never select icons (#880):
+ *   an item's optional semantic `kind` names the section it
+ *   leads to and the top bar picks the glyph, which is what
+ *   lets eciperay retire its temporary host-sourced icon
  *   set (eciperay #451, blocked on this page).
  * - Header actions (optional): caller-supplied data for the
  *   top-bar's right side (e.g. Sign in / account), following
@@ -65,6 +75,21 @@ import { StatusMessage } from "../../views/shared/StatusMessage.js";
  * - Footer: optional `BigFooterData` — when supplied, the page
  *   renders the one BigFooter through the standard shell; no
  *   second footer type is introduced.
+ * - Banners (#879): the analytics consent banner and the
+ *   mobile-app install banner render from this shell — the
+ *   host passes each banner's state as DATA (`consentBanner` /
+ *   `installBanner`, the banner views' own prop shapes):
+ *   presence is visibility, the copy and labels cross as data
+ *   (the views' label props fall back to the voice defaults),
+ *   and accept / decline / dismiss are bare callbacks. The
+ *   consent record, the analytics wiring, and the install
+ *   dismissal state stay host-side; the views are NOT exported
+ *   for hosts to mount — the shell renders them internally,
+ *   after the content slot, exactly where hosts mount their
+ *   local banners today (each view pins itself to its screen
+ *   edge: install to the top, consent to the bottom), so there
+ *   is no visual change. Omit a prop (or pass null) and that
+ *   banner does not render.
  *
  * No styling props, no domain concepts: nav labels, hrefs, and
  * actions are caller data; nothing Eciperay- or
@@ -76,16 +101,25 @@ import { StatusMessage } from "../../views/shared/StatusMessage.js";
  * Placement: page components live in src/pages and are exported
  * from the package root (#298) — pages are the package's only
  * exports. The nav/action data types surface through the pages
- * barrel like every page's prop types; the icon NAME union they
- * reference stays internal (no icon name or component is a
- * package export) — hosts pass name literals as nav data.
+ * barrel like every page's prop types. No icon name or
+ * component is a package export, and none crosses the nav data
+ * either (#880) — an item's semantic `kind` is the only icon
+ * input, and the top bar picks its glyph.
  */
 
 export type AppShellPageNavItem = AppTopBarNavItem;
 
+export type AppShellPageNavItemKind = AppTopBarNavItemKind;
+
 export type AppShellPageAction = AppTopBarAction;
 
 export type AppShellPageSearch = AppTopBarSearch;
+
+/** The consent banner as data (#879): the ConsentBannerView prop shape, aliased per the page-prop rule. */
+export type AppShellPageConsentBanner = ConsentBannerViewProps;
+
+/** The install banner as data (#879): the InstallBannerView prop shape, aliased per the page-prop rule. */
+export type AppShellPageInstallBanner = InstallBannerViewProps;
 
 export type AppShellPageProps = {
   /**
@@ -127,6 +161,27 @@ export type AppShellPageProps = {
    */
   notice?: { message: string; action?: { label: string; onPress: () => void } };
   /**
+   * The analytics consent banner as data (#879): when present,
+   * the shell renders ConsentBannerView itself (bottom-pinned)
+   * after the content slot. The banner's copy crosses as data;
+   * its accept/decline labels default to the voice object's
+   * consentBannerView labels when omitted. The consent state
+   * and its side effects stay host-side — only the accept /
+   * decline intents cross. Omit (or pass null) while consent
+   * is not outstanding and no banner renders.
+   */
+  consentBanner?: AppShellPageConsentBanner | null;
+  /**
+   * The mobile-app install banner as data (#879): when
+   * present, the shell renders InstallBannerView itself
+   * (top-pinned) after the content slot. The message and the
+   * app-store links cross as data (hrefs, per #248); dismissal
+   * is a bare callback and the dismissal state stays
+   * host-side. Omit (or pass null) once dismissed and no
+   * banner renders.
+   */
+  installBanner?: AppShellPageInstallBanner | null;
+  /**
    * The page footer (#410): caller-supplied BigFooter data, in
    * the standard shape every page takes. Omitted, no footer
    * band renders.
@@ -161,6 +216,8 @@ export function AppShellPage({
   search,
   actions,
   notice,
+  consentBanner,
+  installBanner,
   footer,
   onReload,
   contentKey,
@@ -191,6 +248,8 @@ export function AppShellPage({
         >
           {children}
         </LazySlot>
+        {installBanner ? <InstallBannerView {...installBanner} /> : null}
+        {consentBanner ? <ConsentBannerView {...consentBanner} /> : null}
       </ScreenContainer>
     </BigFooterShell>
   );

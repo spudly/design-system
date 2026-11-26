@@ -55,3 +55,15 @@ minimum width), so there are no sizing props to pass.
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
 MealPlanDetailPage), RecipeDetailPage's guest-mode CTA bar, or a changeset
 naming ButtonRow.
+
+## MyVersesPage loading skeleton (#874)
+
+Open in `Pages/Memorize/MyVersesPage`: Loading.
+
+1. Loading: the "My verses" heading renders and the list
+   region shows exactly 3 skeleton card rows — no verse text,
+   no status badges, no Drill / Remove buttons, and no empty
+   state.
+
+**Run when:** MyVersesPage's source or stories, or a changeset
+naming MyVersesPage's loading state.

@@ -21,7 +21,10 @@ NeedsTransaction, Unconfigured.
 2. Closed offers "Reopen checkout"; ErrorState offers
    "Try again"; NeedsTransaction's card title reads "Checkout"
    and its button carries the host-supplied home label;
-   Unconfigured renders its explanatory line with no button.
+   Unconfigured renders its explanatory line and, when the host
+   supplies homeHref, the home button (like NeedsTransaction);
+   ErrorState's body renders as an error Alert (icon + ramp) with
+   its "Try again" button kept.
 
 **Run when:** `src/pages/eciperay/PayPage.tsx`, its stories, or a
 changeset naming PayPage.

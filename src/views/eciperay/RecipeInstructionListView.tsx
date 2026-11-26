@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { DragHandleView } from "./DragHandleView.js";
 import { LabeledListSection } from "./LabeledListSection.js";
 import { RecipeInstructionRowView, type RecipeInstructionRow } from "./RecipeInstructionRowView.js";
 import { useVoice } from "../../voice/index.js";
@@ -24,11 +25,14 @@ export type RecipeInstructionListViewProps = {
   /** Remove intent from a row: its key. */
   onRemove?: (rowKey: string) => void;
   /**
-   * Binds the host's drag handle for a row (Stephen's
-   * 2026-11-09 boundary on #130): the host's drag container
-   * renders its handle through this — for web, a component
-   * holding its sortable activator; the design system itself
-   * renders no handle and takes no drag dependency. A native
+   * Binds the host's drag handle for a row, overriding the
+   * design system's own grip (Stephen's 2026-11-26 boundary
+   * revision on #878: the DS owns the handle visual — the
+   * DragHandleView grip — and hosts keep drag behavior; no
+   * drag library enters the DS). When provided, the host's
+   * handle wins exactly as before — for web, a component
+   * holding its sortable activator. When omitted, each row
+   * renders the default DS grip (DragHandleView). A native
    * host whose container IS the list (DraggableFlatList)
    * renders RecipeInstructionRowView from its own renderItem
    * instead and passes the handle to the row directly.
@@ -41,10 +45,13 @@ export type RecipeInstructionListViewProps = {
  * form's instruction list chrome as a view — the labeled
  * section, the add action in its label row, the empty state,
  * and the rows (RecipeInstructionRowView) in order — landing
- * the sortable-list build under Stephen's 2026-11-09 drag
- * boundary: the DS owns the row views and the list chrome,
- * emitting field-change / add / remove intents; hosts keep
- * their drag containers and bind the handle.
+ * the sortable-list build under Stephen's drag boundary as
+ * revised 2026-11-26 on #878: the DS owns the row views, the
+ * list chrome, and the drag-handle visual (DragHandleView,
+ * rendered by default), emitting field-change / add / remove
+ * intents; hosts keep their drag containers and behavior,
+ * and may still bind their own handle through
+ * `renderDragHandle` instead of the default grip.
  *
  * The list is controlled and owns no state: rows cross as
  * view-models, edits and removals report the row's key, an
@@ -83,7 +90,7 @@ export function RecipeInstructionListView({
           key={row.key}
           row={row}
           index={index}
-          {...(renderDragHandle ? { dragHandle: renderDragHandle(row, index) } : {})}
+          dragHandle={renderDragHandle ? renderDragHandle(row, index) : <DragHandleView />}
           {...(onBodyChange ? { onBodyChange } : {})}
           {...(onRemove ? { onRemove } : {})}
         />

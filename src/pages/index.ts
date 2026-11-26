@@ -67,6 +67,8 @@ export {
 } from "./eciperay/MealPlanDetailPage.js";
 export {
   TabbedShellPage,
+  type TabbedShellPageConsentBanner,
+  type TabbedShellPageInstallBanner,
   type TabbedShellPageLinkTab,
   type TabbedShellPageProps,
   type TabbedShellPageTab,
@@ -74,7 +76,10 @@ export {
 export {
   AppShellPage,
   type AppShellPageAction,
+  type AppShellPageConsentBanner,
+  type AppShellPageInstallBanner,
   type AppShellPageNavItem,
+  type AppShellPageNavItemKind,
   type AppShellPageProps,
   type AppShellPageSearch,
 } from "./eciperay/AppShellPage.js";
@@ -124,6 +129,9 @@ export {
   type ProfilePageAccountData,
   type ProfilePageTransfer,
   type ProfilePageFeedbackPreference,
+  type ProfilePageAuthorDisplay,
+  type ProfilePageFamilySharing,
+  type ProfilePageShowLess,
   type ProfilePageLegalLink,
 } from "./eciperay/ProfilePage.js";
 export { ImportTextPage, type ImportTextPageProps } from "./eciperay/ImportTextPage.js";
@@ -134,8 +142,10 @@ export { HomePage, type HomePageProps, type HomePageRecipe } from "./eciperay/Ho
 export {
   LandingPage,
   type LandingPageProps,
+  type LandingPageConsentBanner,
   type LandingPageCta,
   type LandingPageFeature,
+  type LandingPageInstallBanner,
 } from "./eciperay/LandingPage.js";
 export {
   TagsPage,
@@ -183,6 +193,8 @@ export {
   type CookingModePageProps,
   type CookingModePageStep,
   type CookingModePageIngredients,
+  type CookingModePageCookLogForm,
+  type CookingModePageCookLogFormValues,
 } from "./eciperay/CookingModePage.js";
 export { PayPage, type PayPageProps, type PayPageStatus } from "./eciperay/PayPage.js";
 export {

@@ -22,19 +22,26 @@ export type FeedbackPreferenceViewProps = {
   /** The shortcut is unavailable (analytics not configured): the checkbox disables. */
   shortcutUnavailable?: boolean;
   unavailableHint?: string | null;
-  /** The current consent state; null = not set. Display state — the host owns the consent record. */
-  consent: boolean | null;
+  /** The current consent state; null = not set. Display state — the host owns the consent record.
+   * Optional (#890): when no consent props are supplied at all, no consent UI
+   * renders — a host with no analytics-consent state (the app) passes none. */
+  consent?: boolean | null;
   /** Display-ready status line ("Analytics consent: Accepted"). */
   consentStatusText?: string | null;
   /** The in-section consent prompt is open (a feature asked for consent). */
   consentPromptOpen?: boolean;
   consentPromptText?: string;
-  onAcceptConsent: () => void;
-  onDeclineConsent: () => void;
+  onAcceptConsent?: () => void;
+  onDeclineConsent?: () => void;
   /** Withdraw renders only when provided (the host passes it while a choice is recorded). */
   onWithdrawConsent?: () => void;
   acceptLabel?: string;
   declineLabel?: string;
+  /** Long labels for the out-of-prompt consent actions (#890), distinct from
+   * the prompt's short acceptLabel/declineLabel pair. Each falls back to its
+   * short label when not supplied, so existing consumers render unchanged. */
+  acceptLongLabel?: string;
+  declineLongLabel?: string;
   withdrawLabel?: string;
   /** The privacy-choices sentence: text before the link, then the link itself. */
   choicesHintBefore?: string;
@@ -92,6 +99,8 @@ export function FeedbackPreferenceView({
   onWithdrawConsent,
   acceptLabel: acceptLabelProp,
   declineLabel: declineLabelProp,
+  acceptLongLabel: acceptLongLabelProp,
+  declineLongLabel: declineLongLabelProp,
   withdrawLabel: withdrawLabelProp,
   choicesHintBefore: choicesHintBeforeProp,
   choicesLinkLabel: choicesLinkLabelProp,
@@ -110,6 +119,10 @@ export function FeedbackPreferenceView({
   const withdrawLabel = withdrawLabelProp ?? voice.feedbackPreferenceView.withdrawLabel;
   const choicesHintBefore = choicesHintBeforeProp ?? voice.feedbackPreferenceView.choicesHintBefore;
   const choicesLinkLabel = choicesLinkLabelProp ?? voice.feedbackPreferenceView.choicesLinkLabel;
+  const acceptLongLabel = acceptLongLabelProp ?? acceptLabel;
+  const declineLongLabel = declineLongLabelProp ?? declineLabel;
+  // #890: the consent block exists only when the host supplies consent state.
+  const hasConsent = consent !== undefined;
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): a skeleton branch mirroring the loaded
@@ -144,19 +157,21 @@ export function FeedbackPreferenceView({
               </Col>
             </Col>
           </Row>
-          <Col gap="s">
-            <TextSkeleton size="md" lines={1} />
-            <LoadingScope active>
-              <Row middle wrap gap="s">
-                <Button ghost size="sm" onPress={onAcceptConsent}>
-                  {acceptLabel}
-                </Button>
-                <Button ghost size="sm" onPress={onDeclineConsent}>
-                  {declineLabel}
-                </Button>
-              </Row>
-            </LoadingScope>
-          </Col>
+          {hasConsent ? (
+            <Col gap="s">
+              <TextSkeleton size="md" lines={1} />
+              <LoadingScope active>
+                <Row middle wrap gap="s">
+                  <Button ghost size="sm" onPress={onAcceptConsent}>
+                    {acceptLongLabel}
+                  </Button>
+                  <Button ghost size="sm" onPress={onDeclineConsent}>
+                    {declineLongLabel}
+                  </Button>
+                </Row>
+              </LoadingScope>
+            </Col>
+          ) : null}
         </Col>
       </SectionCard>
     );
@@ -174,8 +189,8 @@ export function FeedbackPreferenceView({
           {shortcutUnavailable && unavailableHint ? (
             <Text variant="hint">{unavailableHint}</Text>
           ) : null}
-          {consentStatusText ? <Text variant="body">{consentStatusText}</Text> : null}
-          {consentPromptOpen ? (
+          {hasConsent && consentStatusText ? <Text variant="body">{consentStatusText}</Text> : null}
+          {hasConsent && consentPromptOpen ? (
             <Col gap="s">
               <Text variant="body">{consentPromptText}</Text>
               <Row middle wrap gap="s">
@@ -187,16 +202,16 @@ export function FeedbackPreferenceView({
                 </Button>
               </Row>
             </Col>
-          ) : (
+          ) : hasConsent ? (
             <Row middle wrap gap="s">
               {consent !== true ? (
                 <Button ghost size="sm" onPress={onAcceptConsent}>
-                  {acceptLabel}
+                  {acceptLongLabel}
                 </Button>
               ) : null}
               {consent !== false ? (
                 <Button ghost size="sm" onPress={onDeclineConsent}>
-                  {declineLabel}
+                  {declineLongLabel}
                 </Button>
               ) : null}
               {consent !== null && onWithdrawConsent ? (
@@ -205,7 +220,7 @@ export function FeedbackPreferenceView({
                 </Button>
               ) : null}
             </Row>
-          )}
+          ) : null}
           {choicesHref ? (
             <Text variant="hint">
               {choicesHintBefore}

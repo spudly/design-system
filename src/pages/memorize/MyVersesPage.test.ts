@@ -119,6 +119,15 @@ test("the empty branch carries the app's empty state verbatim; a non-empty list 
   assert.equal(empty.type, EmptyState);
   assert.equal(empty.props.title, "No verses yet");
   assert.equal(empty.props.body, "Find one in the Search tab to get started.");
+  // #856: no host href -> no action; with searchHref the empty state
+  // carries an icon and the link-form Search action.
+  assert.equal(empty.props.actionHref, undefined);
+  const withAction = screenChildren(
+    MyVersesPage(baseProps({ verses: [], searchHref: "/search" })),
+  )[1];
+  assert.equal(withAction.props.actionLabel, "Search verses");
+  assert.equal(withAction.props.actionHref, "/search");
+  assert.ok(withAction.props.icon, "the empty state carries an icon");
 
   const list = screenChildren(MyVersesPage(baseProps()))[1];
   assert.equal(list.type, BoundedList, "the list renders through BoundedList (#119)");

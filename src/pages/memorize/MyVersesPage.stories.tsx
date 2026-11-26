@@ -71,10 +71,28 @@ export const Default: Story = {
   ),
 };
 
+export const Loading: Story = {
+  render: () => (
+    <>
+      <MyVersesPage
+        footer={memorizeFooterFixture}
+        verses={[]}
+        onRemoveVerse={() => undefined}
+        loading
+      />
+    </>
+  ),
+};
+
 export const Empty: Story = {
   render: () => (
     <>
-      <MyVersesPage footer={memorizeFooterFixture} verses={[]} onRemoveVerse={() => undefined} />
+      <MyVersesPage
+        footer={memorizeFooterFixture}
+        verses={[]}
+        onRemoveVerse={() => undefined}
+        searchHref="/search"
+      />
     </>
   ),
 };
