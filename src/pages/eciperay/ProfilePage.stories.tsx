@@ -77,6 +77,32 @@ export const WithCoverageSections: Story = {
           statusText: "Your Plus plan is active and renews on Dec 1, 2026.",
           onManage: () => undefined,
         }}
+        showLess={{
+          entries: [
+            { sourceRecipeId: "recipe-1", title: "Spicy Tuna Casserole" },
+            { sourceRecipeId: "recipe-2", title: "Liver and Onions" },
+          ],
+          onUndo: () => undefined,
+        }}
+        authorDisplay={{
+          settings: { displayName: "Jamie Cook", showOnPublicRecipes: true },
+          onChange: () => undefined,
+          onSave: () => undefined,
+        }}
+        familySharing={{
+          grants: [
+            {
+              recipientUserId: "user-1",
+              recipientEmail: "alex@example.com",
+              recipientDisplayName: "Alex Cook",
+              createdAt: "2026-10-02T12:00:00.000Z",
+            },
+          ],
+          email: "",
+          onEmailChange: () => undefined,
+          onAdd: () => undefined,
+          onRemove: () => undefined,
+        }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
           onShortcutEnabledChange: () => undefined,

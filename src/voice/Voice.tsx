@@ -188,6 +188,43 @@ export type Voice = {
     choicesHintBefore: string;
     choicesLinkLabel: string;
   };
+  /** AuthorDisplayView (#873): defaults when title / field / hint / save label props are not passed. */
+  authorDisplayView: {
+    title: string;
+    displayNameLabel: string;
+    displayNamePlaceholder: string;
+    hint: string;
+    showNameLabel: string;
+    saveLabel: string;
+  };
+  /** FamilySharingView (#873): defaults when title / description / field / action label props are not passed, plus the grant row's composed lines. */
+  familySharingView: {
+    title: string;
+    description: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    addLabel: string;
+    addingLabel: string;
+    loadingLabel: string;
+    emptyMessage: string;
+    removeLabel: string;
+    removingLabel: string;
+    /** Formatter: builds a grant row's added line from its pre-formatted date. */
+    addedLabel: VoiceFormatter<[date: string]>;
+    /** Formatter: builds a grant's Remove accessible name from its display label. */
+    removeLabelFor: VoiceFormatter<[grantLabel: string]>;
+  };
+  /** ShowLessView (#873): defaults when title / description / state / action label props are not passed, plus the Undo accessible name. */
+  showLessView: {
+    title: string;
+    description: string;
+    loadingLabel: string;
+    emptyMessage: string;
+    undoLabel: string;
+    loadFailedMessage: string;
+    /** Formatter: builds an entry's Undo accessible name from its recipe title. */
+    undoLabelFor: VoiceFormatter<[recipeTitle: string]>;
+  };
   /** SubscriptionView (tranche 2b): defaults when title / manage / refresh / portal label props are not passed. */
   subscriptionView: {
     title: string;
