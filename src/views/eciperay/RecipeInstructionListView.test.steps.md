@@ -13,7 +13,7 @@ release's changed components. The full index lives in
 
 ## RecipeInstructionListView
 
-Open in `Views/RecipeInstructionListView`: Default, Empty, WithoutIntents (row views:
+Open in `Views/RecipeInstructionListView`: Default, WithDefaultDragHandle, Empty, WithoutIntents (row views:
 Default, WithoutDragHandle, Empty); and in
 `Pages/Eciperay/RecipeFormPage`: Default and Empty.
 
@@ -21,14 +21,19 @@ Default, WithoutDragHandle, Empty); and in
    fields filled, the host-bound Drag handle on each row, the
    Remove action on each row, and the + Add action in the
    label row render.
-2. Typing in a row field updates only that row; Remove drops
+2. WithDefaultDragHandle: no host handle is bound, so each
+   row renders the design system's own six-dot grip
+   (DragHandleView, #878) in place of the host Drag handle.
+3. Typing in a row field updates only that row; Remove drops
    its row (later rows renumber / keep their values); + Add
    appends an empty row.
-3. Empty: the empty line renders in place of rows; the + Add
+4. Empty: the empty line renders in place of rows; the + Add
    action stays.
-4. WithoutIntents / WithoutDragHandle: no add, remove, or
-   handle elements render; the row content still renders.
-5. RecipeFormPage Default: both list sections render through
+5. WithoutIntents: no add or remove actions render; each row
+   still renders the default DS grip. WithoutDragHandle (row
+   view): no handle element renders; the row content still
+   renders.
+6. RecipeFormPage Default: both list sections render through
    the views inside the form's flow; Empty: both sections show
    their empty lines.
 

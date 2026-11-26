@@ -6,7 +6,10 @@
  * Stephen's 2026-11-09 drag boundary — the DS owns the row
  * views and the list chrome, emitting field-change / add /
  * remove intents; hosts keep their drag containers and bind
- * the handle; no drag library enters the DS.
+ * the handle; no drag library enters the DS. Revised
+ * 2026-11-26 on #878: the DS also owns the handle visual —
+ * the list renders the DragHandleView grip by default, and a
+ * host-supplied `renderDragHandle` still wins over it.
  *
  * The contracts pinned here:
  * 1. The views are exported from the views barrel (the list
@@ -42,6 +45,7 @@ test("the views ship in the built surface; the list stays internal, the row is p
   const distRuntime = await loadInternalDist();
   assert.equal(typeof distRuntime.RecipeIngredientListView, "function");
   assert.equal(typeof distRuntime.RecipeIngredientRowView, "function");
+  assert.equal(typeof distRuntime.DragHandleView, "function");
   const { readFileSync } = await import("node:fs");
   const { dirname, join } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
@@ -118,6 +122,26 @@ test("populated list: label, add action, row values, handles, and remove actions
   assert.ok(html.includes("Remove"), "the remove actions render");
   assert.ok(html.includes("Remove ingredient 1"), "the first remove action is named by position");
   assert.ok(html.includes("Ingredient 2 quantity"), "the row fields are named by position");
+});
+test("default drag handle: the DS grip renders when no renderDragHandle is given (#878)", async () => {
+  const html = await renderList({ ...baseProps });
+  assert.ok(
+    html.includes('aria-label="Drag to reorder"'),
+    "the default DS grip renders on the rows",
+  );
+  assert.ok(!html.includes("HANDLE"), "no host handle renders");
+});
+test("host override wins: a supplied renderDragHandle replaces the DS grip (#878)", async () => {
+  const { createElement: h } = await import("react");
+  const html = await renderList({
+    ...baseProps,
+    renderDragHandle: () => h("span", null, "HANDLE"),
+  });
+  assert.ok(html.includes("HANDLE"), "the host-bound drag handles render");
+  assert.ok(
+    !html.includes('aria-label="Drag to reorder"'),
+    "the default DS grip does not render when the host supplies its own handle",
+  );
 });
 test("empty list: the empty line renders and the add action stays", async () => {
   const html = await renderList({
