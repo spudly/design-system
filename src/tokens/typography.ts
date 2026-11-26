@@ -103,6 +103,41 @@ const fontFamily = {
   verseNative: "Georgia",
   /** Single font name for React Native on Android for the `verse` role. */
   verseNativeAndroid: "serif",
+  /**
+   * Display/title stack (#851): the family the title-bearing Text
+   * variants (heading / title / formTitle / subheading / display)
+   * render in, resolved through the registered Tamagui `display`
+   * font (see tamagui.config). The base role mirrors the `sans`
+   * stack, so a theme that declares no display override keeps
+   * today's sans titles; Warm Harvest (Eciperay) overrides it to
+   * the serif stack — the design brief's serif display type for
+   * page and recipe titles. Apps mark titles with the Text
+   * variants and never name a family themselves.
+   */
+  display:
+    "Raleway, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  /** Single font name for React Native for the `display` role (mirrors `sansNative` in the base role). */
+  displayNative: "UiSans",
+  /** iOS per-weight face names for the `display` role (the static UiSans faces, as `sansNativeFaces`). */
+  displayNativeFaces: {
+    "400": "UiSans",
+    "500": "UiSans-Medium",
+    "600": "UiSans-SemiBold",
+    "700": "UiSans-Bold",
+    normal: "UiSans",
+    bold: "UiSans-Bold",
+  },
+  /** Single font name for React Native on Android for the `display` role (mirrors `sansNativeAndroid`). */
+  displayNativeAndroid: "UiSans",
+  /** Android per-weight face names for the `display` role (the static UiSans faces, as `sansNativeAndroidFaces`). */
+  displayNativeAndroidFaces: {
+    "400": "UiSans",
+    "500": "UiSans-Medium",
+    "600": "UiSans-SemiBold",
+    "700": "UiSans-Bold",
+    normal: "UiSans",
+    bold: "UiSans-Bold",
+  },
   /** Monospace stack for code / tabular content. */
   mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 } as const;
@@ -127,6 +162,25 @@ const fontWeight = {
   bold: 700,
 } as const;
 
+/**
+ * Font weights for the `display` role — the steps the title-bearing
+ * Text variants (heading / title / formTitle / display at the `bold`
+ * step, subheading at the `semibold` step) resolve to. The variants
+ * reference the registered `display` font's weight scale, and the
+ * registration builds that scale from these values (see
+ * tamagui.config), so a theme carries its title weights here rather
+ * than in a component. The base role carries the standard steps —
+ * identical to `fontWeight` — so a theme that declares no display
+ * weight override keeps today's title weights; Warm Harvest
+ * overrides the two title steps down to the medium step (its
+ * Georgia serif ships only regular/bold faces, and Stephen called
+ * the serif titles too heavy at the standard steps, 2026-11-25).
+ */
+const displayFontWeight = {
+  semibold: 600,
+  bold: 700,
+} as const;
+
 /** Line heights (unitless multipliers). */
 const lineHeight = {
   tight: 1.25,
@@ -134,4 +188,4 @@ const lineHeight = {
   relaxed: 1.75,
 } as const;
 
-export const typography = { fontFamily, fontSize, fontWeight, lineHeight } as const;
+export const typography = { fontFamily, fontSize, fontWeight, displayFontWeight, lineHeight } as const;

@@ -45,9 +45,45 @@ export const eciperayTheme = {
     linkDark: tokens.colors.terracotta.terracotta5,
     accent: "#5f6f52",
   },
-  // No token overrides: fonts come from the base tokens — Raleway
-  // for headings and body in every theme (#65), replacing this
-  // theme's former Georgia serif UI stack.
+  // Display titles take the brief's serif (#851): only the
+  // `display` role is overridden, to the existing serif stack
+  // (Georgia) — the stack this theme's UI used before #65 and the
+  // one RecipeDetailPage's display title already renders in.
+  // Body/headings' `sans` role stays Raleway (#65); the serif
+  // carries no static per-weight faces, so the base role's UiSans
+  // face maps are cleared for this role.
+  //
+  // The serif titles also take lighter weight steps (Stephen,
+  // 2026-11-25): Georgia ships only regular (400) and bold (700)
+  // faces, so at the standard steps the titles rendered at full
+  // bold and read too heavy. The display role's title steps drop
+  // to the medium step (500), which resolves to Georgia's regular
+  // face: the intermediate semibold step (600) renders identically
+  // to bold for a two-face serif (verified pixel-identical in the
+  // Storybook captures), so medium is the first step that visibly
+  // lightens the titles. The registered `display` font's weight
+  // scale carries the reduction (see tamagui.config), so no
+  // component or page names a weight for this. The `sans` role's
+  // weights are untouched: non-title bold text keeps the standard
+  // steps. Everything else in the typography tokens is inherited.
+  tokens: {
+    ...tokens,
+    typography: {
+      ...tokens.typography,
+      fontFamily: {
+        ...tokens.typography.fontFamily,
+        display: "Georgia, 'Times New Roman', serif",
+        displayNative: "Georgia",
+        displayNativeFaces: undefined,
+        displayNativeAndroid: "serif",
+        displayNativeAndroidFaces: undefined,
+      },
+      displayFontWeight: {
+        semibold: tokens.typography.fontWeight.medium,
+        bold: tokens.typography.fontWeight.medium,
+      },
+    },
+  },
 } as const;
 
 export type EciperayTheme = typeof eciperayTheme;

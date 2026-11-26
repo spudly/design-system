@@ -25,6 +25,20 @@ function fontStackFor(theme: StorybookThemeName): string {
   return baseTheme.tokens.typography.fontFamily.sans;
 }
 
+/** The display/title stack for a Storybook theme (#851): the serif stack under Warm Harvest, the UI sans stack otherwise. */
+function displayFontStackFor(theme: StorybookThemeName): string {
+  if (theme.includes("warmHarvest")) return eciperayTheme.tokens.typography.fontFamily.display;
+  if (theme.includes("quietDawn")) return memorizeTheme.tokens.typography.fontFamily.display;
+  return baseTheme.tokens.typography.fontFamily.display;
+}
+
+/** The display title weight steps for a Storybook theme (#851): the brand theme's displayFontWeight tokens — the lighter steps under Warm Harvest, the standard steps otherwise. */
+function displayFontWeightFor(theme: StorybookThemeName): { semibold: number; bold: number } {
+  if (theme.includes("warmHarvest")) return eciperayTheme.tokens.typography.displayFontWeight;
+  if (theme.includes("quietDawn")) return memorizeTheme.tokens.typography.displayFontWeight;
+  return baseTheme.tokens.typography.displayFontWeight;
+}
+
 /** The verse-text stack for a Storybook theme (#66): Alegreya under Quiet Dawn, the base serif stack otherwise. */
 function verseFontStackFor(theme: StorybookThemeName): string {
   if (theme.includes("quietDawn")) return memorizeTheme.tokens.typography.fontFamily.verse;
@@ -36,6 +50,13 @@ function FontStackSync({ theme }: { theme: StorybookThemeName }) {
   useEffect(() => {
     document.documentElement.style.setProperty("--dsFontStack", fontStackFor(theme));
     document.documentElement.style.setProperty("--dsVerseFontStack", verseFontStackFor(theme));
+    document.documentElement.style.setProperty("--dsDisplayFontStack", displayFontStackFor(theme));
+    const displayWeight = displayFontWeightFor(theme);
+    document.documentElement.style.setProperty(
+      "--dsDisplayWeightSemibold",
+      String(displayWeight.semibold),
+    );
+    document.documentElement.style.setProperty("--dsDisplayWeightBold", String(displayWeight.bold));
   }, [theme]);
   return null;
 }
