@@ -122,9 +122,11 @@ function sourceFiles(dir: string): string[] {
 // DropdownButton ground: it forwards its `accessibilityLabel` to the
 // DS Button it renders, which translates it. PasswordField (#758) is
 // sanctioned on the same ground: it forwards its `accessibilityLabel`
-// to the TextField it renders, which translates it.
+// to the TextField it renders, which translates it. DragHandleView
+// (#878) is sanctioned on the Thumbnail ground: it routes its
+// `accessibilityLabel` through platformAccessibilityProps internally.
 const SANCTIONED_TAGS = new Set(
-  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert,LoadingActionCardRow,PasswordField".split(
+  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert,LoadingActionCardRow,PasswordField,DragHandleView".split(
     ",",
   ),
 );

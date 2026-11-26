@@ -39,6 +39,7 @@ export { CommentItem, type CommentItemProps } from "./eciperay/CommentItem.js";
 export { ConfirmActionView, type ConfirmActionViewProps } from "./eciperay/ConfirmActionView.js";
 export { ConsentBannerView, type ConsentBannerViewProps } from "./shared/ConsentBannerView.js";
 export { DetailRow, type DetailRowProps } from "./eciperay/DetailRow.js";
+export { DragHandleView, type DragHandleViewProps } from "./eciperay/DragHandleView.js";
 export { EmptyState, type EmptyStateProps } from "./shared/EmptyState.js";
 export {
   FeedbackPreferenceView,
