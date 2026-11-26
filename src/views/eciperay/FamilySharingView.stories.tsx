@@ -51,7 +51,7 @@ export const Empty: Story = {
 export const LoadingList: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <FamilySharingView grants={[]} email="" isLoading {...actions} />
+      <FamilySharingView grants={[]} email="" loading {...actions} />
     </StoryFrame>
   ),
 };

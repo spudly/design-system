@@ -33,7 +33,7 @@ export type FamilySharingViewProps = {
   removeLabel?: string;
   removingLabel?: string;
   grants: FamilySharingGrant[];
-  isLoading?: boolean;
+  loading?: boolean;
   /** The initial load failed: the list is unknown, not empty. */
   loadFailed?: boolean;
   /** Display-ready load error (the host composes it from its load failure). */
@@ -48,7 +48,7 @@ export type FamilySharingViewProps = {
 };
 
 /** The grant's display label: "Name (email)", or the email alone. */
-export function familySharingGrantLabel(grant: FamilySharingGrant): string {
+function familySharingGrantLabel(grant: FamilySharingGrant): string {
   return grant.recipientDisplayName
     ? `${grant.recipientDisplayName} (${grant.recipientEmail})`
     : grant.recipientEmail;
@@ -85,7 +85,7 @@ export function FamilySharingView({
   removeLabel: removeLabelProp,
   removingLabel: removingLabelProp,
   grants,
-  isLoading = false,
+  loading = false,
   loadFailed = false,
   loadError,
   email,
@@ -122,7 +122,7 @@ export function FamilySharingView({
       </Button>
       {loadError ? <Alert severity="error" message={loadError} /> : null}
       {error ? <Alert severity="error" message={error} /> : null}
-      {isLoading ? (
+      {loading ? (
         <Text variant="hint">{loadingLabel}</Text>
       ) : loadFailed ? null : grants.length === 0 ? (
         <Text variant="hint">{emptyMessage}</Text>

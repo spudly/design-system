@@ -39,7 +39,7 @@ export const Empty: Story = {
 export const LoadingList: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <ShowLessView entries={[]} isLoading {...actions} />
+      <ShowLessView entries={[]} loading {...actions} />
     </StoryFrame>
   ),
 };

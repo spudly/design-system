@@ -25,7 +25,7 @@ export type ShowLessViewProps = {
   undoLabel?: string;
   loadFailedMessage?: string;
   entries: ShowLessEntry[];
-  isLoading?: boolean;
+  loading?: boolean;
   /** The initial load failed: the list is unknown, not empty. */
   loadFailed?: boolean;
   undoingId?: string | null;
@@ -54,7 +54,7 @@ export function ShowLessView({
   undoLabel: undoLabelProp,
   loadFailedMessage: loadFailedMessageProp,
   entries,
-  isLoading = false,
+  loading = false,
   loadFailed = false,
   undoingId = null,
   error,
@@ -73,7 +73,7 @@ export function ShowLessView({
       <Text variant="hint">{description}</Text>
       {loadFailed ? (
         <Alert severity="error" message={loadFailedMessage} />
-      ) : isLoading ? (
+      ) : loading ? (
         <Text variant="hint">{loadingLabel}</Text>
       ) : entries.length === 0 ? (
         <Text variant="hint">{emptyMessage}</Text>

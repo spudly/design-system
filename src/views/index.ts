@@ -10,12 +10,10 @@
 export { AccessTokensPanel, type AccessTokensPanelProps } from "./eciperay/AccessTokensPanel.js";
 export {
   AuthorDisplayView,
-  type AuthorDisplaySettings,
   type AuthorDisplayViewProps,
 } from "./eciperay/AuthorDisplayView.js";
 export {
   FamilySharingView,
-  familySharingGrantLabel,
   type FamilySharingGrant,
   type FamilySharingViewProps,
 } from "./eciperay/FamilySharingView.js";

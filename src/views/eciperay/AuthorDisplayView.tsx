@@ -13,7 +13,7 @@ import { useVoice } from "../../voice/index.js";
  * shown at all. The name also feeds the Recipe JSON-LD
  * `author`, app-side.
  */
-export type AuthorDisplaySettings = {
+type AuthorDisplaySettings = {
   displayName: string | null;
   showOnPublicRecipes: boolean;
 };
