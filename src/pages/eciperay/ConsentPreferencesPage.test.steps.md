@@ -23,3 +23,15 @@ NotSet.
 
 **Run when:** `src/pages/eciperay/ConsentPreferencesPage.tsx`, its
 stories, or a changeset naming ConsentPreferencesPage.
+
+## ConsentPreferencesPage loading skeleton (#874)
+
+Open in `Pages/Eciperay/ConsentPreferencesPage`: Loading.
+
+1. Loading: no recorded choice renders — the section card is
+   in its loading state with description bones, the Accept /
+   Decline / Withdraw row as inert skeleton buttons, and a
+   hint bone below.
+
+**Run when:** ConsentPreferencesPage's source or stories, or
+a changeset naming ConsentPreferencesPage's loading state.

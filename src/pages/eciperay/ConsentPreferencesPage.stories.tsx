@@ -29,6 +29,19 @@ export const Accepted: Story = {
   ),
 };
 
+export const Loading: Story = {
+  render: () => (
+    <>
+      <ConsentPreferencesPage
+        footer={eciperayFooterFixture}
+        currentChoice={null}
+        {...actions}
+        loading
+      />
+    </>
+  ),
+};
+
 export const NotSet: Story = {
   render: () => (
     <>

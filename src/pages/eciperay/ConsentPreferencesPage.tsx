@@ -5,6 +5,7 @@ import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { useVoice } from "../../voice/index.js";
 
 /**
@@ -22,6 +23,14 @@ import { useVoice } from "../../voice/index.js";
  * prop, because the precise analytics wording is the host's
  * privacy surface; the choices here and the profile's
  * FeedbackPreferenceView act on the same host-held record.
+ *
+ * Loading (#874, following the #278 pattern): while
+ * `loading`, the section card renders in its loading state —
+ * description and current-choice lines as bones, and the
+ * three actions as inert skeleton buttons — so the host can
+ * mount the page before the recorded choice resolves instead
+ * of gating on a spinner. No recorded choice renders in this
+ * state.
  */
 export type ConsentPreferencesPageChoice = "accepted" | "declined" | null;
 
@@ -31,6 +40,10 @@ export type ConsentPreferencesPageProps = {
   /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
   header?: BigFooterShellHeader;
   currentChoice: ConsentPreferencesPageChoice;
+  /** Loading state (#874): the section renders its skeleton
+   * (see the header's loading note); `currentChoice` does not
+   * render in this state. */
+  loading?: boolean;
   onAccept: () => void;
   onDecline: () => void;
   onWithdraw: () => void;
@@ -47,6 +60,7 @@ export function ConsentPreferencesPage({
   hint: hintProp,
   footer,
   header,
+  loading = false,
 }: ConsentPreferencesPageProps) {
   const voice = useVoice();
   const description = descriptionProp ?? voice.consentPreferencesPage.description;
@@ -57,6 +71,31 @@ export function ConsentPreferencesPage({
       : currentChoice === "declined"
         ? voice.consentPreferencesPage.declinedLabel
         : voice.consentPreferencesPage.notSetLabel;
+  if (loading) {
+    return (
+      <BigFooterShell footer={footer} header={header}>
+        <ScreenContainer variant="padded">
+          <SectionCard title={voice.consentPreferencesPage.title} variant="elevated" loading>
+            <Col gap="xxl">
+              <TextSkeleton size="md" lines={3} />
+              <ButtonRow>
+                <Button variant="primary" onPress={() => {}}>
+                  {voice.consentPreferencesPage.acceptLabel}
+                </Button>
+                <Button variant="secondary" onPress={() => {}}>
+                  {voice.consentPreferencesPage.declineLabel}
+                </Button>
+                <Button variant="secondary" onPress={() => {}}>
+                  {voice.consentPreferencesPage.withdrawLabel}
+                </Button>
+              </ButtonRow>
+              <TextSkeleton size="sm" lines={1} />
+            </Col>
+          </SectionCard>
+        </ScreenContainer>
+      </BigFooterShell>
+    );
+  }
   return (
     <BigFooterShell footer={footer} header={header}>
       <ScreenContainer variant="padded">

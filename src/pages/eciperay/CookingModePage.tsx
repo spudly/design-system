@@ -1,4 +1,7 @@
 import { FullScreenShell } from "../../widgets/layout/FullScreenShell.js";
+import { LoadingScope } from "../../contexts/LoadingScope.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { StepOverlay } from "../../widgets/overlays/StepOverlay.js";
 import { ScaledIngredientsView } from "../../views/eciperay/ScaledIngredientsView.js";
 import { StepNavControls } from "../shared/StepNavControls.js";
@@ -41,6 +44,14 @@ import { StepNavControls } from "../shared/StepNavControls.js";
  * - There is no swipe navigation here either: the host's
  *   swipe shell mounts this page per step, as it mounted its
  *   own composition before.
+ * - Loading (#874, following the #278 pattern): while
+ *   `loading`, the page renders a skeleton in the full-screen
+ *   shell — a title bone, a step-label bone, and body-line
+ *   bones inside a LoadingScope — so the host can mount the
+ *   page before the recipe's steps resolve instead of gating
+ *   on a spinner. The loading state is checked before the
+ *   out-of-range rule: a host in this state may legitimately
+ *   hold no steps yet.
  */
 
 export type CookingModePageStep = {
@@ -60,6 +71,10 @@ export type CookingModePageProps = {
   recipeTitle: string;
   steps: CookingModePageStep[];
   stepIndex: number;
+  /** Loading state (#874): the page renders its skeleton
+   * (see the header's loading note) and no step content;
+   * `steps` may be empty in this state. */
+  loading?: boolean;
   /** The scaled-ingredients panel; omit (or pass null) to hide it. */
   ingredients?: CookingModePageIngredients | null;
   onPrev: () => void;
@@ -68,7 +83,20 @@ export type CookingModePageProps = {
 };
 
 export function CookingModePage(props: CookingModePageProps) {
-  const { recipeTitle, steps, stepIndex, ingredients, onPrev, onNext, onDone } = props;
+  const { recipeTitle, steps, stepIndex, ingredients, onPrev, onNext, onDone, loading = false } = props;
+  if (loading) {
+    return (
+      <FullScreenShell>
+        <LoadingScope active>
+          <Col gap="l" p="l">
+            <TextSkeleton size="2xl" lines={1} />
+            <TextSkeleton size="sm" lines={1} />
+            <TextSkeleton size="md" lines={4} />
+          </Col>
+        </LoadingScope>
+      </FullScreenShell>
+    );
+  }
   const current = stepIndex >= 0 ? steps.at(stepIndex) : undefined;
   if (current === undefined) {
     return null;
