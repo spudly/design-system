@@ -149,19 +149,26 @@ const MEMORIZE_COVER_LEFT_PATH =
 const MEMORIZE_COVER_RIGHT_PATH =
   "M139.5 146.6 C140.2 145.8 141.9 145.9 144.0 145.3 C146.1 144.7 149.3 143.7 152.0 142.9 C154.7 142.1 157.3 141.4 160.0 140.6 C162.7 139.8 165.3 139.0 168.0 138.2 C170.7 137.4 173.3 136.7 176.0 136.0 C178.7 135.3 181.3 134.6 184.0 133.8 C186.7 133.0 189.8 132.0 192.0 131.4 C194.2 130.8 195.4 130.4 197.0 130.2 C198.6 130.0 200.6 129.9 201.5 130.0 C202.4 130.1 202.1 130.5 202.4 131.0 C202.7 131.5 202.9 132.1 203.1 133.0 C203.2 133.9 203.3 134.5 203.3 136.5 C203.3 138.5 203.3 141.1 203.2 145.0 C203.1 148.9 203.0 154.8 202.9 160.0 C202.8 165.2 202.8 170.9 202.6 176.0 C202.4 181.1 202.4 187.9 201.8 190.8 C201.2 193.8 200.2 192.9 199.2 193.7 C198.2 194.4 197.5 194.8 196.0 195.3 C194.5 195.8 192.0 196.3 190.0 196.9 C188.0 197.5 186.0 198.1 184.0 198.7 C182.0 199.3 180.0 199.7 178.0 200.3 C176.0 200.9 174.0 201.5 172.0 202.1 C170.0 202.7 168.0 203.1 166.0 203.7 C164.0 204.2 162.0 204.8 160.0 205.4 C158.0 206.0 156.0 206.6 154.0 207.2 C152.0 207.8 150.0 208.3 148.0 208.9 C146.0 209.5 143.3 210.2 142.0 210.5 C140.7 210.8 140.5 210.8 140.1 210.4 C139.7 210.0 139.7 216.4 139.6 208.0 C139.5 199.6 139.5 164.7 139.5 160.0 C139.5 155.3 139.5 173.3 139.5 180.0 C139.5 186.7 139.5 205.0 139.5 200.0 C139.5 195.0 139.5 158.9 139.5 150.0 C139.5 141.1 138.8 147.4 139.5 146.6 Z";
 
-/** The Memorize book's central spine (#861): one shallow
- * end-cap curve — 4 units deep across the 18-unit width,
- * leaving each corner horizontally and flattening at the
- * center — used at BOTH ends: the top edge sags into the
- * valley on that profile and the bottom edge bulges on
- * the identical profile mirrored, so the two ends are the
- * same curve (Stephen, 2026-11-25: the traced ends were
- * too steep, and the top must match the bottom). The
- * concept's own spine measures the same 4-unit depth at
- * both ends.
+/** The Memorize book's central spine (#861): ONE
+ * continuous curve at the top and at the bottom, like
+ * the concept's (Stephen, 2026-11-25, round 6 — the
+ * traced end caps read as multiple curves: cap arc,
+ * straight side, cap arc; and the flattened shared cap
+ * that followed still dove steeply off the corners and
+ * plateaued across the middle). The outline is a single
+ * closed spline loop through the concept's measured
+ * profile, tangent-continuous at every join: the top
+ * edge sags in one flowing arc from corner to corner
+ * (144 at the corners, 148.3 at the center, the slope
+ * changing gradually the whole way), the sides hold the
+ * concept's measured width (118.9 to 137.2), and the
+ * bottom edge rounds in the same kind of single arc
+ * (214.2 at the corners, 217.8 at the center) — no
+ * straight segment and no separate cap arc breaks the
+ * flow anywhere around the loop.
  */
 const MEMORIZE_SPINE_PATH =
-  "M119.0 144.3 C122.5 144.3 124.0 148.3 128.0 148.3 C132.0 148.3 133.5 144.3 137.0 144.3 L137.0 214.4 C133.5 214.4 132.0 218.4 128.0 218.4 C124.0 218.4 122.5 214.4 119.0 214.4 Z";
+  "M119.2 143.8 C119.5 143.6 120.2 144.4 120.7 144.7 C121.1 145.0 121.6 145.3 122.1 145.5 C122.6 145.8 123.1 146.0 123.5 146.4 C124.0 146.8 124.5 147.4 125.0 147.8 C125.5 148.1 126.0 148.2 126.5 148.3 C126.9 148.4 127.4 148.3 127.9 148.3 C128.4 148.3 128.9 148.4 129.3 148.3 C129.8 148.3 130.3 148.2 130.8 147.9 C131.3 147.7 131.8 146.9 132.2 146.5 C132.7 146.1 133.2 145.9 133.7 145.7 C134.2 145.4 134.7 145.2 135.2 144.9 C135.6 144.6 136.3 143.7 136.6 143.9 C136.9 144.2 137.0 145.4 137.1 146.2 C137.2 147.0 137.2 145.7 137.2 149.0 C137.2 152.3 137.2 160.7 137.2 166.0 C137.2 171.3 137.2 176.0 137.2 181.0 C137.2 186.0 137.2 191.7 137.2 196.0 C137.2 200.3 137.2 204.4 137.2 207.0 C137.2 209.6 137.1 210.6 137.1 211.8 C137.0 213.0 137.1 213.4 136.8 213.9 C136.5 214.5 135.8 215.0 135.3 215.4 C134.9 215.7 134.4 216.0 133.9 216.3 C133.4 216.6 132.9 216.9 132.4 217.1 C132.0 217.3 131.5 217.4 131.0 217.5 C130.5 217.6 130.0 217.7 129.6 217.7 C129.1 217.8 128.6 217.8 128.1 217.8 C127.6 217.8 127.1 217.8 126.7 217.7 C126.2 217.7 125.7 217.6 125.2 217.6 C124.7 217.5 124.2 217.4 123.8 217.2 C123.3 217.0 122.8 216.6 122.3 216.4 C121.8 216.1 121.3 215.9 120.8 215.6 C120.4 215.2 119.7 214.8 119.4 214.1 C119.1 213.5 119.0 213.0 119.0 211.8 C118.9 210.6 118.9 209.6 118.9 207.0 C118.9 204.4 118.9 200.3 118.9 196.0 C118.9 191.7 118.9 186.0 118.9 181.0 C118.9 176.0 118.9 171.3 118.9 166.0 C118.9 160.7 118.9 152.3 118.9 149.0 C118.9 145.7 118.9 147.1 119.0 146.2 C119.0 145.3 118.9 144.1 119.2 143.8 Z";
 
 /** The Memorize bookmark (#861): gold, tucked behind the
  * right cover, its notch apex and left point measured from
