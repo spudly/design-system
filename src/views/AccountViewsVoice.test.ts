@@ -189,7 +189,7 @@ test("FamilySharingView renders its defaults from the voice object", async () =>
   );
   const empty = await renderWithVoice(h(FamilySharingView, { ...base, grants: [] }));
   assert.ok(empty.includes(v.emptyMessage), "the empty message renders from the voice object");
-  const loading = await renderWithVoice(h(FamilySharingView, { ...base, grants: [], isLoading: true }));
+  const loading = await renderWithVoice(h(FamilySharingView, { ...base, grants: [], loading: true }));
   assert.ok(loading.includes(v.loadingLabel), "the loading label renders from the voice object");
 });
 
