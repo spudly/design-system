@@ -71,6 +71,16 @@ import { TextField } from "../../widgets/form/TextField.js";
  *   clamping to the plan range is baked in here — the host
  *   owns the value and its semantics.
  *
+ * Details-only mode (eciperay #646, tranche 1): the entries
+ * section is OPTIONAL. A host that omits the entry props
+ * (`onSelectEntry` is the marker) gets a details-only form —
+ * title, notes, and dates — whose submit rule is the title
+ * alone; entries are then added and edited on the plan's view
+ * page (MealPlanDetailPage's inline editing). The create flow
+ * uses this mode: it creates an empty plan and lands on the
+ * view page to fill it. Hosts that still pass the entry props
+ * render the picker and steppers exactly as before.
+ *
  * Submission is a bare intent (`onSubmit`); the disabled rule
  * is the app view's one presentation rule (a title and at
  * least one selected entry). The page applies no styling
@@ -108,12 +118,13 @@ export type MealPlanFormPageProps = {
   endsOn: string;
   onEndsOnChange: (value: string) => void;
   /** The entry search text, held by the host, which runs
-   * the server-side search it drives. */
-  searchText: string;
-  onSearchTextChange: (value: string) => void;
+   * the server-side search it drives. Optional (details-only
+   * mode, #646 tranche 1): omit with the other entry props. */
+  searchText?: string;
+  onSearchTextChange?: (value: string) => void;
   /** Results of the host's search for `searchText`, in the
    * host's order. A selected entry need not appear here. */
-  searchResults: MealPlanFormPageEntryOption[];
+  searchResults?: MealPlanFormPageEntryOption[];
   /** The host's search is in flight: the picker shows its
    * searching state instead of the (stale) results. */
   isSearching?: boolean;
@@ -126,23 +137,26 @@ export type MealPlanFormPageProps = {
   /** The selected entries' view-models, in selection order —
    * the removable list and the steppers render in this
    * order. */
-  selectedEntries: MealPlanFormPageEntryOption[];
+  selectedEntries?: MealPlanFormPageEntryOption[];
   /** Quantity overrides by entry key (default 1). */
-  quantityByKey: Record<string, number>;
+  quantityByKey?: Record<string, number>;
   /** Servings overrides by recipe id. */
-  servingsByRecipeId: Record<string, number>;
+  servingsByRecipeId?: Record<string, number>;
   /** Servings-to-eat overrides by recipe id (#659). Optional:
    * hosts that have not adopted the eat control omit it and
    * the eat stepper falls back only to the recipe's own
    * servings — the host's blank/divergent follow-cook logic
    * is NOT baked in here. */
   servingsToEatByRecipeId?: Record<string, number>;
-  /** Add the search result with this key to the selection. */
-  onSelectEntry: (key: string) => void;
+  /** Add the search result with this key to the selection.
+   * Its presence is the marker that renders the entries
+   * section; omit it (with the other entry props) for the
+   * details-only form (#646, tranche 1). */
+  onSelectEntry?: (key: string) => void;
   /** Remove the selected entry with this key. */
-  onRemoveEntry: (key: string) => void;
-  onQuantityChange: (key: string, quantity: number) => void;
-  onRecipeServingsChange: (recipeId: string, servings: number) => void;
+  onRemoveEntry?: (key: string) => void;
+  onQuantityChange?: (key: string, quantity: number) => void;
+  onRecipeServingsChange?: (recipeId: string, servings: number) => void;
   /** Report a servings-to-eat edit for one plan recipe entry,
    * independently of `onRecipeServingsChange` (#659). */
   onRecipeServingsToEatChange?: (recipeId: string, servings: number) => void;
@@ -176,14 +190,14 @@ export function MealPlanFormPage({
   onStartsOnChange,
   endsOn,
   onEndsOnChange,
-  searchText,
+  searchText = "",
   onSearchTextChange,
-  searchResults,
+  searchResults = [],
   isSearching = false,
   searchError,
-  selectedEntries,
-  quantityByKey,
-  servingsByRecipeId,
+  selectedEntries = [],
+  quantityByKey = {},
+  servingsByRecipeId = {},
   servingsToEatByRecipeId,
   onSelectEntry,
   onRemoveEntry,
@@ -197,6 +211,10 @@ export function MealPlanFormPage({
   onSubmit,
   footer,
 }: MealPlanFormPageProps) {
+  // Details-only mode (#646, tranche 1): no entry handler, no
+  // entries section — and the submit rule drops its
+  // at-least-one-entry clause.
+  const showEntries = onSelectEntry !== undefined;
   return (
     <BigFooterShell footer={footer}>
       <FormScreenLayout>
@@ -229,10 +247,14 @@ export function MealPlanFormPage({
           onChangeText={onEndsOnChange}
           placeholder="YYYY-MM-DD"
         />
+        {showEntries ? (
+          <>
         <LabeledGroup label="Meals & recipes">
           <AutocompletePicker
             searchText={searchText}
-            onSearchTextChange={onSearchTextChange}
+            onSearchTextChange={(value) => {
+              onSearchTextChange?.(value);
+            }}
             searchResults={searchResults.map((entry) => ({
               id: entry.key,
               label: entryLabel(entry),
@@ -240,12 +262,16 @@ export function MealPlanFormPage({
             }))}
             isSearching={isSearching}
             searchError={searchError}
-            onSelectResult={onSelectEntry}
+            onSelectResult={(key) => {
+              onSelectEntry?.(key);
+            }}
             selectedItems={selectedEntries.map((entry) => ({
               id: entry.key,
               label: entryLabel(entry),
             }))}
-            onRemoveSelectedItem={onRemoveEntry}
+            onRemoveSelectedItem={(key) => {
+              onRemoveEntry?.(key);
+            }}
             placeholder="Search meals & recipes…"
             searchAccessibilityLabel="Search meals and recipes"
             noResultsMessage="No meals or recipes found."
@@ -259,7 +285,7 @@ export function MealPlanFormPage({
               value={quantityByKey[key] ?? 1}
               min={1}
               onChange={(value) => {
-                onQuantityChange(key, value);
+                onQuantityChange?.(key, value);
               }}
             />
           );
@@ -292,7 +318,7 @@ export function MealPlanFormPage({
                 value={servingsByRecipeId[recipeId] ?? option.servings ?? 1}
                 min={1}
                 onChange={(value) => {
-                  onRecipeServingsChange(recipeId, value);
+                  onRecipeServingsChange?.(recipeId, value);
                 }}
               />
               <NumberStepper
@@ -307,11 +333,13 @@ export function MealPlanFormPage({
             </Col>
           );
         })}
+          </>
+        ) : null}
         {error ? <Alert severity="error" message={error} /> : null}
         <Button
           variant="primary"
           accessibilityLabel="Save plan"
-          disabled={!title.trim() || selectedEntries.length === 0 || isSaving}
+          disabled={!title.trim() || (showEntries && selectedEntries.length === 0) || isSaving}
           onPress={onSubmit}
         >
           Save plan

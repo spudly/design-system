@@ -11,6 +11,8 @@ import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { WeekDayColumn, WeekDayColumns } from "../../widgets/data/WeekDayColumn.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
+import { NumberStepper } from "../../widgets/form/NumberStepper.js";
 
 /**
  * MealPlanDetailPage (#49): Eciperay's meal plan detail screen as
@@ -129,6 +131,23 @@ import { WeekDayColumn, WeekDayColumns } from "../../widgets/data/WeekDayColumn.
  *
  * No lineHeight is set anywhere in this file (the #162 rule).
  *
+ * Inline editing + day view (eciperay #646, tranche 1): the
+ * page gains OPTIONAL editing props. When the host passes no
+ * editing handlers, rendering is exactly the read-only page
+ * above. When it passes them, day sections gain "Add meal" /
+ * "Add recipe" actions, meal entries gain "Add recipe" and
+ * "Delete meal", recipe entries and meal members gain servings
+ * steppers (the DS NumberStepper) and delete actions, and meal
+ * entries render their members so their servings can be edited
+ * in place. Meal-member edits change the SHARED meal (every
+ * plan using it) — the host labels that through the entry's
+ * `sharedMealNote`, rendered above the member list. The day
+ * view (`focusedDayId` + `onFocusedDayChange`) renders one day
+ * with previous/next navigation; it is also the phone
+ * presentation, where the week view collapses to one day at a
+ * time. All mutations stay host-side: the page reports intents
+ * through the callbacks and renders the values it is given.
+ *
  * De-styled for #119: the page renders no layout primitives and
  * sets no styling props. The loading state is the skeleton
  * composition described above, the entry rows are the generic
@@ -162,6 +181,52 @@ export type MealPlanDetailPageEntry = {
   /** Recipe entries whose access was lost: the title gains its
    * "(unavailable)" suffix and the row does not press. Meal
    * entries are never unavailable. */
+  isUnavailable?: boolean;
+  /** The entry's quantity in the plan (eciperay #646, tranche
+   * 1): a number (not part of the pre-composed subtitle)
+   * because the quantity stepper edits it when the host passes
+   * the quantity handler. */
+  quantity?: number;
+  /** Recipe entries only: servings cooked for this plan entry;
+   * the servings steppers render when these and the servings
+   * handler are present. */
+  servingsToCook?: number;
+  /** Recipe entries only: servings eaten from this plan entry. */
+  servingsToEat?: number;
+  /** Meal entries only: the meal's recipe members, rendered
+   * under the meal's row. Omit to render the meal as a single
+   * row exactly as before. */
+  members?: MealPlanDetailPageEntryMember[];
+  /** Meal entries only: the host's label warning that editing
+   * this meal's members edits the shared meal everywhere it
+   * is used (eciperay #646, open question 1 — edit in place,
+   * clearly labeled). Rendered above the member list when
+   * member editing is active. */
+  sharedMealNote?: string;
+};
+
+/** One member of a meal entry (eciperay #646, tranche 1): a
+ * recipe inside the meal, rendered under the meal's row when
+ * the host supplies members. Servings cross as numbers (not
+ * pre-composed strings) because the editing steppers edit
+ * them; the subtitle stays pre-composed like the entry's. */
+export type MealPlanDetailPageEntryMember = {
+  /** The member's own id (the row key, host-composed — e.g.
+   * the client-side entry key pattern `recipe:<id>`). */
+  id: string;
+  /** The recipe the member opens, when the host routes member
+   * rows; omit `href` to render the member as plain text. */
+  targetId?: string;
+  href?: string;
+  title: string;
+  subtitle?: string;
+  /** Servings of the member cooked for the meal; the member
+   * servings stepper renders when this and the servings
+   * handler are both present. */
+  servingsToCook?: number;
+  /** Servings of the member eaten; edited with
+   * `servingsToCook` through the same handler. */
+  servingsToEat?: number;
   isUnavailable?: boolean;
 };
 
@@ -295,6 +360,59 @@ type MealPlanDetailPageReadyProps = {
    * flat list exactly as before — the host opts in when it can
    * supply grouped days. The weekly-totals band is unaffected. */
   weekView?: MealPlanDetailPageWeekView | null;
+  /** Inline editing (eciperay #646, tranche 1) — every prop in
+   * this group is optional; omit them all and the page renders
+   * read-only exactly as before. Each handler's presence is
+   * what renders its affordance. */
+  /** Host-reported inline-edit failure, rendered above the
+   * Entries section (e.g. a save conflict that could not be
+   * rebased). */
+  editingError?: string | null;
+  /** Add a meal entry to a day: the host opens its picker and
+   * creates the entry on that day. Renders the day's
+   * "Add meal" button (week and day views). */
+  onAddMealToDay?: (day: MealPlanDetailPageDay) => void;
+  /** Add a standalone recipe entry to a day (both entry kinds
+   * are kept — eciperay #646, open question 2). Renders the
+   * day's "Add recipe" button beside "Add meal". */
+  onAddRecipeToDay?: (day: MealPlanDetailPageDay) => void;
+  /** Add a recipe to a meal entry: the host opens its picker
+   * and adds the recipe to the shared meal. */
+  onAddRecipeToMeal?: (entry: MealPlanDetailPageEntry) => void;
+  /** Delete an entry from the plan: a meal entry's button
+   * reads "Delete meal"; a recipe entry's reads
+   * "Delete recipe". */
+  onDeleteEntry?: (entry: MealPlanDetailPageEntry) => void;
+  /** Report a quantity edit for one entry. */
+  onEntryQuantityChange?: (entry: MealPlanDetailPageEntry, quantity: number) => void;
+  /** Report a servings edit for one recipe entry (cook and
+   * eat are edited independently, per #363). */
+  onEntryServingsChange?: (
+    entry: MealPlanDetailPageEntry,
+    servings: { servingsToCook: number; servingsToEat: number },
+  ) => void;
+  /** Delete one member from a meal entry (edits the shared
+   * meal through the host's meals API). */
+  onDeleteMember?: (
+    entry: MealPlanDetailPageEntry,
+    member: MealPlanDetailPageEntryMember,
+  ) => void;
+  /** Report a servings edit for one meal member (edits the
+   * shared meal through the host's meals API). */
+  onMemberServingsChange?: (
+    entry: MealPlanDetailPageEntry,
+    member: MealPlanDetailPageEntryMember,
+    servings: { servingsToCook: number; servingsToEat: number },
+  ) => void;
+  /** Day view (eciperay #646, tranche 1): the id of the one
+   * day to render, or null/omitted for the full week/flat
+   * rendering. Requires `weekView` days to resolve against. */
+  focusedDayId?: string | null;
+  /** Report a day-view navigation: a day id focuses that day;
+   * null returns to the full rendering. Its presence renders
+   * the per-day "View day" buttons and the day view's
+   * previous/next navigation. */
+  onFocusedDayChange?: (dayId: string | null) => void;
 };
 
 export type MealPlanDetailPageProps =
@@ -370,14 +488,24 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     editHref,
     entries,
     weekView,
+    editingError,
+    onAddMealToDay,
+    onAddRecipeToDay,
+    onAddRecipeToMeal,
+    onDeleteEntry,
+    onEntryQuantityChange,
+    onEntryServingsChange,
+    onDeleteMember,
+    onMemberServingsChange,
+    focusedDayId,
+    onFocusedDayChange,
   } = props;
 
   // One entry row's rendering, shared verbatim by the flat list
   // and the week view's day columns (#660) so navigation and
   // accessibility behaviour are identical in both.
-  const renderEntry = (entry: MealPlanDetailPageEntry) => (
+  const renderEntryRow = (entry: MealPlanDetailPageEntry) => (
     <ListItem
-      key={entry.id}
       prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
       title={entry.title}
       {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
@@ -388,9 +516,244 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     />
   );
 
+  // One meal member's rendering (#646, tranche 1): the member's
+  // row, then its servings steppers and delete action when the
+  // host passes the member handlers. Member edits go to the
+  // shared meal — the entry's `sharedMealNote` labels that
+  // above the member list (rendered by renderEntry below).
+  const renderMember = (
+    entry: MealPlanDetailPageEntry,
+    member: MealPlanDetailPageEntryMember,
+  ) => (
+    <Col key={member.id}>
+      {member.href ? (
+        <ListItem
+          prefix="Recipe · "
+          title={member.title}
+          {...(member.subtitle ? { subtitle: member.subtitle } : {})}
+          {...(member.isUnavailable
+            ? { isDisabled: true, titleSuffix: " (unavailable)" }
+            : {})}
+          href={member.href}
+        />
+      ) : (
+        <>
+          <Text>
+            {"Recipe · "}
+            {member.title}
+            {member.isUnavailable ? " (unavailable)" : ""}
+          </Text>
+          {member.subtitle ? <Text variant="hint">{member.subtitle}</Text> : null}
+        </>
+      )}
+      {onMemberServingsChange && member.servingsToCook !== undefined ? (
+        <>
+          <NumberStepper
+            label={`Servings to cook · ${member.title}`}
+            value={member.servingsToCook}
+            min={0}
+            onChange={(value) => {
+              onMemberServingsChange(entry, member, {
+                servingsToCook: value,
+                servingsToEat: member.servingsToEat ?? member.servingsToCook ?? value,
+              });
+            }}
+          />
+          <NumberStepper
+            label={`Servings to eat · ${member.title}`}
+            value={member.servingsToEat ?? member.servingsToCook}
+            min={0}
+            onChange={(value) => {
+              onMemberServingsChange(entry, member, {
+                servingsToCook: member.servingsToCook ?? value,
+                servingsToEat: value,
+              });
+            }}
+          />
+        </>
+      ) : null}
+      {onDeleteMember ? (
+        <ButtonRow>
+          <Button
+            variant="secondary"
+            tone="danger"
+            size="sm"
+            accessibilityLabel={`Remove ${member.title} from ${entry.title}`}
+            onPress={() => {
+              onDeleteMember(entry, member);
+            }}
+          >
+            Delete
+          </Button>
+        </ButtonRow>
+      ) : null}
+    </Col>
+  );
+
+  // One entry's full rendering (#646, tranche 1): its row, then
+  // — only when the host passes the matching handlers — its
+  // quantity/servings steppers, its meal members, and its
+  // add/delete actions. With no editing handlers this is
+  // exactly the read-only row above.
+  const renderEntry = (entry: MealPlanDetailPageEntry) => (
+    <Col key={entry.id}>
+      {renderEntryRow(entry)}
+      {onEntryQuantityChange && entry.quantity !== undefined ? (
+        <NumberStepper
+          label={`Quantity · ${entry.title}`}
+          value={entry.quantity}
+          min={1}
+          onChange={(value) => {
+            onEntryQuantityChange(entry, value);
+          }}
+        />
+      ) : null}
+      {entry.kind === "recipe" &&
+      onEntryServingsChange &&
+      entry.servingsToCook !== undefined ? (
+        <>
+          <NumberStepper
+            label={`Servings to cook · ${entry.title}`}
+            value={entry.servingsToCook}
+            min={0}
+            onChange={(value) => {
+              onEntryServingsChange(entry, {
+                servingsToCook: value,
+                servingsToEat: entry.servingsToEat ?? entry.servingsToCook ?? value,
+              });
+            }}
+          />
+          <NumberStepper
+            label={`Servings to eat · ${entry.title}`}
+            value={entry.servingsToEat ?? entry.servingsToCook}
+            min={0}
+            onChange={(value) => {
+              onEntryServingsChange(entry, {
+                servingsToCook: entry.servingsToCook ?? value,
+                servingsToEat: value,
+              });
+            }}
+          />
+        </>
+      ) : null}
+      {entry.kind === "meal" && entry.members && entry.members.length > 0 ? (
+        <>
+          {(onMemberServingsChange || onDeleteMember) && entry.sharedMealNote ? (
+            <Text variant="hint">{entry.sharedMealNote}</Text>
+          ) : null}
+          {entry.members.map((member) => renderMember(entry, member))}
+        </>
+      ) : null}
+      {entry.kind === "meal" && onAddRecipeToMeal ? (
+        <ButtonRow>
+          <Button
+            variant="secondary"
+            size="sm"
+            accessibilityLabel={`Add recipe to ${entry.title}`}
+            onPress={() => {
+              onAddRecipeToMeal(entry);
+            }}
+          >
+            Add recipe
+          </Button>
+        </ButtonRow>
+      ) : null}
+      {onDeleteEntry ? (
+        <ButtonRow>
+          <Button
+            variant="secondary"
+            tone="danger"
+            size="sm"
+            accessibilityLabel={
+              entry.kind === "meal" ? `Delete meal ${entry.title}` : `Delete recipe ${entry.title}`
+            }
+            onPress={() => {
+              onDeleteEntry(entry);
+            }}
+          >
+            {entry.kind === "meal" ? "Delete meal" : "Delete recipe"}
+          </Button>
+        </ButtonRow>
+      ) : null}
+    </Col>
+  );
+
   // The week view (#660) renders only when the host supplies at
   // least one day; omitted/null/empty renders the flat list.
   const weekDays = weekView && weekView.days.length > 0 ? weekView.days : null;
+
+  // One day's full rendering (#646, tranche 1), shared by the
+  // week view's columns and the day view: its entries, its
+  // totals strip, then — when the host passes the handlers —
+  // its add actions and (outside the day view) its "View day"
+  // button.
+  const renderDay = (day: MealPlanDetailPageDay, inDayView: boolean) => (
+    <WeekDayColumn
+      key={day.id}
+      label={day.label}
+      {...(day.dateLabel ? { dateLabel: day.dateLabel } : {})}
+    >
+      {day.entries.length > 0 ? (
+        <Col>{day.entries.map(renderEntry)}</Col>
+      ) : (
+        <Text variant="hint">No entries</Text>
+      )}
+      {day.dailyTotals.map((row) => (
+        <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
+      ))}
+      {day.satietyLabel ? <DetailRow label="Satiety" value={day.satietyLabel} /> : null}
+      {onAddMealToDay || onAddRecipeToDay ? (
+        <ButtonRow>
+          {onAddMealToDay ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              accessibilityLabel={`Add meal to ${day.label}`}
+              onPress={() => {
+                onAddMealToDay(day);
+              }}
+            >
+              Add meal
+            </Button>
+          ) : null}
+          {onAddRecipeToDay ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              accessibilityLabel={`Add recipe to ${day.label}`}
+              onPress={() => {
+                onAddRecipeToDay(day);
+              }}
+            >
+              Add recipe
+            </Button>
+          ) : null}
+        </ButtonRow>
+      ) : null}
+      {!inDayView && onFocusedDayChange ? (
+        <ButtonRow>
+          <Button
+            variant="secondary"
+            size="sm"
+            ghost
+            accessibilityLabel={`View ${day.label} on its own`}
+            onPress={() => {
+              onFocusedDayChange(day.id);
+            }}
+          >
+            View day
+          </Button>
+        </ButtonRow>
+      ) : null}
+    </WeekDayColumn>
+  );
+
+  // The day view (#646, tranche 1): one focused day with
+  // previous/next navigation — also the phone presentation.
+  // An unknown focused id falls back to the full rendering.
+  const focusedDayIndex =
+    weekDays && focusedDayId ? weekDays.findIndex((day) => day.id === focusedDayId) : -1;
+  const focusedDay = focusedDayIndex >= 0 && weekDays ? weekDays[focusedDayIndex] : null;
 
   // The app's goals view renders nothing when the plan has
   // neither goal progress nor a nutrition summary — that is the
@@ -474,29 +837,55 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
               Edit
             </Button>
           </ButtonRow>
+          {editingError ? <Alert severity="error" message={editingError} /> : null}
           <SectionCard title="Entries">
-            {weekDays ? (
-              <WeekDayColumns>
-                {weekDays.map((day) => (
-                  <WeekDayColumn
-                    key={day.id}
-                    label={day.label}
-                    {...(day.dateLabel ? { dateLabel: day.dateLabel } : {})}
+            {focusedDay && weekDays ? (
+              <>
+                <ButtonRow>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    accessibilityLabel="Previous day"
+                    disabled={focusedDayIndex <= 0}
+                    onPress={() => {
+                      const previous = weekDays[focusedDayIndex - 1];
+                      if (previous) {
+                        onFocusedDayChange?.(previous.id);
+                      }
+                    }}
                   >
-                    {day.entries.length > 0 ? (
-                      <Col>{day.entries.map(renderEntry)}</Col>
-                    ) : (
-                      <Text variant="hint">No entries</Text>
-                    )}
-                    {day.dailyTotals.map((row) => (
-                      <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
-                    ))}
-                    {day.satietyLabel ? (
-                      <DetailRow label="Satiety" value={day.satietyLabel} />
-                    ) : null}
-                  </WeekDayColumn>
-                ))}
-              </WeekDayColumns>
+                    Previous day
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    accessibilityLabel="Next day"
+                    disabled={focusedDayIndex >= weekDays.length - 1}
+                    onPress={() => {
+                      const next = weekDays[focusedDayIndex + 1];
+                      if (next) {
+                        onFocusedDayChange?.(next.id);
+                      }
+                    }}
+                  >
+                    Next day
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    ghost
+                    accessibilityLabel="Show all days"
+                    onPress={() => {
+                      onFocusedDayChange?.(null);
+                    }}
+                  >
+                    All days
+                  </Button>
+                </ButtonRow>
+                <WeekDayColumns>{renderDay(focusedDay, true)}</WeekDayColumns>
+              </>
+            ) : weekDays ? (
+              <WeekDayColumns>{weekDays.map((day) => renderDay(day, false))}</WeekDayColumns>
             ) : (
               <Col>{entries.map(renderEntry)}</Col>
             )}

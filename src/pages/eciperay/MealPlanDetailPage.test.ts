@@ -143,14 +143,29 @@ test("the view-model and href contract matches the declared props", () => {
   );
 });
 
-test("the actions are exactly the app screen's — no delete, no entry editing", () => {
+test("the actions are the app screen's — no plan delete; entry editing is opt-in (eciperay #646)", () => {
   assert.match(code, />Shopping list<\/Button>/, "the primary action must be the shopping list");
   assert.match(code, />\s*Edit\s*<\/Button>/, "the secondary action must be Edit");
   assert.doesNotMatch(
     code,
-    /onDelete|onPlanDelete|onRemoveEntry|onAddEntry/,
-    "deleting a plan is the list row's action; entry add/remove lives on the form screen",
+    /onDeletePlan|onPlanDelete/,
+    "deleting the plan itself is the list row's action, never this page's",
   );
+  // Inline editing (eciperay #646 tranche 1): the detail page edits
+  // entries in place when the host supplies these callbacks — each
+  // is optional, so a host that omits them gets the read-only page.
+  for (const cb of [
+    "onAddMealToDay",
+    "onAddRecipeToDay",
+    "onAddRecipeToMeal",
+    "onDeleteEntry",
+    "onEntryQuantityChange",
+    "onEntryServingsChange",
+    "onDeleteMember",
+    "onMemberServingsChange",
+  ]) {
+    assert.match(code, new RegExp(`${cb}\\??:`), `the editing callback ${cb} must be declared`);
+  }
 });
 
 test("entry rows are links carrying the entry href, by kind", () => {
