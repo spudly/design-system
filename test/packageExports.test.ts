@@ -113,6 +113,11 @@ const restoredByModule: [string, string[]][] = [
   // and their prop types, so native hosts can compose them.
   ["./views/eciperay/RecipeIngredientRowView.js", ["RecipeIngredientRowView", "RecipeIngredientRowViewProps"]],
   ["./views/eciperay/RecipeInstructionRowView.js", ["RecipeInstructionRowView", "RecipeInstructionRowViewProps"]],
+  // #876 (2026-11-26): Stephen's approved plan adds the same kind
+  // of minimal named exception for the floating feedback surface —
+  // exactly this view and its prop type, so hosts can compose the
+  // bubble + panel around their own feedback form.
+  ["./views/shared/FeedbackBubbleView.js", ["FeedbackBubbleView", "FeedbackBubbleViewProps"]],
 ];
 
 const restoredNames = new Set(restoredByModule.flatMap(([, names]) => names));
@@ -154,8 +159,9 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions 
         "./voice/index.js",
         "./views/eciperay/RecipeIngredientRowView.js",
         "./views/eciperay/RecipeInstructionRowView.js",
+        "./views/shared/FeedbackBubbleView.js",
       ]),
-      `${rel} must re-export from exactly the pages barrel, the #411 source modules, the #539 voice module, and the #671 row-view modules`,
+      `${rel} must re-export from exactly the pages barrel, the #411 source modules, the #539 voice module, the #671 row-view modules, and the #876 feedback-bubble module`,
     );
     // The built JS drops the type-only names (they are erased at
     // compile time); the source and the built declarations carry
@@ -175,6 +181,7 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions 
             "useVoice",
             "RecipeIngredientRowView",
             "RecipeInstructionRowView",
+            "FeedbackBubbleView",
           ])
         : restoredNames;
     assert.deepEqual(
