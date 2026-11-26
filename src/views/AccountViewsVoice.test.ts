@@ -144,6 +144,74 @@ test("FeedbackPreferenceView renders its defaults from the voice object", async 
   }
 });
 
+test("AuthorDisplayView renders its defaults from the voice object, and caller props win", async () => {
+  const { h, AuthorDisplayView, fixtureVoice } = await loadRuntime();
+  const v = fixtureVoice.authorDisplayView;
+  const base = {
+    settings: { displayName: "Jamie Cook", showOnPublicRecipes: true },
+    onChange: noop,
+    onSave: noop,
+  };
+  const html = await renderWithVoice(h(AuthorDisplayView, base));
+  for (const slot of ["title", "displayNameLabel", "displayNamePlaceholder", "hint", "showNameLabel", "saveLabel"]) {
+    assert.ok(html.includes(v[slot]), `slot ${slot} renders from the voice object`);
+  }
+  const caller = await renderWithVoice(h(AuthorDisplayView, { ...base, title: "Caller title" }));
+  assert.ok(caller.includes("Caller title"), "a caller-passed title wins over the voice default");
+  assert.ok(!caller.includes(v.title), "the voice default is displaced by the caller prop");
+});
+
+test("FamilySharingView renders its defaults from the voice object", async () => {
+  const { h, FamilySharingView, fixtureVoice } = await loadRuntime();
+  const v = fixtureVoice.familySharingView;
+  const base = {
+    grants: [
+      {
+        recipientUserId: "user-1",
+        recipientEmail: "alex@example.com",
+        recipientDisplayName: "Alex Cook",
+        createdAt: "2026-10-02T12:00:00.000Z",
+      },
+    ],
+    email: "",
+    onEmailChange: noop,
+    onAdd: noop,
+    onRemove: noop,
+  };
+  const html = await renderWithVoice(h(FamilySharingView, base));
+  for (const slot of ["title", "description", "emailLabel", "emailPlaceholder", "addLabel", "removeLabel"]) {
+    assert.ok(html.includes(v[slot]), `slot ${slot} renders from the voice object`);
+  }
+  assert.ok(html.includes("Alex Cook (alex@example.com)"), "the grant label composes name and email");
+  assert.ok(
+    html.includes(v.addedLabel("Oct 2, 2026")) || html.includes("Added "),
+    "the grant added line renders through the formatter slot",
+  );
+  const empty = await renderWithVoice(h(FamilySharingView, { ...base, grants: [] }));
+  assert.ok(empty.includes(v.emptyMessage), "the empty message renders from the voice object");
+  const loading = await renderWithVoice(h(FamilySharingView, { ...base, grants: [], loading: true }));
+  assert.ok(loading.includes(v.loadingLabel), "the loading label renders from the voice object");
+});
+
+test("ShowLessView renders its defaults from the voice object", async () => {
+  const { h, ShowLessView, fixtureVoice } = await loadRuntime();
+  const v = fixtureVoice.showLessView;
+  const base = {
+    entries: [{ sourceRecipeId: "recipe-1", title: "Spicy Tuna Casserole" }],
+    onUndo: noop,
+  };
+  const html = await renderWithVoice(h(ShowLessView, base));
+  for (const slot of ["title", "description", "undoLabel"]) {
+    assert.ok(html.includes(v[slot]), `slot ${slot} renders from the voice object`);
+  }
+  assert.ok(html.includes("Spicy Tuna Casserole"), "the entry title renders");
+  const empty = await renderWithVoice(h(ShowLessView, { ...base, entries: [] }));
+  assert.ok(empty.includes(v.emptyMessage), "the empty message renders from the voice object");
+  const failed = await renderWithVoice(h(ShowLessView, { ...base, entries: [], loadFailed: true }));
+  assert.ok(failed.includes(v.loadFailedMessage), "the load-failed message renders from the voice object");
+  assert.ok(!failed.includes(v.emptyMessage), "a failed load does not render as empty");
+});
+
 test("SubscriptionView renders its defaults from the voice object", async () => {
   const { h, SubscriptionView, fixtureVoice } = await loadRuntime();
   const v = fixtureVoice.subscriptionView;
