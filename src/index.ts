@@ -43,6 +43,11 @@
  * host can compose sortable ingredient/instruction rows the way
  * the web host does. No other view or widget is exported.
  *
+ * #876 (2026-11-26, approved plan) adds one more named exception
+ * of the same kind: `FeedbackBubbleView` (plus its prop type),
+ * the floating feedback bubble + panel a host composes around
+ * its own feedback form.
+ *
  * Widgets, icons, and the Storybook factories remain in the repo
  * as internal building blocks (src/widgets, src/icons,
  * src/tamagui.config.ts) that the pages are composed from and that
@@ -74,3 +79,7 @@ export {
   RecipeInstructionRowView,
   type RecipeInstructionRowViewProps,
 } from "./views/eciperay/RecipeInstructionRowView.js";
+export {
+  FeedbackBubbleView,
+  type FeedbackBubbleViewProps,
+} from "./views/shared/FeedbackBubbleView.js";

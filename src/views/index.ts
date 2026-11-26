@@ -42,6 +42,10 @@ export { DetailRow, type DetailRowProps } from "./eciperay/DetailRow.js";
 export { DragHandleView, type DragHandleViewProps } from "./eciperay/DragHandleView.js";
 export { EmptyState, type EmptyStateProps } from "./shared/EmptyState.js";
 export {
+  FeedbackBubbleView,
+  type FeedbackBubbleViewProps,
+} from "./shared/FeedbackBubbleView.js";
+export {
   FeedbackPreferenceView,
   type FeedbackPreferenceViewProps,
 } from "./eciperay/FeedbackPreferenceView.js";
