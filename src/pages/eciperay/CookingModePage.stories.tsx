@@ -69,6 +69,22 @@ export const NoFooter: Story = {
   ),
 };
 
+export const Loading: Story = {
+  render: () => (
+    <>
+      <CookingModePage
+        recipeTitle="Skillet Chicken"
+        steps={[]}
+        stepIndex={0}
+        onPrev={() => undefined}
+        onNext={() => undefined}
+        onDone={() => undefined}
+        loading
+      />
+    </>
+  ),
+};
+
 export const FirstStep: Story = {
   render: () => (
     <>

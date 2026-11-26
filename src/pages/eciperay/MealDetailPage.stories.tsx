@@ -36,6 +36,21 @@ export const Default: Story = {
   ),
 };
 
+export const Loading: Story = {
+  render: () => (
+    <>
+      <MealDetailPage
+        footer={eciperayFooterFixture}
+        title={fixture.title}
+        members={[]}
+        cookHref="/meals/sunday-chicken-dinner/cook"
+        editHref="/meals/sunday-chicken-dinner/edit"
+        loading
+      />
+    </>
+  ),
+};
+
 export const WithDirectIngredients: Story = {
   render: () => (
     <>

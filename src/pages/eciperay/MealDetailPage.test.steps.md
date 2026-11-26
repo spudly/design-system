@@ -76,3 +76,16 @@ FirstStep, LastStep, LoadError.
 **Run when:** any of the five pages' sources or stories, or a
 changeset naming any of them. Run only the numbered cases for
 the page(s) that changed.
+
+## MealDetailPage loading skeleton (#874)
+
+Open in `Pages/Eciperay/MealDetailPage`: Loading.
+
+1. Loading: no meal title, notes, or member names render — a
+   title bone and two meta-line bones stand in for them, the
+   Cook meal / Edit row renders as inert skeleton buttons, and
+   the Recipes card holds exactly 3 skeleton member rows. No
+   Ingredients section renders while loading.
+
+**Run when:** MealDetailPage's source or stories, or a
+changeset naming MealDetailPage's loading state.
