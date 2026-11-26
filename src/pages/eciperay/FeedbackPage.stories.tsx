@@ -46,3 +46,21 @@ export const Submitted: Story = {
     </>
   ),
 };
+
+export const FormWithCancel: Story = {
+  render: () => (
+    <>
+      <FeedbackPage
+        footer={eciperayFooterFixture}
+        message="The shopping list didn't keep my checks after I closed the app."
+        onMessageChange={() => undefined}
+        replyEmail="cook@example.com"
+        onReplyEmailChange={() => undefined}
+        isBug
+        onIsBugChange={() => undefined}
+        onSubmit={() => undefined}
+        onCancel={() => undefined}
+      />
+    </>
+  ),
+};

@@ -1,6 +1,7 @@
 import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CheckboxField } from "../../widgets/form/CheckboxField.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
@@ -25,7 +26,13 @@ import { useVoice } from "../../voice/index.js";
  * crosses only as its result, the submit button's disabled
  * boolean (`submitDisabled`). The submitted state crosses as
  * a boolean and swaps the form for the thanks message, as in
- * the app form.
+ * the app form. Cancel (#877) is likewise a bare intent: when
+ * the host supplies `onCancel`, a secondary Cancel button sits
+ * beside Submit in a ButtonRow; its label is the host's
+ * `cancelLabel` prop when given, else the shared
+ * `voice.common.cancelLabel`. With no handler the page renders
+ * exactly as before, and Cancel is never disabled by
+ * `submitting` / `submitDisabled` (the host form's behavior).
  *
  * De-styled for #119: the page renders no layout primitives
  * and sets no styling props. The shell's own section rhythm
@@ -57,6 +64,15 @@ export type FeedbackPageProps = {
   /** The host's validation result: submit is disabled while true. */
   submitDisabled?: boolean;
   onSubmit: () => void;
+  /**
+   * Optional cancel intent (#877): when supplied, a secondary
+   * Cancel button renders beside Submit and reports this
+   * intent. When omitted, no cancel control renders and the
+   * page renders exactly as before.
+   */
+  onCancel?: () => void;
+  /** The cancel button's label (#877): wins over the shared `voice.common.cancelLabel` default. */
+  cancelLabel?: string;
   /** Optional submitted-state next action (#856): "Send more
    * feedback" — an in-place reset intent that returns to the blank
    * form (a callback, not a link, under #248). When supplied, the
@@ -76,11 +92,14 @@ export function FeedbackPage({
   submitted = false,
   submitDisabled = false,
   onSubmit,
+  onCancel,
+  cancelLabel: cancelLabelProp,
   onResetPress,
   footer,
   header,
 }: FeedbackPageProps) {
   const voice = useVoice();
+  const cancelLabel = cancelLabelProp ?? voice.common.cancelLabel;
   return (
     <BigFooterShell footer={footer} header={header}>
       <ScreenContainer variant="padded">
@@ -122,14 +141,21 @@ export function FeedbackPage({
               onCheckedChange={onIsBugChange}
             />
             {error ? <Alert severity="error" message={error} /> : null}
-            <Button
-              variant="primary"
-              disabled={submitDisabled || submitting}
-              onPress={onSubmit}
-              accessibilityLabel={voice.feedbackPage.submitLabel}
-            >
-              {submitting ? voice.feedbackPage.submitPendingLabel : voice.feedbackPage.submitLabel}
-            </Button>
+            <ButtonRow>
+              {onCancel ? (
+                <Button variant="secondary" onPress={onCancel} accessibilityLabel={cancelLabel}>
+                  {cancelLabel}
+                </Button>
+              ) : null}
+              <Button
+                variant="primary"
+                disabled={submitDisabled || submitting}
+                onPress={onSubmit}
+                accessibilityLabel={voice.feedbackPage.submitLabel}
+              >
+                {submitting ? voice.feedbackPage.submitPendingLabel : voice.feedbackPage.submitLabel}
+              </Button>
+            </ButtonRow>
           </>
         )}
       </ScreenContainer>

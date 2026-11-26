@@ -146,6 +146,30 @@ test("FeedbackPage renders its submitted thanks and pending submit label from th
   );
 });
 
+test("FeedbackPage renders its cancel label from the shared voice slot, with the prop winning", async () => {
+  const { h, FeedbackPage, fixtureVoice } = await loadRuntime();
+  const voice = sentinelVoice(fixtureVoice, "common", { cancelLabel: "SENT cancel label" });
+  const withCancel = await renderWithVoice(
+    h(FeedbackPage, { ...feedbackBase, onCancel: noop }),
+    voice,
+  );
+  assert.ok(
+    withCancel.includes("SENT cancel label"),
+    "the cancel label renders from voice.common.cancelLabel when onCancel is supplied",
+  );
+  const caller = await renderWithVoice(
+    h(FeedbackPage, { ...feedbackBase, onCancel: noop, cancelLabel: "Caller cancel" }),
+    voice,
+  );
+  assert.ok(caller.includes("Caller cancel"), "a caller cancelLabel wins over the voice default");
+  assert.ok(!caller.includes("SENT cancel label"), "the voice cancel label is not used");
+  const withoutCancel = await renderWithVoice(h(FeedbackPage, feedbackBase), voice);
+  assert.ok(
+    !withoutCancel.includes("SENT cancel label"),
+    "no cancel control renders when no onCancel handler is supplied",
+  );
+});
+
 const consentSentinels = {
   title: "SENT consent title",
   description: "SENT consent description",
