@@ -31,11 +31,14 @@ import { SearchField } from "../form/SearchField.js";
  *
  * Nav items navigate to other pages, so every item is a LINK
  * with an href (#248's navigation rule) — there is no callback
- * form. An item may carry an icon NAME (#438 Part 4's registry —
- * data, never a component), resolved here and rendered with
+ * form. An item may carry a semantic KIND (#880 — the section
+ * the item leads to, never an icon name or component); the bar
+ * owns icon selection, mapping the kind to a glyph from its own
+ * icon set (`navItemIconsByKind` below) and rendering it with
  * the label (left of it on native's row frame, centered over
  * it in the web column stack, #627), decorative (the label is
- * the item's accessible name). The active item — the host derives it from its route
+ * the item's accessible name). An item with no kind renders
+ * label-only, as before. The active item — the host derives it from its route
  * and passes `activeItemId` — carries the primary-filled
  * treatment Eciperay's host shell uses today (a primary fill
  * with on-primary ink) and is marked current: `aria-current`
@@ -88,6 +91,35 @@ type AppTopBarBrand = {
   mark?: BrandMarkName;
 };
 
+/**
+ * The semantic kinds of nav item the top bar offers (#880):
+ * the section an item leads to, named as data. The bar — not
+ * the host — selects the glyph each kind renders with (see
+ * `navItemIconsByKind` below); hosts never pass an icon name
+ * or component.
+ */
+export type AppTopBarNavItemKind =
+  | "add"
+  | "feedback"
+  | "home"
+  | "meals"
+  | "profile"
+  | "recipes"
+  | "shared"
+  | "tags";
+
+/** The glyph each nav item kind renders with — the bar's own icon selection (#880). */
+const navItemIconsByKind: Record<AppTopBarNavItemKind, IconName> = {
+  add: "add",
+  feedback: "feedback",
+  home: "home",
+  meals: "meals",
+  profile: "profile",
+  recipes: "recipes",
+  shared: "shared",
+  tags: "tags",
+};
+
 export type AppTopBarNavItem = {
   /** The item's identity — the value `activeItemId` names. */
   id: string;
@@ -102,8 +134,12 @@ export type AppTopBarNavItem = {
    * destinations.
    */
   href: string;
-  /** The item's icon, as a NAME from the semantic icon set — data, never a component. */
-  icon?: IconName;
+  /**
+   * The item's semantic kind (#880): the section it leads to.
+   * The bar maps the kind to its own glyph and renders it with
+   * the label; omit it for a label-only item.
+   */
+  kind?: AppTopBarNavItemKind;
 };
 
 export type AppTopBarAction =
@@ -246,7 +282,7 @@ function NavItem({
   active: boolean;
   glyphInks: { active: string; inactive: string };
 }) {
-  const Glyph = item.icon !== undefined ? iconsByName[item.icon] : undefined;
+  const Glyph = item.kind !== undefined ? iconsByName[navItemIconsByKind[item.kind]] : undefined;
   const glyph = Glyph ? (
     <Glyph size={20} color={active ? glyphInks.active : glyphInks.inactive} />
   ) : null;
