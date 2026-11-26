@@ -40,17 +40,20 @@ import {
  * the existing shell has none, and none is invented.
  *
  * Tabs are DATA (memorize#100's contract): per tab an `id`, a
- * `label`, and — button form — an optional icon NAME (#438
- * Part 4's registry; a name, never a component) plus the tab's
- * `content`, the surface the host renders when the tab is active.
+ * `label`, and the tab's `content`, the surface the host renders
+ * when the tab is active. Hosts never select icons (#880): the
+ * page owns icon selection — in the button form it maps the
+ * tab's semantic `id` to a glyph from its own icon set
+ * (`tabIconsById` below) and renders it left of the label; a tab
+ * whose id the page does not know renders with no icon.
  * Navigation follows Stephen's rule, in the Tabs widget's two
  * shipped forms:
  *
  * - Button form (the default; Memorize's shell): tabs switch
  *   in-page content, so they are buttons — the host holds the
- *   active tab and answers `onTabSelect`. A tab's icon name rides
- *   this form only, mirroring Button (its href form omits the
- *   icon slot).
+ *   active tab and answers `onTabSelect`. A tab's DS-chosen icon
+ *   rides this form only, mirroring Button (its href form omits
+ *   the icon slot).
  * - Link form (`variant="link"`): each tab carries an `href` and
  *   navigates, so the tabs are links; the host derives
  *   `activeTabId` from its route and renders the current page as
@@ -103,22 +106,37 @@ import {
  * Placement: page components live in src/pages and are exported
  * from the package root (#298) — pages are the package's only
  * exports. The tab data types surface through the pages barrel
- * like every page's prop types; the icon NAME union they
- * reference stays internal (no icon name or component is a
- * package export) — hosts pass name literals as tab data.
+ * like every page's prop types. No icon name or component is a
+ * package export, and none crosses the tab data either (#880) —
+ * the tab's `id` is its only identity, and the page picks its
+ * glyph.
  */
+
+/**
+ * The glyph each known tab id renders with (#880): the page —
+ * not the host — selects tab icons, mapping the tab's semantic
+ * identity (the `id` the host already passes) to a name in the
+ * DS's internal icon set. A tab whose id is absent here renders
+ * with NO icon — the documented default for unknown ids (e.g.
+ * Memorize's verses / search / review / settings tabs, which
+ * render label-only exactly as they did before #880).
+ */
+const tabIconsById: Partial<Record<string, IconName>> = {
+  add: "add",
+  feedback: "feedback",
+  home: "home",
+  meals: "meals",
+  profile: "profile",
+  recipes: "recipes",
+  shared: "shared",
+  tags: "tags",
+};
 
 export type TabbedShellPageTab = {
   /** The tab's identity — the value `activeTabId` names and `onTabSelect` reports. */
   id: string;
   /** The tab's visible label — also its accessible name. */
   label: string;
-  /**
-   * The tab's icon, as a NAME from the design system's semantic
-   * icon set (#438 Part 4) — data, never a component. The tab bar
-   * resolves the name and renders the glyph left of the label.
-   */
-  icon?: IconName;
   /**
    * The tab's surface: the host's content for this tab (a page,
    * or a lazy component the host defined), rendered through the
@@ -268,11 +286,14 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
   } else {
     tabBar = (
       <Tabs
-        tabs={props.tabs.map((tab) => ({
-          value: tab.id,
-          label: tab.label,
-          ...(tab.icon !== undefined ? { icon: tab.icon } : null),
-        }))}
+        tabs={props.tabs.map((tab) => {
+          const icon = tabIconsById[tab.id];
+          return {
+            value: tab.id,
+            label: tab.label,
+            ...(icon !== undefined ? { icon } : null),
+          };
+        })}
         value={activeTabId ?? ""}
         onValueChange={props.onTabSelect}
         {...(tabsLabel !== undefined ? { label: tabsLabel } : null)}

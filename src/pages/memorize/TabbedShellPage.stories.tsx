@@ -99,7 +99,7 @@ export const TabbedShell: Story = {
   ),
 };
 
-/** Tabs may carry an icon NAME (data) — the glyph renders left of the label. */
+/** Tabs whose ids the page knows render the page's own glyph left of the label (#880). */
 function IconTabsDemo() {
   const [activeTabId, setActiveTabId] = useState<string | null>("home");
   return (
@@ -107,10 +107,10 @@ function IconTabsDemo() {
       title="Tabbed app"
       tabsLabel="App sections"
       tabs={[
-        { id: "home", label: "Home", icon: "home", content: <VersesContent /> },
-        { id: "meals", label: "Meals", icon: "meals", content: <SearchContent /> },
-        { id: "recipes", label: "Recipes", icon: "recipes", content: <ReviewContent /> },
-        { id: "profile", label: "Profile", icon: "profile", content: <SettingsContent /> },
+        { id: "home", label: "Home", content: <VersesContent /> },
+        { id: "meals", label: "Meals", content: <SearchContent /> },
+        { id: "recipes", label: "Recipes", content: <ReviewContent /> },
+        { id: "profile", label: "Profile", content: <SettingsContent /> },
       ]}
       activeTabId={activeTabId}
       onTabSelect={setActiveTabId}

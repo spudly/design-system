@@ -349,3 +349,141 @@ export const LoadingOverlay: Story = {
     </View>
   ),
 };
+
+// Tranche 1 of eciperay #646: the editable week view. Every
+// day carries its Add meal / Add recipe actions and a View day
+// button; the meal entry renders its members with servings
+// steppers under the shared-meal note; recipe entries carry
+// quantity and servings steppers; every entry carries its
+// delete action. Handlers are no-ops here — the story pins the
+// affordances' rendering, the host wires the mutations.
+const editableEntries: MealPlanDetailPageEntry[] = [
+  {
+    id: "entry-sunday-dinner",
+    kind: "meal",
+    targetId: "meal-sunday-dinner",
+    href: "/meals/meal-sunday-dinner",
+    title: "Sunday Dinner",
+    subtitle: "Qty 1 · 3 recipes",
+    quantity: 1,
+    sharedMealNote: "Editing this meal updates it everywhere it's used.",
+    members: [
+      {
+        id: "recipe:recipe-roast",
+        targetId: "recipe-roast",
+        href: "/recipes/recipe-roast",
+        title: "Herb Roast Chicken",
+        subtitle: "Servings to cook: 4 · Servings to eat: 4",
+        servingsToCook: 4,
+        servingsToEat: 4,
+      },
+      {
+        id: "recipe:recipe-salad",
+        targetId: "recipe-salad",
+        href: "/recipes/recipe-salad",
+        title: "Garden Salad",
+        subtitle: "Servings to cook: 4 · Servings to eat: 2",
+        servingsToCook: 4,
+        servingsToEat: 2,
+      },
+    ],
+  },
+  {
+    id: "entry-test-recipe",
+    kind: "recipe",
+    targetId: "recipe-test",
+    href: "/recipes/recipe-test",
+    title: "Test Recipe",
+    subtitle: "Qty 1 · Servings to cook: 4 · Servings to eat: 4",
+    quantity: 1,
+    servingsToCook: 4,
+    servingsToEat: 4,
+  },
+];
+
+const editableDays: MealPlanDetailPageDay[] = weekDays.map((day, index) => ({
+  ...day,
+  entries: index === 0 ? editableEntries : day.entries,
+}));
+
+const noop = () => undefined;
+
+export const Editable: Story = {
+  render: () => (
+    <>
+      <MealPlanDetailPage
+        state="ready"
+        title="This week"
+        notes="Family dinners — keep weeknights simple."
+        dateRangeLabel="2026-10-19 – 2026-10-25"
+        nutritionLabel="2,140 cal · Protein 118 g"
+        nutritionGoals={detailGoals}
+        goalsHref="/meal-plans/this-week/goals"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={editableEntries}
+        weekView={{ days: editableDays }}
+        onAddMealToDay={noop}
+        onAddRecipeToDay={noop}
+        onAddRecipeToMeal={noop}
+        onDeleteEntry={noop}
+        onEntryQuantityChange={noop}
+        onEntryServingsChange={noop}
+        onDeleteMember={noop}
+        onMemberServingsChange={noop}
+        onFocusedDayChange={noop}
+      />
+    </>
+  ),
+};
+
+export const DayView: Story = {
+  // The day view (eciperay #646, tranche 1): one focused day
+  // with previous/next navigation and an All days return —
+  // also the phone presentation for the week view.
+  render: () => (
+    <>
+      <MealPlanDetailPage
+        state="ready"
+        title="This week"
+        dateRangeLabel="2026-10-19 – 2026-10-25"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={editableEntries}
+        weekView={{ days: editableDays }}
+        focusedDayId={editableDays[0]?.id ?? null}
+        onAddMealToDay={noop}
+        onAddRecipeToDay={noop}
+        onAddRecipeToMeal={noop}
+        onDeleteEntry={noop}
+        onEntryQuantityChange={noop}
+        onEntryServingsChange={noop}
+        onDeleteMember={noop}
+        onMemberServingsChange={noop}
+        onFocusedDayChange={noop}
+      />
+    </>
+  ),
+};
+
+export const EditableError: Story = {
+  // An inline edit that failed (e.g. a save conflict the host
+  // could not rebase) surfaces above the Entries section; the
+  // plan itself still renders.
+  render: () => (
+    <>
+      <MealPlanDetailPage
+        state="ready"
+        title="This week"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={editableEntries}
+        weekView={{ days: editableDays }}
+        editingError="That change could not be saved — the plan changed elsewhere. Your latest plan is shown."
+        onAddMealToDay={noop}
+        onDeleteEntry={noop}
+        onFocusedDayChange={noop}
+      />
+    </>
+  ),
+};

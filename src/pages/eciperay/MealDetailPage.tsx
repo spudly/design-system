@@ -1,4 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { LoadingScope } from "../../contexts/LoadingScope.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ListItem } from "../../widgets/data/ListItem.js";
@@ -36,6 +38,18 @@ import { Text } from "../../widgets/data/Text.js";
  * MealPlanDetailPage: member titles take the theme-aware
  * foreground instead of the app's fixed gray10, which is
  * unreadable on a dark theme's card surface.
+ *
+ * Loading (#874, following the #278 pattern): while
+ * `loading`, the page renders a skeleton mirroring the ready
+ * layout — a title bone, two meta-line bones, the Cook meal /
+ * Edit action row as inert skeleton buttons inside a
+ * LoadingScope, and the Recipes section holding exactly 3
+ * dummy member rows rendered through ListItem's loading
+ * state. No real meal content renders in this state, so the
+ * host can mount the page before the meal query resolves
+ * instead of gating on a spinner. The direct-ingredients
+ * section is omitted while loading: whether the meal has any
+ * is itself part of the pending data.
  *
  * De-styled for #119: the page composes DS components only —
  * the sections stack in a Col at gap xxl (wrappers that existed
@@ -96,12 +110,24 @@ export type MealDetailPageProps = {
    * a real link (Stephen's link-naming rule). Omit or pass an
    * empty list and the "Ingredients" section is omitted. */
   ingredients?: MealDetailPageIngredient[];
+  /** Loading state (#874): the page renders its skeleton
+   * layout (see the header's loading note) and no real meal
+   * content. The data props may hold placeholder values in
+   * this state — none of them render. */
+  loading?: boolean;
   /** The cooking-mode destination (#248: navigation crosses as
    * an href, not a press callback). */
   cookHref: string;
   /** The edit destination (#248). */
   editHref: string;
 };
+
+// The dummy skeleton rows for the loading Recipes list
+// (#874): exactly 3, from a frozen module-level constant —
+// never generated per render (the CheckboxSelectList
+// convention). Their values never render (a loading ListItem
+// renders bones in their place).
+const LOADING_MEMBER_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
 export function MealDetailPage({
   title,
@@ -112,7 +138,41 @@ export function MealDetailPage({
   cookHref,
   editHref,
   footer,
+  loading = false,
 }: MealDetailPageProps) {
+  if (loading) {
+    return (
+      <BigFooterShell footer={footer}>
+        <ScreenContainer>
+          <LoadingScope active>
+            <Col gap="xxl">
+              <TextSkeleton size="2xl" lines={1} />
+              <TextSkeleton size="sm" lines={2} />
+              <ButtonRow>
+                <Button onPress={() => {}}>Cook meal</Button>
+                <Button variant="secondary" onPress={() => {}}>
+                  Edit
+                </Button>
+              </ButtonRow>
+              <SectionCard title="Recipes" loading>
+                <Col>
+                  {LOADING_MEMBER_KEYS.map((key) => (
+                    <ListItem
+                      key={key}
+                      title="Recipe"
+                      subtitle="Recipe details"
+                      onPress={() => {}}
+                      loading
+                    />
+                  ))}
+                </Col>
+              </SectionCard>
+            </Col>
+          </LoadingScope>
+        </ScreenContainer>
+      </BigFooterShell>
+    );
+  }
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>

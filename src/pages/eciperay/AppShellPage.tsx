@@ -7,6 +7,7 @@ import {
   AppTopBar,
   type AppTopBarAction,
   type AppTopBarNavItem,
+  type AppTopBarNavItemKind,
   type AppTopBarSearch,
 } from "../../widgets/layout/AppTopBar.js";
 import { LazySlot } from "../../views/shared/LazySlot.js";
@@ -41,13 +42,14 @@ import {
  *   BrandLink home (the wordmark always navigates home, a
  *   canonical destination, so it is always a real link —
  *   Stephen's link-naming rule).
- * - Nav items as DATA: `{ id, label, href, icon? }[]` plus
+ * - Nav items as DATA: `{ id, label, href, kind? }[]` plus
  *   `activeItemId` — every nav item navigates, so every item is
  *   a link with an href (#248's navigation rule); the active
  *   item (the host derives it from its route) carries the
- *   primary-filled treatment. Icons are registry NAMES only
- *   (#438 Part 4) — the host never passes a component, which is
- *   what lets eciperay retire its temporary host-sourced icon
+ *   primary-filled treatment. Hosts never select icons (#880):
+ *   an item's optional semantic `kind` names the section it
+ *   leads to and the top bar picks the glyph, which is what
+ *   lets eciperay retire its temporary host-sourced icon
  *   set (eciperay #451, blocked on this page).
  * - Header actions (optional): caller-supplied data for the
  *   top-bar's right side (e.g. Sign in / account), following
@@ -99,12 +101,15 @@ import {
  * Placement: page components live in src/pages and are exported
  * from the package root (#298) — pages are the package's only
  * exports. The nav/action data types surface through the pages
- * barrel like every page's prop types; the icon NAME union they
- * reference stays internal (no icon name or component is a
- * package export) — hosts pass name literals as nav data.
+ * barrel like every page's prop types. No icon name or
+ * component is a package export, and none crosses the nav data
+ * either (#880) — an item's semantic `kind` is the only icon
+ * input, and the top bar picks its glyph.
  */
 
 export type AppShellPageNavItem = AppTopBarNavItem;
+
+export type AppShellPageNavItemKind = AppTopBarNavItemKind;
 
 export type AppShellPageAction = AppTopBarAction;
 

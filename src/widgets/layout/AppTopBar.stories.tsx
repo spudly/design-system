@@ -20,16 +20,16 @@ export default meta;
 type Story = StoryObj<typeof AppTopBar>;
 
 const eciperayNav = [
-  { id: "home", label: "Home", href: "/", icon: "home" as const },
-  { id: "recipes", label: "Recipes", href: "/recipes", icon: "recipes" as const },
-  { id: "meals", label: "Meals", href: "/meals", icon: "meals" as const },
-  { id: "shared", label: "Shared with me", href: "/shared", icon: "shared" as const },
-  { id: "add", label: "Add", href: "/add", icon: "add" as const },
-  { id: "tags", label: "Tags", href: "/tags", icon: "tags" as const },
-  { id: "profile", label: "Profile", href: "/profile", icon: "profile" as const },
+  { id: "home", label: "Home", href: "/", kind: "home" as const },
+  { id: "recipes", label: "Recipes", href: "/recipes", kind: "recipes" as const },
+  { id: "meals", label: "Meals", href: "/meals", kind: "meals" as const },
+  { id: "shared", label: "Shared with me", href: "/shared", kind: "shared" as const },
+  { id: "add", label: "Add", href: "/add", kind: "add" as const },
+  { id: "tags", label: "Tags", href: "/tags", kind: "tags" as const },
+  { id: "profile", label: "Profile", href: "/profile", kind: "profile" as const },
 ];
 
-/** Brand link, icon nav with Recipes current, and a callback header action. */
+/** Brand link, kind nav with Recipes current, and a callback header action. */
 export const Default: Story = {
   args: {
     brand: { label: "Eciperay", href: "/", mark: "eciperay" },
@@ -77,11 +77,11 @@ export const WordmarkOnlyBrand: Story = {
   },
 };
 
-/** Label-only nav (no icon names) with link-form header actions. */
+/** Label-only nav (no item kinds) with link-form header actions. */
 export const LabelOnlyNav: Story = {
   args: {
     brand: { label: "Eciperay", href: "/", mark: "eciperay" },
-    navItems: eciperayNav.map(({ icon: _icon, ...item }) => item),
+    navItems: eciperayNav.map(({ kind: _kind, ...item }) => item),
     navLabel: "Eciperay sections",
     activeItemId: "home",
     actions: [
@@ -92,12 +92,12 @@ export const LabelOnlyNav: Story = {
 };
 
 const phoneNav = [
-  { id: "home", label: "Home", href: "/", icon: "home" as const },
-  { id: "recipes", label: "Recipes", href: "/recipes", icon: "recipes" as const },
-  { id: "meals", label: "Meals", href: "/meals", icon: "meals" as const },
-  { id: "add", label: "Add", href: "/add", icon: "add" as const },
-  { id: "tags", label: "Tags", href: "/tags", icon: "tags" as const },
-  { id: "profile", label: "Profile", href: "/profile", icon: "profile" as const },
+  { id: "home", label: "Home", href: "/", kind: "home" as const },
+  { id: "recipes", label: "Recipes", href: "/recipes", kind: "recipes" as const },
+  { id: "meals", label: "Meals", href: "/meals", kind: "meals" as const },
+  { id: "add", label: "Add", href: "/add", kind: "add" as const },
+  { id: "tags", label: "Tags", href: "/tags", kind: "tags" as const },
+  { id: "profile", label: "Profile", href: "/profile", kind: "profile" as const },
 ];
 
 const phoneWidthArgs = {

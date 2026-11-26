@@ -7,8 +7,10 @@
  * 1. The frame is exported from the pages barrel; its props and
  *    nav/action data are type aliases (the repo-wide rule,
  *    #214). Nav crosses as DATA: id + label + href + optional
- *    icon NAME (the navigation rule: a nav item navigates, so
- *    it is a link — there is no callback nav form). Actions
+ *    semantic kind (#880 — the top bar picks the glyph; hosts
+ *    never pass an icon name) (the navigation rule: a nav item
+ *    navigates, so it is a link — there is no callback nav
+ *    form). Actions
  *    follow the href-vs-callback split: an `href` action
  *    navigates, an `onPress` action acts in place.
  * 2. The page composes DS components only — no direct Tamagui
@@ -153,13 +155,13 @@ const sentinelNav = [
     id: "home",
     label: "Home",
     href: "/",
-    icon: "home" as const,
+    kind: "home" as const,
   },
   {
     id: "recipes",
     label: "Recipes",
     href: "/recipes",
-    icon: "recipes" as const,
+    kind: "recipes" as const,
   },
   {
     id: "profile",

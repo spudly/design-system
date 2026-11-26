@@ -79,6 +79,7 @@ export {
   type AppShellPageConsentBanner,
   type AppShellPageInstallBanner,
   type AppShellPageNavItem,
+  type AppShellPageNavItemKind,
   type AppShellPageProps,
   type AppShellPageSearch,
 } from "./eciperay/AppShellPage.js";

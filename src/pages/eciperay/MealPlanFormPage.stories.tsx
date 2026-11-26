@@ -151,3 +151,25 @@ export const NoSelection: Story = {
     </>
   ),
 };
+
+export const DetailsOnly: Story = {
+  // Details-only mode (eciperay #646, tranche 1): the host
+  // omits every entry prop, so the form is title, notes, and
+  // dates alone — the create flow's form, whose submit creates
+  // an empty plan and lands on the view page to fill it. The
+  // submit button is enabled with a title and no entries.
+  render: () => (
+    <MealPlanFormPage
+      footer={eciperayFooterFixture}
+      title="New plan"
+      onTitleChange={() => undefined}
+      notes=""
+      onNotesChange={() => undefined}
+      startsOn="2026-10-19"
+      onStartsOnChange={() => undefined}
+      endsOn="2026-10-25"
+      onEndsOnChange={() => undefined}
+      onSubmit={() => undefined}
+    />
+  ),
+};

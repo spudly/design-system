@@ -6,16 +6,17 @@
  * The contracts pinned here:
  * 1. The frame is exported from the pages barrel; its props and
  *    tab data are type aliases (the repo-wide rule, #214). Tabs
- *    cross as DATA: button-form tabs carry id + label + optional
- *    icon NAME + slotted content; link-form tabs carry id +
- *    label + href and NO content or icon (the navigation rule's
- *    two forms, mirroring Tabs and Button).
+ *    cross as DATA: button-form tabs carry id + label + slotted
+ *    content; link-form tabs carry id + label + href and NO
+ *    content (the navigation rule's two forms, mirroring Tabs
+ *    and Button). Hosts never select icons (#880): the page maps
+ *    a button-form tab's id to its own glyph internally — a
+ *    known id renders its glyph, an unknown id renders none.
  * 2. The page composes DS components only — no direct Tamagui
  *    imports (#297's rule), no styling props, and NO
  *    ChunkErrorBoundary: lazy content renders through the
  *    internal LazySlot view, so hosts never import the boundary.
- *    The icon NAME type is referenced from the internal registry;
- *    no icon component is imported.
+ *    No icon component is imported.
  * 3. Behavior (element tree + SSR): the active tab's content —
  *    and only it — renders through the slot; the slot is keyed
  *    by the active surface (the boundary's keyed-remount
@@ -124,10 +125,9 @@ const sentinelTabs = (React: any) => [
     content: <span>VERSES SURFACE</span>,
   },
   {
-    id: "search",
-    label: "Search",
-    icon: "tags",
-    content: <span>SEARCH SURFACE</span>,
+    id: "tags",
+    label: "Tags",
+    content: <span>TAGS SURFACE</span>,
   },
 ];
 test("the slot renders only the active tab's content, keyed by the active surface", async () => {
@@ -137,7 +137,7 @@ test("the slot renders only the active tab's content, keyed by the active surfac
     title: "Memorize",
     tabsLabel: "Memorize sections",
     tabs: sentinelTabs(React),
-    activeTabId: "search",
+    activeTabId: "tags",
     onTabSelect,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
@@ -149,27 +149,29 @@ test("the slot renders only the active tab's content, keyed by the active surfac
     label: "Memorize",
   });
   // The tab bar receives the tabs mapped to the Tabs contract:
-  // id → value, icon name carried through as data.
+  // id → value, and the page's own icon selection (#880) — the
+  // known "tags" id carries its glyph as data, the unknown
+  // "verses" id carries none.
   assert.deepEqual(tabBar.props.tabs, [
     {
       value: "verses",
       label: "My verses",
     },
     {
-      value: "search",
-      label: "Search",
+      value: "tags",
+      label: "Tags",
       icon: "tags",
     },
   ]);
-  assert.equal(tabBar.props.value, "search");
+  assert.equal(tabBar.props.value, "tags");
   assert.equal(tabBar.props.onValueChange, onTabSelect);
   assert.equal(tabBar.props.label, "Memorize sections");
   // The content region is the internal LazySlot, keyed by the
   // active surface so switching tabs remounts it (a failure on
   // one surface clears when another is selected).
   assert.equal(slot.type, distViews.LazySlot);
-  assert.equal(slot.key, "search");
-  assert.equal(slot.props.children.props.children, "SEARCH SURFACE");
+  assert.equal(slot.key, "tags");
+  assert.equal(slot.props.children.props.children, "TAGS SURFACE");
 });
 test("an override surface replaces tab content with no tab selected; contentKey wins", async () => {
   const { React, TabbedShellPage } = await loadRuntime();

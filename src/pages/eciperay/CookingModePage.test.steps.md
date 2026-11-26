@@ -53,3 +53,15 @@ Open in `Views/ScaledIngredientsView`: OnOverlay.
 **Run when:** `src/views/eciperay/ScaledIngredientsView.tsx`, its
 stories, CookingModePage, or a changeset naming
 ScaledIngredientsView.
+
+## CookingModePage loading skeleton (#874)
+
+Open in `Pages/Eciperay/CookingModePage`: Loading.
+
+1. Loading: no step label, step body, or nav controls render —
+   a title bone, a step-label bone, and four body-line bones
+   stand in for them inside the full-screen shell, even though
+   the story passes no steps.
+
+**Run when:** CookingModePage's source or stories, or a
+changeset naming CookingModePage's loading state.
