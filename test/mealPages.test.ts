@@ -208,7 +208,7 @@ test("MealPlanFormPage servings-to-eat controls render alongside servings-to-coo
     "eat edits report through the eat callback",
   );
   assert.ok(
-    page.includes("onRecipeServingsChange(recipeId, value)"),
+    page.includes("onRecipeServingsChange?.(recipeId, value)"),
     "cook edits still report through the cook callback, independently of the eat callback",
   );
 });
