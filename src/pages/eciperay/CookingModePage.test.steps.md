@@ -15,7 +15,7 @@ release's changed components. The full index lives in
 ## CookingModePage
 
 Open in `Pages/Eciperay/CookingModePage`: WithIngredientsPanel,
-FirstStep, LastStep, NoFooter.
+FirstStep, LastStep, NoFooter, CookLogFormOpen.
 
 1. WithIngredientsPanel: the scaled-ingredients panel renders
    between the "Step 2 of 3" label and the step body — heading
@@ -31,6 +31,11 @@ FirstStep, LastStep, NoFooter.
    is present.
 4. The progress dots track the step (second dot active in
    WithIngredientsPanel, first in FirstStep, third in LastStep).
+5. CookLogFormOpen (#871): the dark RatingForm renders centered
+   on the dark overlay in place of the step view — title, stars,
+   notes field, and Skip/Save actions visible and reachable, no
+   step label/body/nav and no Done pill. (The Save disabled-look
+   while pending is covered by RatingForm's own steps.)
 
 **Run when:** `src/pages/eciperay/CookingModePage.tsx`, its stories,
 `src/widgets/overlays/StepOverlay.tsx`, `src/views/eciperay/ScaledIngredientsView.tsx`,
