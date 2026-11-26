@@ -60,10 +60,17 @@ test("BrandMark carries the Eciperay mark geometry, ported from the logo (#726)"
 
 test("BrandMark carries the Memorize mark, ported from Stephen's concept-1 pick in Quiet Dawn (#861)", () => {
   assert.match(brandMark, /case "memorize":/, "the Memorize case renders");
-  assert.match(brandMark, /MEMORIZE_MARK_FIELD = "#faf8f2"/, "the warm-paper field");
   assert.match(brandMark, /MEMORIZE_MARK_BOOK = "#0f766e"/, "the deep teal book");
-  assert.match(brandMark, /MEMORIZE_MARK_ACCENT = "#b45309"/, "the gold rays, flame, and bookmark");
-  assert.match(brandMark, /fill=\{MEMORIZE_MARK_FIELD\}/, "the field renders in Quiet Dawn paper");
+  assert.match(
+    brandMark,
+    /MEMORIZE_MARK_ACCENT = "#f59e0b"/,
+    "the gold rays, flame, and bookmark — warning6, lightened per Stephen 2026-11-25",
+  );
+  assert.ok(
+    !brandMark.includes("MEMORIZE_MARK_FIELD"),
+    "no background field — the mark renders on transparency (Stephen, 2026-11-25)",
+  );
+  assert.match(brandMark, /MEMORIZE_PAGE_LINE_PATH/, "the rebuilt page-block line is part of the port");
   assert.match(brandMark, /fill=\{MEMORIZE_MARK_BOOK\}/, "the open book renders in deep teal");
   assert.match(brandMark, /fill=\{MEMORIZE_MARK_ACCENT\}/, "the rays and flame render in gold");
   assert.match(brandMark, /MEMORIZE_FLAME_PATH/, "the central flame is part of the port");
