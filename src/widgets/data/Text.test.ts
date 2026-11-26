@@ -98,7 +98,7 @@ describe("textVariants", () => {
   test("the formTitle variant is the 2xl bold form-flow title", () => {
     assert.match(
       code,
-      /formTitle: \{\s+fontSize: tokens\.typography\.fontSize\["2xl"\],\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+fontFamily: "\$display",\s+\},/,
+      /formTitle: \{\s+fontSize: tokens\.typography\.fontSize\["2xl"\],\s+fontWeight: "\$4",\s+fontFamily: "\$display",\s+\},/,
     );
   });
 
@@ -118,7 +118,7 @@ describe("textVariants", () => {
   test("the display variant is the 3xl bold display title (#721, #851)", () => {
     assert.match(
       code,
-      /display: \{\s+fontSize: tokens\.typography\.fontSize\["3xl"\],\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+fontFamily: "\$display",\s+\},/,
+      /display: \{\s+fontSize: tokens\.typography\.fontSize\["3xl"\],\s+fontWeight: "\$4",\s+fontFamily: "\$display",\s+\},/,
     );
     assert.match(code, /"display"/, "display must be in the public TextProps union");
   });

@@ -136,7 +136,7 @@ test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 
   const text = readCode("src/widgets/data/Text.tsx");
   assert.match(
     text,
-    /title: \{\s+fontSize: tokens\.typography\.fontSize\.xl,\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+fontFamily: "\$display",\s+\}/,
+    /title: \{\s+fontSize: tokens\.typography\.fontSize\.xl,\s+fontWeight: "\$4",\s+fontFamily: "\$display",\s+\}/,
     "Text's title variant must carry the xl/bold treatment the page title rendered with",
   );
 });

@@ -20,6 +20,17 @@
  *    config: a config built from eciperayTheme carries the serif
  *    family, one built from memorizeTheme or baseTheme carries
  *    the sans family, and the `heading` font is the display font.
+ * 5. Display title weights follow the same per-brand pattern:
+ *    the base `displayFontWeight` tokens carry the standard steps
+ *    (semibold 600 / bold 700, identical to `fontWeight`); Warm
+ *    Harvest overrides both title steps to the medium step (500)
+ *    — Georgia's two faces make the intermediate semibold step
+ *    render as bold, so medium is the first step that visibly
+ *    lightens its serif titles (Stephen, 2026-11-25); Quiet Dawn
+ *    declares no override. The registered `display` font's weight
+ *    scale carries the brand's steps in its semibold/bold slots;
+ *    the `body` font's scale keeps the standard steps under every
+ *    brand.
  *
  * Assertions are on token values and registered config behavior
  * (imports only — no source scans).
@@ -98,4 +109,34 @@ test("the registered display font follows the brand config", () => {
 
   const baseConfig = createTamaguiConfig(baseTheme);
   assert.equal(baseConfig.fonts.display.family, baseConfig.fonts.body.family);
+});
+
+test("display title weights: base steps standard, Warm Harvest at medium, Quiet Dawn inherits", () => {
+  const { fontWeight, displayFontWeight } = tokens.typography;
+  assert.equal(displayFontWeight.semibold, fontWeight.semibold);
+  assert.equal(displayFontWeight.bold, fontWeight.bold);
+  assert.deepEqual(baseTheme.tokens.typography.displayFontWeight, displayFontWeight);
+  const warmHarvest = eciperayTheme.tokens.typography.displayFontWeight;
+  assert.equal(warmHarvest.semibold, fontWeight.medium);
+  assert.equal(warmHarvest.bold, fontWeight.medium);
+  assert.deepEqual(memorizeTheme.tokens.typography.displayFontWeight, displayFontWeight);
+});
+
+function weightStep(font: unknown, key: string): string {
+  const weight = (font as { weight: Record<string, { val: string } | string> }).weight[key];
+  return typeof weight === "string" ? weight : weight.val;
+}
+
+test("the registered display font's weight scale carries the brand's title steps", () => {
+  const { fontWeight } = tokens.typography;
+  const eciperayConfig = createTamaguiConfig(eciperayTheme);
+  assert.equal(weightStep(eciperayConfig.fonts.display, "3"), String(fontWeight.medium));
+  assert.equal(weightStep(eciperayConfig.fonts.display, "4"), String(fontWeight.medium));
+  // The body font's scale keeps the standard steps under the same brand.
+  assert.equal(weightStep(eciperayConfig.fonts.body, "3"), String(fontWeight.semibold));
+  assert.equal(weightStep(eciperayConfig.fonts.body, "4"), String(fontWeight.bold));
+
+  const memorizeConfig = createTamaguiConfig(memorizeTheme);
+  assert.equal(weightStep(memorizeConfig.fonts.display, "3"), String(fontWeight.semibold));
+  assert.equal(weightStep(memorizeConfig.fonts.display, "4"), String(fontWeight.bold));
 });

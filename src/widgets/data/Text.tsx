@@ -13,7 +13,14 @@ const StyledText = styled(TamaguiText, {
     variant: {
       heading: {
         fontSize: tokens.typography.fontSize["3xl"],
-        fontWeight: tokens.typography.fontWeight.bold,
+        // The display font's bold weight slot (#851): the weight
+        // resolves through the registered `display` font's scale,
+        // whose steps the brand's displayFontWeight tokens carry —
+        // the standard bold step, or one step lighter under Warm
+        // Harvest, whose serif titles Stephen called too heavy at
+        // full bold (2026-11-25). The title variants never name a
+        // numeric weight: the scale is the theme's lever.
+        fontWeight: "$4",
         // The registered `display` font (#851): the brand's title
         // treatment — serif under Warm Harvest, the UI sans
         // elsewhere. See the component's fontFamily prop below.
@@ -21,17 +28,17 @@ const StyledText = styled(TamaguiText, {
       },
       title: {
         fontSize: tokens.typography.fontSize.xl,
-        fontWeight: tokens.typography.fontWeight.bold,
+        fontWeight: "$4",
         fontFamily: "$display",
       },
       formTitle: {
         fontSize: tokens.typography.fontSize["2xl"],
-        fontWeight: tokens.typography.fontWeight.bold,
+        fontWeight: "$4",
         fontFamily: "$display",
       },
       display: {
         fontSize: tokens.typography.fontSize["3xl"],
-        fontWeight: tokens.typography.fontWeight.bold,
+        fontWeight: "$4",
         fontFamily: "$display",
       },
       label: {
@@ -43,7 +50,11 @@ const StyledText = styled(TamaguiText, {
       },
       subheading: {
         fontSize: tokens.typography.fontSize.xl,
-        fontWeight: tokens.typography.fontWeight.semibold,
+        // The display font's semibold weight slot (#851): resolves
+        // through the same per-brand scale as the bold titles
+        // above — the standard semibold step, one step lighter
+        // under Warm Harvest.
+        fontWeight: "$3",
         fontFamily: "$display",
       },
       body: {

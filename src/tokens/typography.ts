@@ -162,6 +162,25 @@ const fontWeight = {
   bold: 700,
 } as const;
 
+/**
+ * Font weights for the `display` role — the steps the title-bearing
+ * Text variants (heading / title / formTitle / display at the `bold`
+ * step, subheading at the `semibold` step) resolve to. The variants
+ * reference the registered `display` font's weight scale, and the
+ * registration builds that scale from these values (see
+ * tamagui.config), so a theme carries its title weights here rather
+ * than in a component. The base role carries the standard steps —
+ * identical to `fontWeight` — so a theme that declares no display
+ * weight override keeps today's title weights; Warm Harvest
+ * overrides the two title steps down to the medium step (its
+ * Georgia serif ships only regular/bold faces, and Stephen called
+ * the serif titles too heavy at the standard steps, 2026-11-25).
+ */
+const displayFontWeight = {
+  semibold: 600,
+  bold: 700,
+} as const;
+
 /** Line heights (unitless multipliers). */
 const lineHeight = {
   tight: 1.25,
@@ -169,4 +188,4 @@ const lineHeight = {
   relaxed: 1.75,
 } as const;
 
-export const typography = { fontFamily, fontSize, fontWeight, lineHeight } as const;
+export const typography = { fontFamily, fontSize, fontWeight, displayFontWeight, lineHeight } as const;
