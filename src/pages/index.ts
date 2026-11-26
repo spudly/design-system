@@ -124,6 +124,9 @@ export {
   type ProfilePageAccountData,
   type ProfilePageTransfer,
   type ProfilePageFeedbackPreference,
+  type ProfilePageAuthorDisplay,
+  type ProfilePageFamilySharing,
+  type ProfilePageShowLess,
   type ProfilePageLegalLink,
 } from "./eciperay/ProfilePage.js";
 export { ImportTextPage, type ImportTextPageProps } from "./eciperay/ImportTextPage.js";

@@ -29,6 +29,18 @@ import {
   NutritionGoalsForm,
   type NutritionGoalsFormProps,
 } from "../../views/eciperay/NutritionGoalsForm.js";
+import {
+  AuthorDisplayView,
+  type AuthorDisplayViewProps,
+} from "../../views/eciperay/AuthorDisplayView.js";
+import {
+  FamilySharingView,
+  type FamilySharingViewProps,
+} from "../../views/eciperay/FamilySharingView.js";
+import {
+  ShowLessView,
+  type ShowLessViewProps,
+} from "../../views/eciperay/ShowLessView.js";
 
 // The section view-models live with the views (#438 Part 3);
 // the page's contract names are aliases, so consumers of the
@@ -38,6 +50,9 @@ export type ProfilePageSubscription = SubscriptionViewProps;
 export type ProfilePageAccountData = AccountDataViewProps;
 export type ProfilePageTransfer = TransferRecipesViewProps;
 export type ProfilePageFeedbackPreference = FeedbackPreferenceViewProps;
+export type ProfilePageAuthorDisplay = AuthorDisplayViewProps;
+export type ProfilePageFamilySharing = FamilySharingViewProps;
+export type ProfilePageShowLess = ShowLessViewProps;
 type ProfilePageNutritionGoals = NutritionGoalsFormProps;
 type ProfilePageAccessTokens = AccessTokensPanelProps;
 
@@ -57,7 +72,10 @@ export type ProfilePageLegalLink = {
  * order. The nutrition-goals and access-tokens sections are
  * covered by the `nutritionGoals` / `accessTokens` data props
  * (#511), and every section is composed by the page itself
- * from data props (#685).
+ * from data props (#685). The author-display, family-sharing,
+ * and show-less sections — the last three hosts rendered
+ * themselves — are covered by the `authorDisplay` /
+ * `familySharing` / `showLess` data props (#873).
  *
  * No render slots remain: the feedback position is served by
  * the `feedbackPreferenceSection` data prop (#680), the generic
@@ -113,6 +131,17 @@ export type ProfilePageProps = {
    * before-feedback position, in that order.
    */
   subscription?: ProfilePageSubscription;
+  /**
+   * The last three host-rendered profile sections, covered
+   * as data props in #873: `showLess`, `authorDisplay`, and
+   * `familySharing` render at the before-feedback position,
+   * in that order — the relative order the host ProfilePage
+   * places them today, directly ahead of the feedback
+   * position.
+   */
+  authorDisplay?: ProfilePageAuthorDisplay;
+  familySharing?: ProfilePageFamilySharing;
+  showLess?: ProfilePageShowLess;
   feedbackPreferenceSection?: ProfilePageFeedbackPreference;
   transfer?: ProfilePageTransfer;
   accountData?: ProfilePageAccountData;
@@ -127,6 +156,9 @@ export function ProfilePage({
   showcaseHref,
   legalLinks,
   subscription,
+  authorDisplay,
+  familySharing,
+  showLess,
   feedbackPreferenceSection,
   transfer,
   accountData,
@@ -152,6 +184,9 @@ export function ProfilePage({
             Manage Tags
           </Button>
         ) : null}
+        {showLess ? <ShowLessView {...showLess} /> : null}
+        {authorDisplay ? <AuthorDisplayView {...authorDisplay} /> : null}
+        {familySharing ? <FamilySharingView {...familySharing} /> : null}
         {feedbackPreferenceSection ? (
           <FeedbackPreferenceView {...feedbackPreferenceSection} />
         ) : null}

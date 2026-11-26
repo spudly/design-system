@@ -8,6 +8,20 @@
  * as they reach widgets.
  */
 export { AccessTokensPanel, type AccessTokensPanelProps } from "./eciperay/AccessTokensPanel.js";
+export {
+  AuthorDisplayView,
+  type AuthorDisplayViewProps,
+} from "./eciperay/AuthorDisplayView.js";
+export {
+  FamilySharingView,
+  type FamilySharingGrant,
+  type FamilySharingViewProps,
+} from "./eciperay/FamilySharingView.js";
+export {
+  ShowLessView,
+  type ShowLessEntry,
+  type ShowLessViewProps,
+} from "./eciperay/ShowLessView.js";
 export { AccountDataView, type AccountDataViewProps } from "./eciperay/AccountDataView.js";
 export {
   CatalogFiltersBar,
