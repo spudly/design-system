@@ -84,6 +84,32 @@ export const FirstStep: Story = {
   ),
 };
 
+/**
+ * The cook-log form open (#871): the host passes `cookLogForm`
+ * data (from its Done handling), and the page replaces the
+ * step view with the dark RatingForm — a valid step sits
+ * underneath, so the capture proves the form replaces it.
+ */
+export const CookLogFormOpen: Story = {
+  render: () => (
+    <>
+      <CookingModePage
+        recipeTitle="Skillet Chicken"
+        steps={steps}
+        stepIndex={1}
+        cookLogForm={{
+          onSubmit: () => undefined,
+          onSkip: () => undefined,
+          isPending: false,
+        }}
+        onPrev={() => undefined}
+        onNext={() => undefined}
+        onDone={() => undefined}
+      />
+    </>
+  ),
+};
+
 export const LastStep: Story = {
   render: () => (
     <>
