@@ -2,6 +2,7 @@ import { FullScreenShell } from "../../widgets/layout/FullScreenShell.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { Col } from "../../widgets/layout/Col.js";
+import { RatingForm } from "../../widgets/form/RatingForm.js";
 import { StepOverlay } from "../../widgets/overlays/StepOverlay.js";
 import { ScaledIngredientsView } from "../../views/eciperay/ScaledIngredientsView.js";
 import { StepNavControls } from "../shared/StepNavControls.js";
@@ -52,6 +53,21 @@ import { StepNavControls } from "../shared/StepNavControls.js";
  *   on a spinner. The loading state is checked before the
  *   out-of-range rule: a host in this state may legitimately
  *   hold no steps yet.
+ *
+ * The cook-log form (#871, following the #687 pattern on
+ * RecipeDetailPage/RecipesPage): the form is rendered by the
+ * page itself — the DS RatingForm in its dark variant (the
+ * variant built for this dark overlay), driven by the
+ * top-level `cookLogForm` data prop. While the form data is
+ * present, the form replaces the step view entirely — the
+ * same replacement-state semantics both hosts used for their
+ * local forms. The form's rating/notes state stays inside
+ * the form; only the submit view-model, the skip intent, and
+ * the pending flag cross the boundary. The open/closed state,
+ * the mutation, and navigation stay host-side: the host opens
+ * the form from its Done handling by passing the prop, and
+ * exits cooking mode from its own onSkip / submit-success
+ * handling.
  */
 
 export type CookingModePageStep = {
@@ -67,6 +83,24 @@ export type CookingModePageIngredients = {
   lines: string[];
 };
 
+/** The cook-log form's submit view-model (#871, the #687 shape). */
+export type CookingModePageCookLogFormValues = {
+  rating: 1 | 2 | 3 | 4 | 5 | null;
+  notes: string | null;
+};
+
+export type CookingModePageCookLogForm = {
+  onSubmit: (values: CookingModePageCookLogFormValues) => void;
+  onSkip: () => void;
+  isPending: boolean;
+  /** Defaults to the voice object's ratingForm title (#539). */
+  title?: string;
+  /** Defaults to the voice object's ratingForm notesPlaceholder (#539). */
+  notesPlaceholder?: string;
+  /** Defaults to the voice object's ratingForm secondaryLabel (#539). */
+  secondaryLabel?: string;
+};
+
 export type CookingModePageProps = {
   recipeTitle: string;
   steps: CookingModePageStep[];
@@ -77,13 +111,21 @@ export type CookingModePageProps = {
   loading?: boolean;
   /** The scaled-ingredients panel; omit (or pass null) to hide it. */
   ingredients?: CookingModePageIngredients | null;
+  /** The cook-log form as data (#871): when present, the page
+   * renders the DS RatingForm (dark variant) itself in place
+   * of the step view. The form's rating/notes state stays
+   * inside the form; only the submit view-model, the skip
+   * intent, and the pending flag cross the boundary — the
+   * mutation itself stays app-side. Omit (or pass null) for
+   * the normal step view. */
+  cookLogForm?: CookingModePageCookLogForm | null;
   onPrev: () => void;
   onNext: () => void;
   onDone: () => void;
 };
 
 export function CookingModePage(props: CookingModePageProps) {
-  const { recipeTitle, steps, stepIndex, ingredients, onPrev, onNext, onDone, loading = false } = props;
+  const { recipeTitle, steps, stepIndex, ingredients, cookLogForm, onPrev, onNext, onDone, loading = false } = props;
   if (loading) {
     return (
       <FullScreenShell>
@@ -97,6 +139,36 @@ export function CookingModePage(props: CookingModePageProps) {
       </FullScreenShell>
     );
   }
+
+
+  // The cook-log form branch resolves before the step guard
+  // (#871): the hosts open the form from Done on any step, so
+  // its presence replaces the step view independent of the
+  // current step state. The form renders through StepOverlay's
+  // panel mode — the overlay's dark shell, scroll column, and
+  // focus containment, with no step content and no Done pill
+  // (the form's Skip/Save are its exits).
+  if (cookLogForm) {
+    return (
+      <FullScreenShell>
+        <StepOverlay
+          title={recipeTitle}
+          panel={
+            <RatingForm
+              variant="dark"
+              onSubmit={cookLogForm.onSubmit}
+              onSkip={cookLogForm.onSkip}
+              isPending={cookLogForm.isPending}
+              title={cookLogForm.title}
+              notesPlaceholder={cookLogForm.notesPlaceholder}
+              secondaryLabel={cookLogForm.secondaryLabel}
+            />
+          }
+        />
+      </FullScreenShell>
+    );
+  }
+
   const current = stepIndex >= 0 ? steps.at(stepIndex) : undefined;
   if (current === undefined) {
     return null;

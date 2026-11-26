@@ -36,14 +36,29 @@ export type StepOverlayProps = {
    * meal's title). */
   title: string;
   /** The second eyebrow line: the current step, pre-composed
-   * ("Step 2 of 5") — the overlay renders it verbatim. */
-  stepLabel: string;
-  /** The step's body text, rendered at reading size. */
-  body: string;
+   * ("Step 2 of 5") — the overlay renders it verbatim. Required
+   * in step mode; omitted in panel mode (see `panel`). */
+  stepLabel?: string;
+  /** The step's body text, rendered at reading size. Required
+   * in step mode; omitted in panel mode (see `panel`). */
+  body?: string;
   /** The Done pill's label ("Done"). */
   doneLabel?: string;
-  /** The Done pill's callback: leaving the steps. */
-  onDone: () => void;
+  /** The Done pill's callback: leaving the steps. The pill
+   * renders only when this is provided — panel mode omits it,
+   * since the panel's own actions are its exits. */
+  onDone?: () => void;
+  /**
+   * Optional panel mode (#871): a self-contained composition
+   * (CookingModePage's cook-log form is the first consumer)
+   * rendered in the scroll column under the title eyebrow, in
+   * place of the step label, body, accessory, and children.
+   * The overlay still owns the dark shell, the scroll column,
+   * and the dialog/focus containment — the panel replaces a
+   * modal overlay's content, so focus must move into it just
+   * as it does for steps.
+   */
+  panel?: ReactNode;
   /**
    * Optional accessory rendered between the step label and
    * the body — a panel belonging to the step as a whole (the
@@ -120,6 +135,12 @@ const scrollContentContainerStyle = { flexGrow: 1, justifyContent: "center" } as
  * First consumer: MealCookingModePage's cooking steps. Any
  * step-by-step reader — a guided flow, a workout — composes
  * the same shell with its own navigation.
+ *
+ * Panel mode (#871): CookingModePage's cook-log form is the
+ * first panel consumer — when the host opens the form, it
+ * replaces the step view inside this same shell (dark
+ * background, scroll column, focus containment), with no step
+ * content and no Done pill.
  */
 
 // The shell's effective Tab stops, shared by the shell wrap
@@ -167,6 +188,7 @@ export function StepOverlay({
   body,
   doneLabel,
   onDone,
+  panel,
   accessory,
   children,
 }: StepOverlayProps) {
@@ -352,7 +374,7 @@ export function StepOverlay({
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       if (!event.repeat) {
-        onDone();
+        onDone?.();
       }
     }
   };
@@ -398,64 +420,75 @@ export function StepOverlay({
                   {title}
                 </Text>
               </Col>
-              <Spacer y="s" />
-              <Col>
-                <Text
-                  fontSize={tokens.typography.fontSize.sm}
-                  letterSpacing={1.4}
-                  color="$surface"
-                  opacity={0.6}
-                  textTransform="uppercase"
-                >
-                  {stepLabel}
-                </Text>
-              </Col>
-              <Spacer y="m" />
-              {accessory ? (
+              {panel ? (
                 <>
-                  {accessory}
                   <Spacer y="m" />
+                  {panel}
                 </>
-              ) : null}
-              <Col style={{ paddingBlockEnd: 32 }}>
-                <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
-                  {body}
-                </Text>
-              </Col>
-              {children}
+              ) : (
+                <>
+                  <Spacer y="s" />
+                  <Col>
+                    <Text
+                      fontSize={tokens.typography.fontSize.sm}
+                      letterSpacing={1.4}
+                      color="$surface"
+                      opacity={0.6}
+                      textTransform="uppercase"
+                    >
+                      {stepLabel}
+                    </Text>
+                  </Col>
+                  <Spacer y="m" />
+                  {accessory ? (
+                    <>
+                      {accessory}
+                      <Spacer y="m" />
+                    </>
+                  ) : null}
+                  <Col style={{ paddingBlockEnd: 32 }}>
+                    <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
+                      {body}
+                    </Text>
+                  </Col>
+                  {children}
+                </>
+              )}
             </Col>
           </PageContentColumn>
         </ScrollView>
-        <Col
-          position="absolute"
-          style={{ right: tokens.spacing[6], top: 48 }}
-          borderRadius={tokens.radii.full}
-          overflow="hidden"
-          backgroundColor={tokens.colors.gray.gray10}
-          {...platformAccessibilityProps({
-            accessibilityRole: "button",
-            accessibilityLabel: resolvedDoneLabel,
-          })}
-          onPress={onDone}
-          tabIndex={0}
-          onKeyDown={handleDoneKeyDown}
-          cursor="web:pointer"
-        >
+        {onDone ? (
           <Col
             position="absolute"
-            style={{ top: 0, left: 0, right: 0, bottom: 0 }}
-            backgroundColor="$surface"
-            opacity={0.1}
-          />
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            color="$surface"
-            paddingHorizontal="$4"
-            paddingVertical="$2"
+            style={{ right: tokens.spacing[6], top: 48 }}
+            borderRadius={tokens.radii.full}
+            overflow="hidden"
+            backgroundColor={tokens.colors.gray.gray10}
+            {...platformAccessibilityProps({
+              accessibilityRole: "button",
+              accessibilityLabel: resolvedDoneLabel,
+            })}
+            onPress={onDone}
+            tabIndex={0}
+            onKeyDown={handleDoneKeyDown}
+            cursor="web:pointer"
           >
-            {resolvedDoneLabel}
-          </Text>
-        </Col>
+            <Col
+              position="absolute"
+              style={{ top: 0, left: 0, right: 0, bottom: 0 }}
+              backgroundColor="$surface"
+              opacity={0.1}
+            />
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              color="$surface"
+              paddingHorizontal="$4"
+              paddingVertical="$2"
+            >
+              {resolvedDoneLabel}
+            </Text>
+          </Col>
+        ) : null}
       </ShellCol>
     </ModalLayerContext.Provider>
   );

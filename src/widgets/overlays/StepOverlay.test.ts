@@ -141,7 +141,36 @@ test("the Done pill routes its button semantics through the translator (#237)", 
   assert.match(code, /onPress=\{onDone\}/);
   assert.match(code, /tabIndex=\{0\}/);
   assert.match(code, /opacity=\{0\.1\}/);
-  assert.match(code, /if \(!event\.repeat\) \{\s+onDone\(\);\s+\}/);
+  assert.match(code, /if \(!event\.repeat\) \{\s+onDone\?\.\(\);\s+\}/);
+});
+
+test("panel mode renders the panel instead of the step content, with no Done pill (#871)", () => {
+  // The step props become optional and the panel prop joins
+  // them: panel mode needs the shell but none of the step
+  // content, and its own actions are its exits.
+  assert.match(code, /stepLabel\?: string;/);
+  assert.match(code, /body\?: string;/);
+  assert.match(code, /onDone\?: \(\) => void;/);
+  assert.match(code, /panel\?: ReactNode;/);
+  // The column branches on the panel: the panel renders under
+  // the title eyebrow, and the step label/body/children path
+  // is the other branch.
+  const panelBranch = code.indexOf("panel ? (");
+  assert.ok(panelBranch !== -1, "the scroll column must branch on the panel");
+  assert.ok(
+    code.indexOf("{panel}", panelBranch) > panelBranch,
+    "the panel renders inside its branch",
+  );
+  assert.ok(
+    code.indexOf("{stepLabel}", panelBranch) > panelBranch,
+    "the step label renders only in the step branch",
+  );
+  assert.ok(
+    code.indexOf("{children}", panelBranch) > panelBranch,
+    "children render only in the step branch",
+  );
+  // The Done pill renders only when onDone is provided.
+  assert.match(code, /\{onDone \? \(\s*<Col\s+position="absolute"/);
 });
 
 test("the header treatment: uppercased eyebrows at 60% over the body at reading size", () => {
