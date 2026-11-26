@@ -5,6 +5,7 @@ import { LegalSection } from "../../widgets/content/LegalSection.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import {
   AccountDataView,
   type AccountDataViewProps,
@@ -101,6 +102,15 @@ export type ProfilePageLegalLink = {
 export type ProfilePageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** Loading state (#874): forwarded to every composed
+   * section view's own `loading` prop, so each section
+   * renders its skeleton (the #278 pattern), and the email
+   * line renders as a bone. The host can mount the page
+   * before the profile data resolves instead of gating on
+   * a spinner; section data does not render in this state.
+   * The static chrome (title, Legal links, Sign Out) is
+   * not data and renders as usual. */
+  loading?: boolean;
   email?: string | null;
   onSignOut: () => void;
   /** The tags destination (#248: navigation crosses as an href,
@@ -150,6 +160,7 @@ export type ProfilePageProps = {
 };
 
 export function ProfilePage({
+  loading = false,
   email,
   onSignOut,
   tagsHref,
@@ -170,28 +181,32 @@ export function ProfilePage({
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
         <Text variant="title">Profile</Text>
-        {email ? <Text variant="muted">{email}</Text> : null}
+        {loading ? (
+          <TextSkeleton size="sm" lines={1} />
+        ) : email ? (
+          <Text variant="muted">{email}</Text>
+        ) : null}
         {showcaseHref ? (
           <Button variant="secondary" href={showcaseHref}>
             Component Showcase
           </Button>
         ) : null}
-        {subscription ? <SubscriptionView {...subscription} /> : null}
-        {nutritionGoals ? <NutritionGoalsForm {...nutritionGoals} /> : null}
-        {accessTokens ? <AccessTokensPanel {...accessTokens} /> : null}
+        {subscription ? <SubscriptionView {...subscription} loading={loading || subscription.loading} /> : null}
+        {nutritionGoals ? <NutritionGoalsForm {...nutritionGoals} loading={loading || nutritionGoals.loading} /> : null}
+        {accessTokens ? <AccessTokensPanel {...accessTokens} loading={loading || accessTokens.loading} /> : null}
         {tagsHref ? (
           <Button variant="secondary" href={tagsHref}>
             Manage Tags
           </Button>
         ) : null}
-        {showLess ? <ShowLessView {...showLess} /> : null}
-        {authorDisplay ? <AuthorDisplayView {...authorDisplay} /> : null}
-        {familySharing ? <FamilySharingView {...familySharing} /> : null}
+        {showLess ? <ShowLessView {...showLess} loading={loading || showLess.loading} /> : null}
+        {authorDisplay ? <AuthorDisplayView {...authorDisplay} loading={loading || authorDisplay.loading} /> : null}
+        {familySharing ? <FamilySharingView {...familySharing} loading={loading || familySharing.loading} /> : null}
         {feedbackPreferenceSection ? (
-          <FeedbackPreferenceView {...feedbackPreferenceSection} />
+          <FeedbackPreferenceView {...feedbackPreferenceSection} loading={loading || feedbackPreferenceSection.loading} />
         ) : null}
-        {transfer ? <TransferRecipesView {...transfer} /> : null}
-        {accountData ? <AccountDataView {...accountData} /> : null}
+        {transfer ? <TransferRecipesView {...transfer} loading={loading || transfer.loading} /> : null}
+        {accountData ? <AccountDataView {...accountData} loading={loading || accountData.loading} /> : null}
         <LegalSection title="Legal">
           <Col gap="s">
             {(legalLinks ?? []).map((link) => (

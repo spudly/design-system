@@ -31,6 +31,10 @@ Open in `Pages/Eciperay/ProfilePage`: WithCoverageSections
    (two entries with Undo buttons), Author name on public
    recipes (name field + checked show-my-name checkbox), then
    Family sharing (one grant row with a Remove button).
+3. Loading (#874): every composed section renders its
+   skeleton state, the email line is a bone, and no section
+   data (plan name, display name, grant email, consent
+   status) renders; Legal links and Sign Out still render.
 
 **Run when:** `src/pages/eciperay/ProfilePage.tsx`, its stories, the
 four section views below, or a changeset naming ProfilePage.

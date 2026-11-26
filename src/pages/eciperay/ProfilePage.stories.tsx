@@ -58,6 +58,78 @@ export const WithSections: Story = {
   ),
 };
 
+export const Loading: Story = {
+  // #874: the page-level loading state — every composed
+  // section renders its skeleton and the email line is a
+  // bone; no section data renders.
+  render: () => (
+    <>
+      <ProfilePage
+        footer={eciperayFooterFixture}
+        email="cook@example.com"
+        onSignOut={() => undefined}
+        loading
+        subscription={{
+          planLabel: "Plus plan",
+          statusText: "Your Plus plan is active and renews on Dec 1, 2026.",
+          onManage: () => undefined,
+        }}
+        authorDisplay={{
+          settings: { displayName: "Jamie Cook", showOnPublicRecipes: true },
+          onChange: () => undefined,
+          onSave: () => undefined,
+        }}
+        familySharing={{
+          grants: [
+            {
+              recipientUserId: "user-1",
+              recipientEmail: "alex@example.com",
+              recipientDisplayName: "Alex Cook",
+              createdAt: "2026-10-02T12:00:00.000Z",
+            },
+          ],
+          email: "",
+          onEmailChange: () => undefined,
+          onAdd: () => undefined,
+          onRemove: () => undefined,
+        }}
+        feedbackPreferenceSection={{
+          shortcutEnabled: true,
+          onShortcutEnabledChange: () => undefined,
+          consent: true,
+          consentStatusText: "Analytics consent: Accepted",
+          onAcceptConsent: () => undefined,
+          onDeclineConsent: () => undefined,
+          onWithdrawConsent: () => undefined,
+          choicesHref: "/privacy/consent",
+        }}
+        accountData={{
+          onExportData: () => undefined,
+          onDeleteAccount: () => undefined,
+        }}
+        nutritionGoals={{
+          goals: nutritionGoalsFixture,
+          onChange: () => undefined,
+          onSave: () => undefined,
+        }}
+        accessTokens={{
+          tokens: accessTokensFixture.tokens,
+          tokenName: "",
+          onTokenNameChange: () => undefined,
+          onCreate: () => undefined,
+          createdSecret: null,
+          onDismissSecret: () => undefined,
+          onRevoke: () => undefined,
+        }}
+        legalLinks={[
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Privacy Policy", href: "/privacy" },
+        ]}
+      />
+    </>
+  ),
+};
+
 export const WithCoverageSections: Story = {
   // The #438 Part 3 typed sections: subscription,
   // feedback-preference, transfer, and account-data render from
