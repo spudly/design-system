@@ -363,7 +363,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       3 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |      10 |         8 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **213** |   **199** |
+| **Total**                                   |                   | **220** |   **199** |
 
 <!-- VR-COVERAGE-END -->
 
