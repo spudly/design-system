@@ -53,7 +53,7 @@ export function FeedbackBubbleView({
     <Col
       position={{ default: "absolute", web: "fixed" }}
       zIndex={50}
-      alignItems="flex-end"
+      right
       gap="m"
       style={{ right: 16, bottom: 80 }}
     >
