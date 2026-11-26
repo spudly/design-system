@@ -75,6 +75,7 @@ export {
   AppShellPage,
   type AppShellPageAction,
   type AppShellPageNavItem,
+  type AppShellPageNavItemKind,
   type AppShellPageProps,
   type AppShellPageSearch,
 } from "./eciperay/AppShellPage.js";

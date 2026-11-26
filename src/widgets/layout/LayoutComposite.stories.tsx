@@ -170,10 +170,10 @@ export const ScreenShell: Story = {
       <AppTopBar
         brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
         navItems={[
-          { id: "home", label: "Home", href: "/", icon: "home" },
-          { id: "recipes", label: "Recipes", href: "/recipes", icon: "recipes" },
-          { id: "meals", label: "Meals", href: "/meals", icon: "meals" },
-          { id: "profile", label: "Profile", href: "/profile", icon: "profile" },
+          { id: "home", label: "Home", href: "/", kind: "home" },
+          { id: "recipes", label: "Recipes", href: "/recipes", kind: "recipes" },
+          { id: "meals", label: "Meals", href: "/meals", kind: "meals" },
+          { id: "profile", label: "Profile", href: "/profile", kind: "profile" },
         ]}
         navLabel="Eciperay sections"
         activeItemId="recipes"

@@ -11,7 +11,7 @@ import { eciperayFooterFixture } from "../shared/fixtures.js";
  * brand, nav set, and list label are Eciperay's real shell
  * values (packages/web/src/components/AppShell.tsx: the 7-item
  * nav — Home, Recipes, Meals, Shared with me, Add, Tags,
- * Profile — each an icon name + label + route); the page
+ * Profile — each a semantic kind + label + route); the page
  * surface is a static stand-in composed from DS components, the
  * way the app slots a DS page into the frame. The frame is the
  * full fluid width (#854, Stephen's direction: the page itself
@@ -47,18 +47,18 @@ function RecipesContent() {
 }
 
 const eciperayNav: AppShellPageNavItem[] = [
-  { id: "home", label: "Home", href: "/", icon: "home" },
-  { id: "recipes", label: "Recipes", href: "/recipes", icon: "recipes" },
-  { id: "meals", label: "Meals", href: "/meals", icon: "meals" },
-  { id: "shared", label: "Shared with me", href: "/shared", icon: "shared" },
-  { id: "add", label: "Add", href: "/add", icon: "add" },
-  { id: "tags", label: "Tags", href: "/tags", icon: "tags" },
-  { id: "profile", label: "Profile", href: "/profile", icon: "profile" },
+  { id: "home", label: "Home", href: "/", kind: "home" },
+  { id: "recipes", label: "Recipes", href: "/recipes", kind: "recipes" },
+  { id: "meals", label: "Meals", href: "/meals", kind: "meals" },
+  { id: "shared", label: "Shared with me", href: "/shared", kind: "shared" },
+  { id: "add", label: "Add", href: "/add", kind: "add" },
+  { id: "tags", label: "Tags", href: "/tags", kind: "tags" },
+  { id: "profile", label: "Profile", href: "/profile", kind: "profile" },
 ];
 
-const labelOnlyNav: AppShellPageNavItem[] = eciperayNav.map(({ icon: _icon, ...item }) => item);
+const labelOnlyNav: AppShellPageNavItem[] = eciperayNav.map(({ kind: _kind, ...item }) => item);
 
-/** The Eciperay shell as the app renders it: icon nav, Recipes current, account action, footer. */
+/** The Eciperay shell as the app renders it: kind nav, Recipes current, account action, footer. */
 export const Default: Story = {
   render: () => (
     <>

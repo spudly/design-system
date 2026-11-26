@@ -201,6 +201,7 @@ export {
   AppTopBar,
   type AppTopBarAction,
   type AppTopBarNavItem,
+  type AppTopBarNavItemKind,
   type AppTopBarProps,
 } from "./layout/AppTopBar.js";
 export { CandidateList, type CandidateListProps } from "./data/CandidateList.js";
