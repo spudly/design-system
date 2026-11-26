@@ -105,10 +105,10 @@ test("ProfilePage renders its four covered sections from typed data props", () =
   assert.match(source, /feedbackPreferenceSection\?: ProfilePageFeedbackPreference/);
   assert.match(source, /transfer\?: ProfilePageTransfer/);
   assert.match(source, /accountData\?: ProfilePageAccountData/);
-  assert.match(source, /<SubscriptionView \{\.\.\.subscription\} \/>/);
-  assert.match(source, /<FeedbackPreferenceView \{\.\.\.feedbackPreferenceSection\} \/>/);
-  assert.match(source, /<TransferRecipesView \{\.\.\.transfer\} \/>/);
-  assert.match(source, /<AccountDataView \{\.\.\.accountData\} \/>/);
+  assert.match(source, /<SubscriptionView \{\.\.\.subscription\} loading=\{!!\(loading \|\| subscription\.loading\)\} \/>/);
+  assert.match(source, /<FeedbackPreferenceView \{\.\.\.feedbackPreferenceSection\} loading=\{!!\(loading \|\| feedbackPreferenceSection\.loading\)\} \/>/);
+  assert.match(source, /<TransferRecipesView \{\.\.\.transfer\} loading=\{!!\(loading \|\| transfer\.loading\)\} \/>/);
+  assert.match(source, /<AccountDataView \{\.\.\.accountData\} loading=\{!!\(loading \|\| accountData\.loading\)\} \/>/);
 });
 
 test("ImportImagePage renders the import-anyway override inside the page", () => {
