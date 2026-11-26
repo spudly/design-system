@@ -1,8 +1,10 @@
 import type { ComponentType } from "react";
 import { AddIcon } from "./AddIcon.js";
+import { ErrorIcon } from "./ErrorIcon.js";
 import { FeedbackIcon } from "./FeedbackIcon.js";
 import { HelpIcon } from "./HelpIcon.js";
 import { HomeIcon } from "./HomeIcon.js";
+import { InfoIcon } from "./InfoIcon.js";
 import type { IconComponentProps } from "./Icon.js";
 import { ListIcon } from "./ListIcon.js";
 import { MealsIcon } from "./MealsIcon.js";
@@ -12,6 +14,7 @@ import { ProfileIcon } from "./ProfileIcon.js";
 import { RecipesIcon } from "./RecipesIcon.js";
 import { ShareIcon } from "./ShareIcon.js";
 import { SharedIcon } from "./SharedIcon.js";
+import { SuccessIcon } from "./SuccessIcon.js";
 import { TagsIcon } from "./TagsIcon.js";
 import { WarningIcon } from "./WarningIcon.js";
 
@@ -44,14 +47,17 @@ import { WarningIcon } from "./WarningIcon.js";
  * plus "help" for SearchHelpPopover's trigger (#699), plus "list"
  * for SectionHeading's icon form (RecipeDetailPage's Ingredients
  * heading, #721), plus "more" for card overflow-menu triggers
- * (DiscoveryCard's per-card actions, #791).
+ * (DiscoveryCard's per-card actions, #791), plus "error", "info",
+ * and "success" for Alert severity icons and EmptyState (#856).
  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export const iconNames = [
   "add",
+  "error",
   "feedback",
   "help",
   "home",
+  "info",
   "list",
   "meals",
   "more",
@@ -60,6 +66,7 @@ export const iconNames = [
   "recipes",
   "share",
   "shared",
+  "success",
   "tags",
   "warning",
 ] as const;
@@ -70,9 +77,11 @@ export type IconName = (typeof iconNames)[number];
 /** The glyph component each icon name resolves to. Internal: slot owners resolve through this record; callers only ever pass the name. */
 export const iconsByName: Record<IconName, ComponentType<IconComponentProps>> = {
   add: AddIcon,
+  error: ErrorIcon,
   feedback: FeedbackIcon,
   help: HelpIcon,
   home: HomeIcon,
+  info: InfoIcon,
   list: ListIcon,
   meals: MealsIcon,
   more: MoreIcon,
@@ -81,6 +90,7 @@ export const iconsByName: Record<IconName, ComponentType<IconComponentProps>> = 
   recipes: RecipesIcon,
   share: ShareIcon,
   shared: SharedIcon,
+  success: SuccessIcon,
   tags: TagsIcon,
   warning: WarningIcon,
 };

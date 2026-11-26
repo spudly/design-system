@@ -41,6 +41,7 @@ export const Submitted: Story = {
         onIsBugChange={() => undefined}
         submitted
         onSubmit={() => undefined}
+        onResetPress={() => undefined}
       />
     </>
   ),

@@ -51,7 +51,12 @@ export const NeedsTransaction: Story = {
 export const Unconfigured: Story = {
   render: () => (
     <>
-      <PayPage footer={eciperayFooterFixture} status="unconfigured" />
+      <PayPage
+        footer={eciperayFooterFixture}
+        status="unconfigured"
+        homeHref="/"
+        homeLabel="Go to Eciperay home"
+      />
     </>
   ),
 };

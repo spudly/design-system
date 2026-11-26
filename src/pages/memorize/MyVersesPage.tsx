@@ -116,6 +116,12 @@ export type MyVersesPageProps = {
   verses: MyVersesPageItem[];
   /** Row action: remove this verse from the app's list. */
   onRemoveVerse: (verseId: string) => void;
+  /** Optional empty-state recovery link (#856): the host's search
+   * destination (host owns the destination, the drillHref rule
+   * #425), rendered as the no-verses EmptyState's link-form action
+   * ("Search verses") when supplied. Optional — a host that
+   * supplies nothing renders the empty state exactly as before. */
+  searchHref?: string;
 };
 
 function MyVerseRow({
@@ -149,13 +155,18 @@ function MyVerseRow({
  * Controlled — see the file header for the contract and the
  * screen inventory it mirrors.
  */
-export function MyVersesPage({ verses, onRemoveVerse, footer, header }: MyVersesPageProps) {
+export function MyVersesPage({ verses, onRemoveVerse, searchHref, footer, header }: MyVersesPageProps) {
   return (
     <BigFooterShell footer={footer} header={header} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">My verses</Text>
         {verses.length === 0 ? (
-          <EmptyState title="No verses yet" body="Find one in the Search tab to get started." />
+          <EmptyState
+            title="No verses yet"
+            body="Find one in the Search tab to get started."
+            icon="recipes"
+            {...(searchHref ? { actionLabel: "Search verses", actionHref: searchHref } : {})}
+          />
         ) : (
           <BoundedList
             data={verses}

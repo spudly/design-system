@@ -57,6 +57,11 @@ export type FeedbackPageProps = {
   /** The host's validation result: submit is disabled while true. */
   submitDisabled?: boolean;
   onSubmit: () => void;
+  /** Optional submitted-state next action (#856): "Send more
+   * feedback" — an in-place reset intent that returns to the blank
+   * form (a callback, not a link, under #248). When supplied, the
+   * submitted success Alert carries it as its action. */
+  onResetPress?: () => void;
 };
 
 export function FeedbackPage({
@@ -71,6 +76,7 @@ export function FeedbackPage({
   submitted = false,
   submitDisabled = false,
   onSubmit,
+  onResetPress,
   footer,
   header,
 }: FeedbackPageProps) {
@@ -81,7 +87,17 @@ export function FeedbackPage({
         <Text variant="title">{voice.feedbackPage.title}</Text>
         <Text variant="hint">{voice.feedbackPage.description}</Text>
         {submitted ? (
-          <Text variant="success">{voice.feedbackPage.submittedMessage}</Text>
+          <Alert
+            severity="success"
+            message={voice.feedbackPage.submittedMessage}
+            {...(onResetPress
+              ? {
+                  actions: [
+                    { label: voice.feedbackPage.submittedActionLabel, onPress: onResetPress },
+                  ],
+                }
+              : {})}
+          />
         ) : (
           <>
             <TextAreaField

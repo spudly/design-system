@@ -243,6 +243,7 @@ export const fixtureVoice: Voice = {
     replyEmailLabel: "Email me back (optional)",
     replyEmailPlaceholder: "you@example.com",
     bugLabel: "This is a bug",
+    submittedActionLabel: "Send more feedback",
     submitLabel: "Submit feedback",
     submitPendingLabel: "Submitting\u2026",
   },

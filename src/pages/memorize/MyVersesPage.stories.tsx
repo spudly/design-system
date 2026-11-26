@@ -74,7 +74,12 @@ export const Default: Story = {
 export const Empty: Story = {
   render: () => (
     <>
-      <MyVersesPage footer={memorizeFooterFixture} verses={[]} onRemoveVerse={() => undefined} />
+      <MyVersesPage
+        footer={memorizeFooterFixture}
+        verses={[]}
+        onRemoveVerse={() => undefined}
+        searchHref="/search"
+      />
     </>
   ),
 };
