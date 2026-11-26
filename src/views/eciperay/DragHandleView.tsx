@@ -26,10 +26,13 @@ export type DragHandleViewProps = {
  * the surrounding drag activator is the host's element, so
  * this view claims no interactive role of its own.
  */
-export function DragHandleView({ accessibilityLabel = "Drag to reorder" }: DragHandleViewProps) {
+export function DragHandleView(props: DragHandleViewProps) {
   return (
     <Center
-      {...platformAccessibilityProps({ accessibilityRole: "image", accessibilityLabel })}
+      {...platformAccessibilityProps({
+        accessibilityRole: "image",
+        accessibilityLabel: props.accessibilityLabel ?? "Drag to reorder",
+      })}
     >
       <GripIcon />
     </Center>
