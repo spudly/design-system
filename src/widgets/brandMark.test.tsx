@@ -70,7 +70,7 @@ test("BrandMark carries the Memorize mark, ported from Stephen's concept-1 pick 
     !brandMark.includes("MEMORIZE_MARK_FIELD"),
     "no background field — the mark renders on transparency (Stephen, 2026-11-25)",
   );
-  assert.match(brandMark, /MEMORIZE_PAGE_LINE_PATH/, "the rebuilt page-block line is part of the port");
+  assert.match(brandMark, /MEMORIZE_PAGES_PATH/, "the two separate curved page strips are part of the port");
   assert.match(brandMark, /fill=\{MEMORIZE_MARK_BOOK\}/, "the open book renders in deep teal");
   assert.match(brandMark, /fill=\{MEMORIZE_MARK_ACCENT\}/, "the rays and flame render in gold");
   assert.match(brandMark, /MEMORIZE_FLAME_PATH/, "the central flame is part of the port");
