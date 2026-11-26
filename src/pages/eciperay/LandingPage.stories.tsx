@@ -34,3 +34,50 @@ export const Wide: Story = {
   parameters: { dsViewport: "full" },
   render: () => <LandingPage footer={eciperayFooterFixture} {...landingFixture} />,
 };
+
+/** Consent banner data (#879): Eciperay's analytics-consent copy as the host passes it. */
+const consentBannerFixture = {
+  messageBeforeLink: "We use cookies and analytics as described in our",
+  linkLabel: "privacy policy",
+  linkHref: "/privacy",
+  messageAfterLink: ".",
+  onAccept: () => {},
+  onDecline: () => {},
+};
+
+/** Install banner data (#879): the mobile-app prompt as the host passes it. */
+const installBannerFixture = {
+  message: "Get the Eciperay app for the best cooking experience.",
+  links: [
+    { label: "Download on the App Store", href: "/get-the-app" },
+    { label: "Get it on Google Play", href: "/get-the-app" },
+  ],
+  onDismiss: () => {},
+};
+
+/** Consent outstanding on the signed-out surface (#879): the page renders the bottom-pinned consent banner itself. */
+export const WithConsentBanner: Story = {
+  render: () => (
+    <>
+      <LandingPage
+        footer={eciperayFooterFixture}
+        {...landingFixture}
+        consentBanner={consentBannerFixture}
+      />
+    </>
+  ),
+};
+
+/** Both banners visible (#879): the install banner pins to the top, the consent banner to the bottom. */
+export const WithBanners: Story = {
+  render: () => (
+    <>
+      <LandingPage
+        footer={eciperayFooterFixture}
+        {...landingFixture}
+        consentBanner={consentBannerFixture}
+        installBanner={installBannerFixture}
+      />
+    </>
+  ),
+};

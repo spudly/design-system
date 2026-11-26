@@ -61,6 +61,8 @@ test("AppShellPage is exported from the built pages barrel", async () => {
   assert.match(types, /type AppShellPageNavItem/);
   assert.match(types, /type AppShellPageAction/);
   assert.match(types, /type AppShellPageSearch/);
+  assert.match(types, /type AppShellPageConsentBanner/);
+  assert.match(types, /type AppShellPageInstallBanner/);
 });
 
 test("the shell is BigFooterShell in content scroll mode around the plain ScreenContainer", async () => {
@@ -119,6 +121,8 @@ function loadRuntime() {
       await import("../../../dist/pages/memorize/TabbedShellPage.js");
     const distViews: Record<string, any> = await import("../../../dist/views/index.js");
     const distWidgets: Record<string, any> = await import("../../../dist/widgets/index.js");
+    const { VoiceProvider }: Record<string, any> = await import("../../../dist/voice/index.js");
+    const { fixtureVoice }: Record<string, any> = await import("../../../dist/voice/fixtures.js");
     return {
       React,
       renderToString,
@@ -129,6 +133,8 @@ function loadRuntime() {
       TabbedShellPage,
       distViews,
       distWidgets,
+      VoiceProvider,
+      fixtureVoice,
     };
   })();
   return runtimePromise;
@@ -463,4 +469,116 @@ test("SSR: a notice renders its message and action above the content; content st
   assert.match(html, /Try again/, "the notice action label renders");
   assert.match(html, /role="status"/, "the notice keeps the polite live-region semantics");
   assert.match(html, /PAGE SURFACE/, "the page content stays mounted under the notice");
+});
+test("banners (#879): absent by default; when present the shell renders the banner views with the host data forwarded", async () => {
+  const { AppShellPage, distViews } = await loadRuntime();
+  const bare = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    children: <span>PAGE SURFACE</span>,
+  });
+  const bareChildren = bare.props.children.props.children;
+  assert.equal(bareChildren[3], null, "no install banner data — no install banner renders");
+  assert.equal(bareChildren[4], null, "no consent banner data — no consent banner renders");
+  let accepts = 0;
+  let declines = 0;
+  let dismissals = 0;
+  const consentBanner = {
+    messageBeforeLink: "We use cookies as described in our",
+    linkLabel: "privacy policy",
+    linkHref: "/privacy",
+    messageAfterLink: ".",
+    onAccept: () => {
+      accepts += 1;
+    },
+    onDecline: () => {
+      declines += 1;
+    },
+  };
+  const installBanner = {
+    message: "Get the app for the best experience.",
+    links: [{ label: "App Store", href: "https://apps.example.test/install" }],
+    onDismiss: () => {
+      dismissals += 1;
+    },
+  };
+  const withBanners = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    consentBanner,
+    installBanner,
+    children: <span>PAGE SURFACE</span>,
+  });
+  const children = withBanners.props.children.props.children;
+  const installEl = children[3];
+  const consentEl = children[4];
+  assert.equal(
+    installEl.type,
+    distViews.InstallBannerView,
+    "the install banner renders through InstallBannerView",
+  );
+  assert.deepEqual(installEl.props, installBanner, "the install banner data crosses unchanged");
+  assert.equal(
+    consentEl.type,
+    distViews.ConsentBannerView,
+    "the consent banner renders through ConsentBannerView",
+  );
+  assert.deepEqual(consentEl.props, consentBanner, "the consent banner data crosses unchanged");
+  consentEl.props.onAccept();
+  consentEl.props.onDecline();
+  installEl.props.onDismiss();
+  assert.equal(accepts, 1, "the accept callback fires");
+  assert.equal(declines, 1, "the decline callback fires");
+  assert.equal(dismissals, 1, "the dismiss callback fires");
+});
+test("SSR: banners render their copy, the policy link, and the voice-default action labels", async () => {
+  const { AppShellPage, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
+    await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const html = renderToString(
+    <TamaguiProvider config={config} defaultTheme="light">
+      <VoiceProvider voice={fixtureVoice}>
+        <AppShellPage
+          brand={{ label: "Eciperay", href: "/" }}
+          navItems={sentinelNav}
+          activeItemId="recipes"
+          consentBanner={{
+            messageBeforeLink: "We use cookies as described in our",
+            linkLabel: "privacy policy",
+            linkHref: "/privacy",
+            messageAfterLink: ".",
+            onAccept: () => {},
+            onDecline: () => {},
+          }}
+          installBanner={{
+            message: "Get the app for the best experience.",
+            links: [{ label: "App Store", href: "https://apps.example.test/install" }],
+            onDismiss: () => {},
+          }}
+        >
+          <span>PAGE SURFACE</span>
+        </AppShellPage>
+      </VoiceProvider>
+    </TamaguiProvider>,
+  );
+  assert.match(html, /We use cookies as described in our/, "the consent message renders");
+  assert.match(html, /href="\/privacy"/, "the policy link is a real link with its href");
+  assert.match(html, /privacy policy/, "the policy link label renders");
+  assert.ok(
+    html.includes(fixtureVoice.consentBannerView.acceptLabel),
+    "the accept label defaults to the voice object",
+  );
+  assert.ok(
+    html.includes(fixtureVoice.consentBannerView.declineLabel),
+    "the decline label defaults to the voice object",
+  );
+  assert.match(html, /Get the app for the best experience\./, "the install message renders");
+  assert.match(
+    html,
+    /href="https:\/\/apps\.example\.test\/install"/,
+    "the store link is a real link with its href",
+  );
+  assert.match(html, /PAGE SURFACE/, "the page content stays mounted under the banners");
 });

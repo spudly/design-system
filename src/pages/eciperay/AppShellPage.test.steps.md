@@ -15,9 +15,10 @@ release's changed components. The full index lives in
 
 Open in `Pages/Eciperay/AppShellPage`: Default, NoIcons,
 LinkActions, NoFooter, ChunkFailedContent, WithNotice,
-WithNoticeAction;
+WithNoticeAction, WithConsentBanner, WithInstallBanner,
+WithBanners;
 `Pages/Memorize/TabbedShellPage`: TabbedShell, WithNotice,
-WithNoticeAction.
+WithNoticeAction, WithConsentBanner, WithInstallBanner.
 
 1. AppShellPage Default: the top bar shows the Eciperay
    wordmark (a real link home), the seven nav items with their
@@ -42,6 +43,16 @@ WithNoticeAction.
    underneath. WithNoticeAction: a "Try again" button renders
    with the message and activating it fires the host's
    callback. Without a notice supplied, no notice row renders.
+6. Banners (#879, both shells): WithConsentBanner — the
+   consent banner pins to the bottom of the viewport with its
+   message, its privacy-policy link (a real link), and Decline
+   / Accept buttons that fire the host's callbacks.
+   WithInstallBanner — the install banner pins to the top of
+   the viewport with its message, its app-store links (real
+   links), and a dismiss button that fires the host's
+   callback. WithBanners (AppShellPage): both banners render
+   at once, each pinned to its own edge. Without banner data
+   supplied, neither banner renders.
 
 **Run when:** `src/pages/eciperay/AppShellPage.tsx`,
 `src/pages/memorize/TabbedShellPage.tsx`, `src/widgets/layout/AppTopBar.tsx`,

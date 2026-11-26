@@ -58,7 +58,27 @@ const eciperayNav: AppShellPageNavItem[] = [
 
 const labelOnlyNav: AppShellPageNavItem[] = eciperayNav.map(({ kind: _kind, ...item }) => item);
 
-/** The Eciperay shell as the app renders it: kind nav, Recipes current, account action, footer. */
+/** Consent banner data (#879): Eciperay's analytics-consent copy as the host passes it. */
+const consentBannerFixture = {
+  messageBeforeLink: "We use cookies and analytics as described in our",
+  linkLabel: "privacy policy",
+  linkHref: "/privacy",
+  messageAfterLink: ".",
+  onAccept: () => {},
+  onDecline: () => {},
+};
+
+/** Install banner data (#879): the mobile-app prompt as the host passes it. */
+const installBannerFixture = {
+  message: "Get the Eciperay app for the best cooking experience.",
+  links: [
+    { label: "Download on the App Store", href: "/get-the-app" },
+    { label: "Get it on Google Play", href: "/get-the-app" },
+  ],
+  onDismiss: () => {},
+};
+
+/** The Eciperay shell as the app renders it: icon nav, Recipes current, account action, footer. */
 export const Default: Story = {
   render: () => (
     <>
@@ -190,6 +210,64 @@ export const WithNoticeAction: Story = {
           message: "Your profile could not be loaded.",
           action: { label: "Try again", onPress: () => {} },
         }}
+      >
+        <RecipesContent />
+      </AppShellPage>
+    </>
+  ),
+};
+
+/** Consent outstanding (#879): the shell renders the bottom-pinned consent banner itself. */
+export const WithConsentBanner: Story = {
+  render: () => (
+    <>
+      <AppShellPage
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
+        navItems={eciperayNav}
+        navLabel="Eciperay sections"
+        activeItemId="recipes"
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        footer={eciperayFooterFixture}
+        consentBanner={consentBannerFixture}
+      >
+        <RecipesContent />
+      </AppShellPage>
+    </>
+  ),
+};
+
+/** Install prompt not yet dismissed (#879): the shell renders the top-pinned install banner itself. */
+export const WithInstallBanner: Story = {
+  render: () => (
+    <>
+      <AppShellPage
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
+        navItems={eciperayNav}
+        navLabel="Eciperay sections"
+        activeItemId="recipes"
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        footer={eciperayFooterFixture}
+        installBanner={installBannerFixture}
+      >
+        <RecipesContent />
+      </AppShellPage>
+    </>
+  ),
+};
+
+/** Both banners visible (#879): the install banner pins to the top, the consent banner to the bottom. */
+export const WithBanners: Story = {
+  render: () => (
+    <>
+      <AppShellPage
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
+        navItems={eciperayNav}
+        navLabel="Eciperay sections"
+        activeItemId="recipes"
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        footer={eciperayFooterFixture}
+        consentBanner={consentBannerFixture}
+        installBanner={installBannerFixture}
       >
         <RecipesContent />
       </AppShellPage>

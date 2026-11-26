@@ -8,6 +8,14 @@ import { AppTopBar } from "../../widgets/layout/AppTopBar.js";
 import { LazySlot } from "../../views/shared/LazySlot.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { StatusMessage } from "../../views/shared/StatusMessage.js";
+import {
+  ConsentBannerView,
+  type ConsentBannerViewProps,
+} from "../../views/shared/ConsentBannerView.js";
+import {
+  InstallBannerView,
+  type InstallBannerViewProps,
+} from "../../views/shared/InstallBannerView.js";
 
 /**
  * TabbedShellPage (#438 Part 5): the tabbed app shell as a
@@ -75,6 +83,22 @@ import { StatusMessage } from "../../views/shared/StatusMessage.js";
  * today). Deep-link parsing and drill state stay app-side; only
  * the chrome moved.
  *
+ * Banners (#879): like AppShellPage, this shell renders the
+ * analytics consent banner and the mobile-app install banner
+ * itself — the host passes each banner's state as DATA
+ * (`consentBanner` / `installBanner`, the banner views' own
+ * prop shapes): presence is visibility, copy and labels cross
+ * as data (the views' label props fall back to the voice
+ * defaults), and accept / decline / dismiss are bare
+ * callbacks. The consent record, analytics wiring, and
+ * install dismissal state stay host-side; the views are NOT
+ * exported for hosts to mount. The banners render after the
+ * content slot, exactly where hosts mount their local banners
+ * today (each view pins itself to its screen edge: install to
+ * the top, consent to the bottom), so there is no visual
+ * change. Omit a prop (or pass null) and that banner does not
+ * render.
+ *
  * (#438's final major removed the `ChunkErrorBoundary` root
  * export once both apps rendered through pages that slot
  * content this way; the boundary is internal now.)
@@ -135,6 +159,12 @@ export type TabbedShellPageLinkTab = {
   href: string;
 };
 
+/** The consent banner as data (#879): the ConsentBannerView prop shape, aliased per the page-prop rule. */
+export type TabbedShellPageConsentBanner = ConsentBannerViewProps;
+
+/** The install banner as data (#879): the InstallBannerView prop shape, aliased per the page-prop rule. */
+export type TabbedShellPageInstallBanner = InstallBannerViewProps;
+
 type TabbedShellPageBaseProps = {
   /** The app title at the shell's head — the host's app name (e.g. "Memorize"). */
   title: string;
@@ -148,6 +178,27 @@ type TabbedShellPageBaseProps = {
    * no notice renders and the shell is unchanged.
    */
   notice?: { message: string; action?: { label: string; onPress: () => void } };
+  /**
+   * The analytics consent banner as data (#879): when present,
+   * the shell renders ConsentBannerView itself (bottom-pinned)
+   * after the content slot. Copy crosses as data; the accept /
+   * decline labels default to the voice object's
+   * consentBannerView labels when omitted. The consent state
+   * and its side effects stay host-side — only the accept /
+   * decline intents cross. Omit (or pass null) while consent
+   * is not outstanding and no banner renders.
+   */
+  consentBanner?: TabbedShellPageConsentBanner | null;
+  /**
+   * The mobile-app install banner as data (#879): when
+   * present, the shell renders InstallBannerView itself
+   * (top-pinned) after the content slot. The message and the
+   * app-store links cross as data (hrefs, per #248); dismissal
+   * is a bare callback and the dismissal state stays
+   * host-side. Omit (or pass null) once dismissed and no
+   * banner renders.
+   */
+  installBanner?: TabbedShellPageInstallBanner | null;
   /** The tab list's accessible name (Memorize's shell: "Memorize sections"). */
   tabsLabel?: string;
   /**
@@ -215,7 +266,8 @@ export type TabbedShellPageProps = TabbedShellPageBaseProps &
  * see the file header for the contract and the ownership split.
  */
 export function TabbedShellPage(props: TabbedShellPageProps) {
-  const { title, tabsLabel, footer, activeTabId, onReload, contentKey, notice } = props;
+  const { title, tabsLabel, footer, activeTabId, onReload, contentKey, notice, consentBanner, installBanner } =
+    props;
 
   let tabBar: ReactNode;
   let content: ReactNode;
@@ -274,6 +326,8 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
             {content}
           </LazySlot>
         ) : null}
+        {installBanner ? <InstallBannerView {...installBanner} /> : null}
+        {consentBanner ? <ConsentBannerView {...consentBanner} /> : null}
       </ScreenContainer>
     </BigFooterShell>
   );
