@@ -159,6 +159,18 @@ export const NoSelection: Story = {
   ),
 };
 
+/** The loading state (#874): the form's at-rest shape as
+ * bones — heading, the title field's stack, the notes box,
+ * the recipe picker's box, and the submit button's box —
+ * while the meal the form edits is still resolving. */
+export const Loading: Story = {
+  render: () => (
+    <>
+      <Form loading />
+    </>
+  ),
+};
+
 export const WithDirectIngredients: Story = {
   render: () => (
     <>
