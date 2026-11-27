@@ -814,6 +814,7 @@ export function RecipesPage(props: RecipesPageProps) {
     onActiveFiltersChange,
     filterChooserOpen,
     onFilterChooserOpenChange,
+    filtersLoading,
   } = props;
 
   // Pagination: the shared catalog pattern (#285) — the same
@@ -1126,6 +1127,7 @@ export function RecipesPage(props: RecipesPageProps) {
       {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
       {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
       {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
+      {...(filtersLoading !== undefined ? { loading: filtersLoading } : {})}
     />
   );
 
