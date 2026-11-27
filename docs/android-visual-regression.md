@@ -339,7 +339,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-manualentrypage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-mealcookingmodepage          | light_warmHarvest |       6 |         6 |
 | pages-eciperay-mealdetailpage               | light_warmHarvest |       4 |         3 |
-| pages-eciperay-mealformpage                 | light_warmHarvest |       4 |         4 |
+| pages-eciperay-mealformpage                 | light_warmHarvest |       5 |         4 |
 | pages-eciperay-mealplandetailpage           | light_warmHarvest |      13 |        10 |
 | pages-eciperay-mealplanformpage             | light_warmHarvest |       4 |         2 |
 | pages-eciperay-mealplanspage                | light_warmHarvest |       6 |         5 |
