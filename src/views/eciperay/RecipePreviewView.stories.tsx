@@ -34,6 +34,30 @@ export const Default: Story = {
   ),
 };
 
+/**
+ * The loading state (#874): while the parse is still
+ * resolving, the view renders text bones in the preview's
+ * shape — title, meta, ingredient, and instruction lines —
+ * and none of the parsed data shows.
+ */
+export const Loading: Story = {
+  render: () => (
+    <StoryFrame variant="panel">
+      <RecipePreviewView
+        title="Creamy Mushroom Stroganoff"
+        metaLabel="Serves 4 · 35 minutes"
+        ingredients={["12 oz egg noodles", "1 lb mushrooms", "1 cup sour cream"]}
+        instructions={[
+          "Boil the noodles until tender.",
+          "Sear the mushrooms until golden.",
+          "Stir in the sour cream and serve over the noodles.",
+        ]}
+        loading
+      />
+    </StoryFrame>
+  ),
+};
+
 /** A parse that produced only a title renders just the title. */
 export const TitleOnly: Story = {
   render: () => (

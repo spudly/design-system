@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+RecipePreviewView renders a skeleton loading state (#874, following the #278 pattern), so hosts can mount the parsed-recipe preview before the parse resolves instead of gating on a spinner. RecipePreviewView gains an optional `loading` prop: while loading, it renders text bones in the preview's shape — a title line, a meta line, three ingredient lines, and three instruction lines — and no parsed data renders. The flag reaches the view through the existing preview data object: AiSessionPage and ImportReviewPage spread that object onto RecipePreviewView unchanged, so passing `loading` inside the `preview` prop skeletonizes the preview stage on both pages with no page changes. RecipePreviewView gains a `Loading` story pinning the state. Verify after adopting: passing `loading` to RecipePreviewView (or inside a page's `preview` data) shows the preview as skeleton bones with no recipe text, and omitting it renders the preview exactly as before. This is a partial tranche of #874 — the remaining pages and views without skeleton states are inventoried in the pull request's audit table and follow in a later tranche.
