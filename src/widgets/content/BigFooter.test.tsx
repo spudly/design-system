@@ -369,14 +369,15 @@ test("on native the shell renders one ScrollView and no BigFooter (#547)", () =>
   );
 });
 test("composed pages and stories render exactly one footer", () => {
-  // AiSessionPage: BOTH states (start and in-session) render
-  // through the shell — the start state used to return early
-  // without it.
+  // AiSessionPage: ALL states (loading skeleton, start and
+  // in-session) render through the shell — the start state used
+  // to return early without it. The three branches are mutually
+  // exclusive, so exactly one footer renders per state.
   const aiSession = readCode("src/pages/eciperay/AiSessionPage.tsx");
   assert.equal(
     (aiSession.match(/<BigFooterShell footer=\{footer\}>/g) ?? []).length,
-    2,
-    "AiSessionPage renders the footer in the start and in-session states",
+    3,
+    "AiSessionPage renders the footer in the loading, start and in-session states",
   );
   // MealsHubPage: the hub owns the footer on BOTH tabs (PR #413
   // review). On the plans tab the hub's shell encloses the pinned
