@@ -1,5 +1,9 @@
+import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
+import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
+import { Center } from "../../widgets/layout/Center.js";
 import { AutocompletePicker } from "../../widgets/form/AutocompletePicker.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { FormHeading } from "../../widgets/content/FormHeading.js";
@@ -61,6 +65,17 @@ import { TextField } from "../../widgets/form/TextField.js";
  * separation from the last field is the layout's own gap);
  * the page composes DS components and passes data and
  * callbacks only.
+ *
+ * Loading (#874, following the #278 pattern): while
+ * `loading`, the page renders bones in the form's at-rest
+ * shape — the heading line, the title field's
+ * label-and-input stack, the notes area as one tall box, the
+ * recipe picker's box, and the submit button's box — and no
+ * controls render, so a host can mount the form before the
+ * meal it edits resolves instead of gating the screen on a
+ * spinner. (The servings steppers and the direct-ingredients
+ * section render per selection / host opt-in, so they carry
+ * no at-rest bone.)
  */
 
 export type MealFormPageRecipeOption = {
@@ -159,10 +174,31 @@ export type MealFormPageProps = {
   onIngredientChange?: (ingredientId: string, patch: MealFormPageIngredientPatch) => void;
   /** Save in flight: the submit button disables. */
   isSaving?: boolean;
+  /** Loading state (#874): renders the skeleton shape
+   * described in the file header; no controls render in this
+   * state. */
+  loading?: boolean;
   /** Host-reported save failure, rendered above the submit row. */
   error?: string | null;
   onSubmit: () => void;
 };
+
+/** One labeled field's skeleton (#874): the label bone sits
+ * centered in the field Label's own line box
+ * (SIZABLE_TEXT_LINE_BOX, 27) over the input's box (44, a
+ * TextField input's minimum height) — the NutritionGoalsForm
+ * field-skeleton measurement, so the bones hold the loaded
+ * field's height instead of sliding off it. */
+function FieldSkeleton() {
+  return (
+    <Col gap="xs">
+      <Center width="35%" height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
+        <TextSkeleton size="sm" lines={1} />
+      </Center>
+      <BoxSkeleton height={44} />
+    </Col>
+  );
+}
 
 export function MealFormPage({
   title,
@@ -186,10 +222,30 @@ export function MealFormPage({
   onRemoveIngredient,
   onIngredientChange,
   isSaving = false,
+  loading = false,
   error,
   onSubmit,
   footer,
 }: MealFormPageProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    return (
+      <BigFooterShell footer={footer}>
+        <FormScreenLayout>
+          {/* The form's at-rest shape as bones (#874): the
+              heading line, the title field's label-and-input
+              stack, the notes area as one tall box (its
+              4-line TextArea), the recipe picker's box, and
+              the submit button's box last. */}
+          <TextSkeleton size="lg" lines={1} />
+          <FieldSkeleton />
+          <BoxSkeleton height={112} />
+          <BoxSkeleton height={44} />
+          <BoxSkeleton height={48} />
+        </FormScreenLayout>
+      </BigFooterShell>
+    );
+  }
   return (
     <BigFooterShell footer={footer}>
       <FormScreenLayout>

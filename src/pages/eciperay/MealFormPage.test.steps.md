@@ -15,7 +15,7 @@ release's changed components. The full index lives in
 
 Open in `Pages/Eciperay/RecipeFormPage`: Default, Empty,
 ContentLocked, VersionDiff. Open in `Pages/Eciperay/MealFormPage`:
-Default, NoSelection, SaveError. Open in
+Default, NoSelection, SaveError, Loading. Open in
 `Pages/Eciperay/MealPlanFormPage`: Default, NoSelection.
 
 1. RecipeFormPage Default: Title, the Status toggle buttons,
@@ -49,6 +49,11 @@ Default, NoSelection, SaveError. Open in
    (plus Servings to cook and Servings to eat for recipes, #659) steppers grouped per selected
    entry in their own field stacks; NoSelection disables Save
    plan.
+6. MealFormPage Loading (#874): the form renders as skeleton
+   bones in its at-rest shape — the heading line, the Title
+   field's label-and-input stack, the notes area as one tall
+   box, the recipe picker's box, and the Save meal button's
+   box — and no fields, picker, steppers, or buttons render.
 
 **Run when:** `src/pages/eciperay/RecipeFormPage.tsx`,
 `src/pages/eciperay/MealFormPage.tsx`, `src/pages/eciperay/MealPlanFormPage.tsx`,
