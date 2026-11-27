@@ -51,10 +51,12 @@ function BarDemo({
   initialActive,
   initialChooserOpen = false,
   withSearchHelp = false,
+  loading = false,
 }: {
   initialActive?: string[];
   initialChooserOpen?: boolean;
   withSearchHelp?: boolean;
+  loading?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [ingredient, setIngredient] = useState("");
@@ -125,6 +127,7 @@ function BarDemo({
       onActiveFiltersChange={setActiveFilters}
       filterChooserOpen={chooserOpen}
       onFilterChooserOpenChange={setChooserOpen}
+      loading={loading}
     />
   );
 }
@@ -143,4 +146,11 @@ export const WithFiltersAdded: Story = {
 
 export const WithSearchHelp: Story = {
   render: () => <BarDemo withSearchHelp />,
+};
+
+/** The loading state (#874): the search row as bones — the
+ * search field's box and the Filters button's box — while the
+ * catalog's filter definitions are still resolving. */
+export const Loading: Story = {
+  render: () => <BarDemo loading />,
 };

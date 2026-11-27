@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+CatalogFiltersBar renders a skeleton loading state (#874, following the #278 pattern), so catalog pages can mount the filter bar before their filter definitions resolve instead of gating the list header on a spinner. CatalogFiltersBar gains an optional `loading` prop: while loading, it renders bones in the bar's at-rest shape — the search field's box and the Filters button's box in the search row — and no controls render. The shared catalog-page prop block (CatalogPageFilterProps) gains a `filtersLoading` pass-through, and RecipesPage forwards it to the bar, so a host skeletonizes the bar by passing `filtersLoading` to the page. CatalogFiltersBar gains a `Loading` story pinning the state. Verify after adopting: passing `loading` to CatalogFiltersBar (or `filtersLoading` to RecipesPage) shows the search row as skeleton bones with no search field or buttons, and omitting it renders the bar exactly as before. This is a partial tranche of #874 — the remaining pages without skeleton states are inventoried in the pull request's audit table and follow in a later tranche.

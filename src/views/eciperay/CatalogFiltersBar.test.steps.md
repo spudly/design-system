@@ -14,7 +14,7 @@ release's changed components. The full index lives in
 ## CatalogFiltersBar & CatalogHeader
 
 Open in `Views/CatalogFiltersBar`: Collapsed, ChooserOpen,
-WithFiltersAdded; and `Views/CatalogHeader`: Default.
+WithFiltersAdded, Loading; and `Views/CatalogHeader`: Default.
 
 1. Collapsed: a search field and a Filters button — nothing
    else. The search starts empty, so there is no clear button
@@ -33,7 +33,11 @@ WithFiltersAdded; and `Views/CatalogHeader`: Default.
    row naming its filter; its remove button visibly reads
    "Remove" and its accessible name is `Remove <label>
 filter`; removing it returns the row to the chooser.
-4. CatalogHeader Default: the title renders as the heading
+4. Loading: the bar renders only the search row as skeleton
+   bones — a wide field-shaped bone and a small button-shaped
+   bone beside it — with no search field, no Filters button,
+   and no filter controls.
+5. CatalogHeader Default: the title renders as the heading
    above the composed bar, left-aligned at the column inset.
 
 **Run when:** `src/views/eciperay/CatalogFiltersBar.tsx`,
