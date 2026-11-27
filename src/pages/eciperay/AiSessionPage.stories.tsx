@@ -43,6 +43,27 @@ export const Start: Story = {
   ),
 };
 
+/** The loading state (#874): the start view's at-rest shape
+ * as bones — the heading's title and intro lines, the prompt
+ * area as one tall box, and the action row's button box —
+ * while the session the page will start is still resolving. */
+export const Loading: Story = {
+  render: () => (
+    <>
+      <AiSessionPage
+        footer={eciperayFooterFixture}
+        config={aiSessionGenerateConfigFixture}
+        session={null}
+        prompt=""
+        followUp=""
+        busy={false}
+        loading
+        {...noopHandlers}
+      />
+    </>
+  ),
+};
+
 export const Planning: Story = {
   render: () => (
     <>

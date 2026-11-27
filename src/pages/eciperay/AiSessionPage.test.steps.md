@@ -14,7 +14,7 @@ release's changed components. The full index lives in
 
 ## AiSessionPage
 
-Open in `Pages/Eciperay/AiSessionPage`: Start, Planning, PreviewReady.
+Open in `Pages/Eciperay/AiSessionPage`: Start, Planning, PreviewReady, Loading.
 
 1. Start: the Cancel button is a **ghost (text-only) button with a
    readable label** — never a filled button whose label clashes with
@@ -22,6 +22,11 @@ Open in `Pages/Eciperay/AiSessionPage`: Start, Planning, PreviewReady.
    treatment.
 2. PreviewReady renders the plan preview with all sections visible
    and no clipped footer actions.
+3. Loading (#874): the page renders as skeleton bones in the
+   start view's at-rest shape — the heading's title and intro
+   lines, the prompt area as one tall box, and the action
+   row's button box — and no prompt field, transcript, or
+   buttons render.
 
 **Run when:** `src/pages/eciperay/AiSessionPage.tsx`, its stories, or a
 changeset naming AiSessionPage.

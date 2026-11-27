@@ -1,6 +1,10 @@
+import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
+import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { ChatTranscript } from "../../widgets/content/ChatTranscript.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { RecipePreviewView, type RecipePreviewViewProps } from "../../views/eciperay/RecipePreviewView.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
@@ -71,6 +75,14 @@ import { TextAreaField } from "../../widgets/form/TextAreaField.js";
  * dims it and refuses activation, held-key repeats included —
  * replacing the hand-built pressable stack this page used to
  * carry, including its own keyboard handler.
+ *
+ * Loading (#874, following the #278 pattern): while
+ * `loading`, the page renders bones in the start view's
+ * at-rest shape — the heading's title and intro lines, the
+ * prompt area as one tall box (its `xl` TextAreaField), and
+ * the action row's button box — and no controls render, so
+ * a host can mount the page before the session it will start
+ * resolves instead of gating the screen on a spinner.
  */
 
 export type AiSessionPageConfig = {
@@ -116,6 +128,10 @@ export type AiSessionPageProps = {
   startPending?: boolean;
   approvePending?: boolean;
   finalizePending?: boolean;
+  /** Loading state (#874): renders the skeleton shape
+   * described in the file header; no controls render in this
+   * state. */
+  loading?: boolean;
   error?: string | null;
   onStart: (prompt: string) => void;
   onSendMessage: (text: string) => void;
@@ -137,6 +153,7 @@ export function AiSessionPage({
   startPending = false,
   approvePending = false,
   finalizePending = false,
+  loading = false,
   error,
   onStart,
   onSendMessage,
@@ -146,6 +163,27 @@ export function AiSessionPage({
   onEmptyCancel,
   footer,
 }: AiSessionPageProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    return (
+      <BigFooterShell footer={footer}>
+        <SessionShell>
+          {/* The start view's at-rest shape as bones (#874):
+              the heading's title (2xl) and intro (sm) lines,
+              the prompt area as one tall box (the `xl`
+              TextAreaField's 192 minimum height), and the
+              action row's button box (a default Button's 48
+              minimum height) last. */}
+          <Col gap="s">
+            <TextSkeleton size="2xl" lines={1} />
+            <TextSkeleton size="sm" lines={1} />
+          </Col>
+          <BoxSkeleton height={192} />
+          <BoxSkeleton height={48} />
+        </SessionShell>
+      </BigFooterShell>
+    );
+  }
   if (!session) {
     return (
       <BigFooterShell footer={footer}>

@@ -329,7 +329,7 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // LandingPage story (+1 standard)). (Component stories are not
   // in the capture set — STANDARD_PREFIXES covers Pages only; the
   // #119 tranches' component stories are Chromatic-covered.)
-  const EXPECTED_LIGHT_STORY_COUNT = 207; // +1: the MealFormPage Loading story, #874 tranche 7 (on top of 206: +1 MealPlanFormPage Loading story, #874 tranche 5; 205: +1 ProfilePage Loading story, #874 tranche 2)
+  const EXPECTED_LIGHT_STORY_COUNT = 208; // +1: the AiSessionPage Loading story, #874 tranche 6, and +1: the MealFormPage Loading story, #874 tranche 7 (on top of 206: +1 MealPlanFormPage Loading story, #874 tranche 5; 205: +1 ProfilePage Loading story, #874 tranche 2)
   // the standard set grew by the eight B3a recipe-form stories,
   // #124, the sixteen B3b meals/shopping stories, #125, the
   // twenty-three B3c account/auth stories, #126, the three
