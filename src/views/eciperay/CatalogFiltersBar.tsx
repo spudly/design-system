@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { tokens } from "../../tokens/index.js";
 import { useVoice } from "../../voice/index.js";
 import { politeLiveRegionProps } from "../../widgets/accessibility.js";
@@ -11,6 +12,7 @@ import {
   type SearchHelpContent,
 } from "../../widgets/overlays/SearchHelpPopover.js";
 import { Text } from "../../widgets/data/Text.js";
+import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { FieldRow } from "../../widgets/form/FieldRow.js";
 import { SelectField, type SelectOption } from "../../widgets/form/SelectField.js";
 import { TextField } from "../../widgets/form/TextField.js";
@@ -39,6 +41,13 @@ import { TextField } from "../../widgets/form/TextField.js";
  * program, unchanged in behavior: the catalog pages compose
  * this bar into their list headers and pass their catalog's
  * definitions in.
+ *
+ * Loading (#874, following the #278 pattern): while
+ * `loading`, the bar renders bones in its at-rest shape — the
+ * search field's box and the Filters button's box in the
+ * search row — and no controls render, so a catalog page can
+ * mount the bar before its filter definitions resolve instead
+ * of gating the header on a spinner.
  */
 
 /** A single-select filter: a SelectField over caller-supplied
@@ -143,6 +152,10 @@ export type CatalogFiltersBarProps<FilterId extends string = string> = {
    * like `activeFilters`; uncontrolled when omitted. */
   filterChooserOpen?: boolean;
   onFilterChooserOpenChange?: (open: boolean) => void;
+  /** Loading state (#874): renders the skeleton shape
+   * described in the file header; no controls render in this
+   * state. */
+  loading?: boolean;
 };
 
 /** The filter-bar prop block the catalog pages share (#587,
@@ -191,6 +204,11 @@ export type CatalogPageFilterProps<FilterId extends string = string> = {
    * like `activeFilters`; uncontrolled when omitted. */
   filterChooserOpen?: boolean;
   onFilterChooserOpenChange?: (open: boolean) => void;
+  /** The bar's loading state (#874), passed through to the
+   * bar's `loading` prop: see CatalogFiltersBarProps. Named
+   * distinctly because RecipesPage already carries a `loading`
+   * prop for its public mode's first load. */
+  filtersLoading?: boolean;
 };
 
 function NumberFilter({
@@ -334,8 +352,10 @@ export function CatalogFiltersBar<FilterId extends string = string>({
   onActiveFiltersChange,
   filterChooserOpen,
   onFilterChooserOpenChange,
+  loading = false,
 }: CatalogFiltersBarProps<FilterId>) {
   const voice = useVoice();
+  const showSkeleton = useLoadingScope(loading);
   // Uncontrolled seed: a filter that already carries a non-default
   // value starts added, so existing callers that preset filter
   // values keep seeing (and can clear) those filters.
@@ -364,6 +384,24 @@ export function CatalogFiltersBar<FilterId extends string = string>({
     clearFilter(definition);
     setActive(active.filter((filterId) => filterId !== definition.id));
   };
+
+  if (showSkeleton) {
+    return (
+      <Col gap="m">
+        {/* The at-rest search row as bones (#874): the search
+            field's box — 46px, the 44px glyph box plus the
+            container's two 1px borders, the BulkSelectToolbar
+            measurement — grown to the row's remaining width,
+            and the small Filters button's box beside it. */}
+        <FieldRow>
+          <Col grow>
+            <BoxSkeleton height={46} />
+          </Col>
+          <BoxSkeleton width={84} height={46} />
+        </FieldRow>
+      </Col>
+    );
+  }
 
   return (
     <Col gap="m">
