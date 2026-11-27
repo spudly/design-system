@@ -1,5 +1,7 @@
+import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { Text } from "../../widgets/data/Text.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 
 /**
  * RecipePreviewView (#684): the parsed-recipe preview the
@@ -15,6 +17,15 @@ import { Text } from "../../widgets/data/Text.js";
  * renders it verbatim and owns no servings/time formatting.
  * AiSessionPage and ImportReviewPage frame this view in
  * their PreviewCard.
+ *
+ * Loading (#874, following the #278 pattern): while
+ * `loading`, the view renders text bones in the preview's
+ * shape — a title line, a meta line, three ingredient lines,
+ * and three instruction lines — and no parsed data renders,
+ * so the host can mount the preview card before the parse
+ * resolves instead of gating on a spinner. Hosts using the
+ * pages pass the flag inside the preview data object: both
+ * pages spread it onto this view unchanged.
  */
 export type RecipePreviewViewProps = {
   /** The parsed recipe's title. */
@@ -25,6 +36,9 @@ export type RecipePreviewViewProps = {
   ingredients?: string[];
   /** The parsed instruction lines, rendered numbered, in order. */
   instructions?: string[];
+  /** Loading state (#874): renders the skeleton shape
+   * described above; no parsed data renders in this state. */
+  loading?: boolean;
 };
 
 export function RecipePreviewView({
@@ -32,7 +46,19 @@ export function RecipePreviewView({
   metaLabel,
   ingredients,
   instructions,
+  loading = false,
 }: RecipePreviewViewProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    return (
+      <Col gap="s">
+        <TextSkeleton size="md" lines={1} />
+        <TextSkeleton size="md" lines={1} />
+        <TextSkeleton size="md" lines={3} />
+        <TextSkeleton size="md" lines={3} />
+      </Col>
+    );
+  }
   return (
     <Col gap="s">
       <Text variant="strong">{title}</Text>
