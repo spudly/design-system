@@ -1,3 +1,4 @@
+import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
@@ -29,6 +30,11 @@ export type AuthorDisplayViewProps = {
   settings: AuthorDisplaySettings;
   /** Whole-settings change handler (the host form-state contract). */
   onChange: (settings: AuthorDisplaySettings) => void;
+  /** Loading state (#874): the section card renders in its
+   * loading scope so the field, checkbox, and Save button
+   * skeletonize (the #278 pattern); no stored settings or
+   * error render in this state. */
+  loading?: boolean;
   saving?: boolean;
   /** Disable Save (e.g. until the stored settings have loaded). */
   saveDisabled?: boolean;
@@ -46,6 +52,12 @@ export type AuthorDisplayViewProps = {
  * query, the form state as a whole, and the save mutation;
  * every change reports the whole settings object through
  * `onChange`.
+ *
+ * Loading (#874, following the #278 pattern): while
+ * `loading`, the section card renders in its loading scope —
+ * the field, checkbox, and Save button skeletonize — so the
+ * host can mount the section before the stored settings
+ * resolve instead of gating on a spinner.
  */
 export function AuthorDisplayView({
   title: titleProp,
@@ -56,6 +68,7 @@ export function AuthorDisplayView({
   saveLabel: saveLabelProp,
   settings,
   onChange,
+  loading = false,
   saving = false,
   saveDisabled = false,
   error,
@@ -69,8 +82,9 @@ export function AuthorDisplayView({
   const hint = hintProp ?? voice.authorDisplayView.hint;
   const showNameLabel = showNameLabelProp ?? voice.authorDisplayView.showNameLabel;
   const saveLabel = saveLabelProp ?? voice.authorDisplayView.saveLabel;
+  const showSkeleton = useLoadingScope(loading);
   return (
-    <SectionCard title={title} variant="elevated">
+    <SectionCard title={title} variant="elevated" loading={showSkeleton}>
       <TextField
         label={displayNameLabel}
         value={settings.displayName ?? ""}
@@ -87,7 +101,7 @@ export function AuthorDisplayView({
           onChange({ ...settings, showOnPublicRecipes: next });
         }}
       />
-      {error ? <Alert severity="error" message={error} /> : null}
+      {error && !showSkeleton ? <Alert severity="error" message={error} /> : null}
       <Button variant="primary" disabled={saving || saveDisabled} onPress={onSave}>
         {saveLabel}
       </Button>
