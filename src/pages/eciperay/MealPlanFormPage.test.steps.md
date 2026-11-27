@@ -16,7 +16,7 @@ release's changed components. The full index lives in
 Open in `Pages/Eciperay/RecipeFormPage`: Default, Empty,
 ContentLocked, VersionDiff. Open in `Pages/Eciperay/MealFormPage`:
 Default, NoSelection, SaveError. Open in
-`Pages/Eciperay/MealPlanFormPage`: Default, NoSelection.
+`Pages/Eciperay/MealPlanFormPage`: Default, NoSelection, Loading.
 
 1. RecipeFormPage Default: Title, the Status toggle buttons,
    Description with its "Generate with AI" action, the Servings
@@ -53,6 +53,12 @@ Default, NoSelection, SaveError. Open in
    editing a Day field reporting the new YYYY-MM-DD value for
    that entry only; NoSelection disables Save
    plan.
+6. MealPlanFormPage Loading (#874): the form renders as
+   skeleton bones in its at-rest shape — the heading line,
+   the Title / Starts on / Ends on fields' label-and-input
+   stacks, the notes area as one tall box, the entry picker's
+   box, and the Save plan button's box — and no fields,
+   picker, steppers, or buttons render.
 
 **Run when:** `src/pages/eciperay/RecipeFormPage.tsx`,
 `src/pages/eciperay/MealFormPage.tsx`, `src/pages/eciperay/MealPlanFormPage.tsx`,

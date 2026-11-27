@@ -152,6 +152,18 @@ export const NoSelection: Story = {
   ),
 };
 
+/** The loading state (#874): the form's at-rest shape as
+ * bones — heading, field stacks, the notes box, the entry
+ * picker's box, and the submit button's box — while the plan
+ * the form edits is still resolving. */
+export const Loading: Story = {
+  render: () => (
+    <>
+      <Form loading />
+    </>
+  ),
+};
+
 export const DetailsOnly: Story = {
   // Details-only mode (eciperay #646, tranche 1): the host
   // omits every entry prop, so the form is title, notes, and
