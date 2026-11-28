@@ -13,6 +13,7 @@ import { loadInternalDist } from "../../test/internalDist.js";
 // normalization amendment (the loading prop is `loading`
 // everywhere; `isLoading` no longer exists in the package).
 
+const noop = () => { /* noop */ };
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const read = (path: string) => readFileSync(join(root, path), "utf8");
 const readCode = (path: string) =>
@@ -417,7 +418,6 @@ test("T1: CheckboxSelectList's centered spinner is gone", () => {
 test("T1 SSR: loading rows and cards render skeletons, no real content, actions as skeletons", async () => {
   const { CardRow, ListItem, DiscoveryCard, CommentItem, LogEntryCard, TokenRow } =
     await loadRuntime();
-  const noop = () => { /* noop */ };
   const cardRow = await renderToHtml(
     <CardRow
       title="Secret Plan"
@@ -517,7 +517,6 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
 });
 test("T1 SSR: loading PreviewCard and the collections render their dummy items", async () => {
   const { PreviewCard, CheckboxSelectList, MasonryGrid, Button } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const preview = await renderToHtml(
     <PreviewCard
       title="Your recipe"
@@ -613,7 +612,6 @@ test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatmen
     "a skeleton button is hidden from assistive tech",
   );
   const { Button, LoadingScope } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const scoped = await renderToHtml(
     <LoadingScope active={true}>
       <Button onPress={noop}>ScopedAction</Button>
@@ -720,7 +718,6 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     "the ghost bone is the shared clock's bone",
   );
   const { Button, LoadingScope } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const scopedGhost = await renderToHtml(
     <LoadingScope active={true}>
       <Button ghost={true} size="sm" onPress={noop}>
@@ -773,7 +770,6 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
 });
 test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unchanged", async () => {
   const { Card, SectionCard, CardRow, CheckboxSelectList, Button } = await loadRuntime();
-  const noop = () => { /* noop */ };
 
   // The Card shell's scope skeletonizes a nested row that was
   // never handed a loading prop — no prop-drilling past the shell.
@@ -921,7 +917,6 @@ test("T2: every converted data widget declares `loading` and reads the LoadingSc
 });
 test("T2 SSR: loading NutritionPanel renders the ready layout's skeleton, no real values", async () => {
   const { NutritionPanel } = await loadRuntime();
-  const noop = () => { /* noop */ };
 
   // The view-model's own loading state: header bone + the label
   // skeleton (title + serving + calories bones, exactly 3 dummy
@@ -1010,7 +1005,6 @@ test("T2 SSR: loading NutritionPanel renders the ready layout's skeleton, no rea
 });
 test("T2 SSR: loading RatingsCard and TagList render skeletons, no real content", async () => {
   const { RatingsCard, TagList } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const ratings = await renderToHtml(
     <RatingsCard
       ratings={{
@@ -1096,7 +1090,6 @@ test("T2 SSR: loading RatingsCard and TagList render skeletons, no real content"
 });
 test("T2 SSR: loading SecretRevealPanel and StepList hide their content", async () => {
   const { SecretRevealPanel, StepList } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const secret = await renderToHtml(
     <SecretRevealPanel
       secret="fixture-hidden-value"
@@ -1199,7 +1192,6 @@ test("T2 SSR: loading RecipeOverviewPanel mirrors its blocks; no real content", 
 });
 test("T2 SSR: loading RecipeIngredientsPanel skeletonizes controls and rows", async () => {
   const { RecipeIngredientsPanel } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const view = {
     servings: 4,
     onServingsChange: noop,
@@ -1375,7 +1367,6 @@ function loadPages() {
 test("T4 SSR: loading MealPlansPage and HomePage render skeleton rows, frames intact", async () => {
   await loadRuntime();
   const { MealPlansPage, HomePage } = await loadPages();
-  const noop = () => { /* noop */ };
   const plans = await renderToHtml(
     <MealPlansPage
       plans={[
@@ -1442,7 +1433,6 @@ test("T4 SSR: loading MealPlansPage and HomePage render skeleton rows, frames in
 test("T4 SSR: loading MealsHubPage and ShoppingListPage render skeleton rows", async () => {
   await loadRuntime();
   const { MealsHubPage, ShoppingListPage } = await loadPages();
-  const noop = () => { /* noop */ };
   const hub = await renderToHtml(
     <MealsHubPage
       activeTab="meals"
@@ -1507,7 +1497,6 @@ test("T4 SSR: loading MealsHubPage and ShoppingListPage render skeleton rows", a
 test("T4 SSR: loading TagsPage renders skeleton rows, the create form stays live", async () => {
   await loadRuntime();
   const { TagsPage } = await loadPages();
-  const noop = () => { /* noop */ };
   const tags = await renderToHtml(
     <TagsPage
       tags={[
@@ -1693,7 +1682,6 @@ test("T3 SSR: loading RecipeCommentsView renders comment skeletons, no real cont
 });
 test("T3 SSR: loading SubscriptionView and AccessTokensPanel hide their real content", async () => {
   const { SubscriptionView, AccessTokensPanel } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const subscription = await renderToHtml(
     <SubscriptionView
       planLabel="Secret Plus plan"
@@ -1730,7 +1718,6 @@ test("T3 SSR: loading SubscriptionView and AccessTokensPanel hide their real con
 });
 test("T3 SSR: loading CandidateList and NutritionGoalsForm render skeletons", async () => {
   const { CandidateList, NutritionGoalsForm } = await loadRuntime();
-  const noop = () => { /* noop */ };
   const candidates = await renderToHtml(
     <CandidateList
       title="Ready to activate"
