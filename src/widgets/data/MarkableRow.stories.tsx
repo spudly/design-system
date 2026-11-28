@@ -25,19 +25,19 @@ export const Default: Story = {
         <Col>
           <MarkableRow
             label="1 1/2 lb chicken thighs"
-            isMarked={marked["chicken"] ?? false}
-            onPress={() => toggle("chicken")}
+            isMarked={marked.chicken ?? false}
+            onPress={() => { toggle("chicken"); }}
           />
           <MarkableRow
             label="2 cups jasmine rice"
-            isMarked={marked["rice"] ?? false}
-            onPress={() => toggle("rice")}
+            isMarked={marked.rice ?? false}
+            onPress={() => { toggle("rice"); }}
           />
           <MarkableRow
             label="1 tsp smoked paprika"
             trailingNote="optional"
-            isMarked={marked["paprika"] ?? false}
-            onPress={() => toggle("paprika")}
+            isMarked={marked.paprika ?? false}
+            onPress={() => { toggle("paprika"); }}
           />
           <MarkableRow label="Salt to taste" />
         </Col>

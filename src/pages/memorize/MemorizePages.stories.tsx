@@ -92,8 +92,7 @@ export const PassageView: Story = {
 function MemorizationSessionDemo() {
   const words = passageFixture.drillWords;
   const [revealed, setRevealed] = useState<boolean[]>([true, false, false]);
-  const reveal = (index: number) =>
-    setRevealed((rows) => rows.map((row, i) => (i === index ? true : row)));
+  const reveal = (index: number) => { setRevealed((rows) => rows.map((row, i) => (i === index ? true : row))); };
   return (
     <PageFrame>
       <Text variant="heading">{passageFixture.reference}</Text>
@@ -107,7 +106,7 @@ function MemorizationSessionDemo() {
         <BlankWord
           word={words[0]!}
           revealed={revealed[0]!}
-          onReveal={() => reveal(0)}
+          onReveal={() => { reveal(0); }}
           index={0}
           total={words.length}
         />
@@ -115,7 +114,7 @@ function MemorizationSessionDemo() {
         <BlankWord
           word={words[1]!}
           revealed={revealed[1]!}
-          onReveal={() => reveal(1)}
+          onReveal={() => { reveal(1); }}
           index={1}
           total={words.length}
         />
@@ -123,7 +122,7 @@ function MemorizationSessionDemo() {
         <BlankWord
           word={words[2]!}
           revealed={revealed[2]!}
-          onReveal={() => reveal(2)}
+          onReveal={() => { reveal(2); }}
           index={2}
           total={words.length}
         />

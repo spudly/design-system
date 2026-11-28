@@ -103,10 +103,10 @@ export const DialogOpen: Story = {
           description="This cannot be undone."
           actions={
             <>
-              <Button variant="secondary" size="sm" onPress={() => setOpen(false)}>
+              <Button variant="secondary" size="sm" onPress={() => { setOpen(false); }}>
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" onPress={() => setOpen(false)}>
+              <Button variant="primary" size="sm" onPress={() => { setOpen(false); }}>
                 Delete
               </Button>
             </>
@@ -116,7 +116,7 @@ export const DialogOpen: Story = {
             “Creamy Tuscan Garlic Chicken” will be removed from your library.
           </Text>
         </Dialog>
-        {!open ? <Text variant="hint">Dialog closed — reload the story to reopen.</Text> : null}
+        {open ? null : <Text variant="hint">Dialog closed — reload the story to reopen.</Text>}
       </YStack>
     );
   },
@@ -153,7 +153,7 @@ export const StepOverlayOpen: Story = {
                 variant="secondary"
                 size="sm"
                 disabled={stepIndex === 0}
-                onPress={() => setStepIndex((current) => Math.max(0, current - 1))}
+                onPress={() => { setStepIndex((current) => Math.max(0, current - 1)); }}
               >
                 Back
               </Button>
@@ -161,7 +161,7 @@ export const StepOverlayOpen: Story = {
                 variant="primary"
                 size="sm"
                 disabled={stepIndex === STEPS.length - 1}
-                onPress={() => setStepIndex((current) => Math.min(STEPS.length - 1, current + 1))}
+                onPress={() => { setStepIndex((current) => Math.min(STEPS.length - 1, current + 1)); }}
               >
                 Next
               </Button>

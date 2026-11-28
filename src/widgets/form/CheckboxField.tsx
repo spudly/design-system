@@ -191,7 +191,7 @@ export function CheckboxField({
   const id = idProp ?? autoId;
   const labelId = `${id}-label`;
   const errorId = `${id}-error`;
-  const toggle = () => onCheckedChange(!checked);
+  const toggle = () => { onCheckedChange(!checked); };
   const listShape = detail !== undefined || separator || strikeWhenChecked;
   // The list shape's accessible name composes the detail after the
   // label (the row family's standing rule — ListItem's composed
@@ -205,7 +205,7 @@ export function CheckboxField({
       id={id}
       checked={checked}
       onCheckedChange={onCheckedChange}
-      {...(disabled !== undefined ? { disabled } : {})}
+      {...(disabled === undefined ? {} : { disabled })}
       {...(listShape
         ? { "aria-label": accessibilityLabel ?? accessibleName }
         : { "aria-labelledby": labelId })}

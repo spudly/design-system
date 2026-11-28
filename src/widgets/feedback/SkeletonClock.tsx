@@ -140,10 +140,10 @@ function useWebPrefersReducedMotion(): boolean {
       return;
     }
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduced(query.matches);
+    const onChange = () => { setReduced(query.matches); };
     onChange();
     query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
+    return () => { query.removeEventListener("change", onChange); };
   }, []);
   return reduced;
 }

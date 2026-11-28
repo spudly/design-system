@@ -50,8 +50,7 @@ export const Transient: Story = {
     return (
       <YStack maxWidth={430} gap={tokens.spacing[4]}>
         <Button
-          onPress={() =>
-            setMessage((current) => (current === null ? "Added to this week's meal plan." : null))
+          onPress={() => { setMessage((current) => (current === null ? "Added to this week's meal plan." : null)); }
           }
         >
           Toggle confirmation

@@ -49,7 +49,7 @@ function DefaultDemo() {
       <XStack gap="$3">
         {rows.map((row) => (
           <YStack key={row.title} flex={1}>
-            <CardRow {...row} onPress={() => setRowPresses((count) => count + 1)} />
+            <CardRow {...row} onPress={() => { setRowPresses((count) => count + 1); }} />
           </YStack>
         ))}
       </XStack>
@@ -75,10 +75,10 @@ function WithActionDemo() {
       <CardRow
         title="Weeknight favorites"
         subtitle="4 entries · Oct 19 – Oct 25 · 12,400 cal"
-        onPress={() => setRowPresses((count) => count + 1)}
+        onPress={() => { setRowPresses((count) => count + 1); }}
         actionLabel="Delete"
         actionTone="danger"
-        onActionPress={() => setActionPresses((count) => count + 1)}
+        onActionPress={() => { setActionPresses((count) => count + 1); }}
       />
       <Text>Row presses: {rowPresses}</Text>
       <Text>Delete presses: {actionPresses}</Text>

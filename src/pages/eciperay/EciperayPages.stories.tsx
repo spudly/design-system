@@ -62,8 +62,7 @@ function RecipeDetailDemo() {
               label={ingredient.label}
               metadata={ingredient.metadata}
               checked={checked[index] ?? false}
-              onCheckedChange={(next) =>
-                setChecked((rows) => rows.map((row, i) => (i === index ? next : row)))
+              onCheckedChange={(next) => { setChecked((rows) => rows.map((row, i) => (i === index ? next : row))); }
               }
             />
           ))}

@@ -24,7 +24,7 @@ export const Hidden: Story = {
     revealed: false,
     index: 0,
     total: 3,
-    onReveal: () => console.log("revealed"),
+    onReveal: () => { console.log("revealed"); },
   },
 };
 
@@ -47,7 +47,7 @@ function InteractiveDrill() {
       <BlankWord
         word={words[0]!}
         revealed={revealed[0]!}
-        onReveal={() => setRevealed((r) => r.map((v, i) => (i === 0 ? true : v)))}
+        onReveal={() => { setRevealed((r) => r.map((v, i) => (i === 0 ? true : v))); }}
         index={0}
         total={words.length}
       />{" "}
@@ -55,7 +55,7 @@ function InteractiveDrill() {
       <BlankWord
         word={words[1]!}
         revealed={revealed[1]!}
-        onReveal={() => setRevealed((r) => r.map((v, i) => (i === 1 ? true : v)))}
+        onReveal={() => { setRevealed((r) => r.map((v, i) => (i === 1 ? true : v))); }}
         index={1}
         total={words.length}
       />

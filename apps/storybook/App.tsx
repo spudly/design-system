@@ -153,7 +153,7 @@ function useStoryIndexLog() {
       for (const story of stories) console.log(`DSVR INDEX_ITEM ${story.id}`);
       console.log("DSVR INDEX_END");
     }, 500);
-    return () => clearInterval(timer);
+    return () => { clearInterval(timer); };
   }, []);
 }
 
@@ -213,7 +213,7 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
       console.log(`DSVR READY ${nonce} ${storyId}`);
     };
     const handler = (payload?: { storyId?: string }) => {
-      if (!payload || payload.storyId === undefined || payload.storyId === storyId) {
+      if (payload?.storyId === undefined || payload.storyId === storyId) {
         // Let the rendered frame actually paint before signalling.
         setTimeout(fire, 250);
       }
@@ -260,7 +260,7 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
       }
     };
     const handler = (payload?: { storyId?: string }) => {
-      if (!payload || payload.storyId === undefined || payload.storyId === storyId) {
+      if (payload?.storyId === undefined || payload.storyId === storyId) {
         setTimeout(run, 650);
       }
     };
@@ -306,9 +306,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        {!ready ? (
-          <View style={{ flex: 1 }} />
-        ) : capture ? (
+        {ready ? capture ? (
           <CaptureRoot
             storyId={capture.storyId}
             theme={capture.theme ?? ""}
@@ -317,6 +315,8 @@ export default function App() {
           />
         ) : (
           <StorybookUIRoot />
+        ) : (
+          <View style={{ flex: 1 }} />
         )}
       </SafeAreaProvider>
     </GestureHandlerRootView>

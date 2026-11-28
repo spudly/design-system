@@ -26,7 +26,7 @@ function PrefixedDemo() {
         prefix="Meal · "
         title="Taco Tuesday"
         subtitle="Serves 4 · 2,150 cal"
-        onPress={() => setPresses((count) => count + 1)}
+        onPress={() => { setPresses((count) => count + 1); }}
       />
       <Text>Row presses: {presses}</Text>
     </YStack>

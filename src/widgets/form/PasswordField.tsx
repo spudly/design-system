@@ -73,7 +73,7 @@ export function PasswordField({
     <Row
       middle
       center
-      onPress={disabled ? undefined : () => setRevealed((value) => !value)}
+      onPress={disabled ? undefined : () => { setRevealed((value) => !value); }}
       {...platformAccessibilityProps({
         accessibilityRole: "button",
         accessibilityLabel: toggleLabel,
