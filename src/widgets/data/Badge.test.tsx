@@ -191,7 +191,7 @@ describe("badgeRemovable", () => {
       "the × button must carry the remove accessible name through the platform helper",
     );
     assert.ok(
-      badgeSource.includes("`Remove ${children}`"),
+      badgeSource.includes(`\`Remove \${children}\``),
       "the default remove name is Remove <label> for a string label",
     );
     assert.ok(badgeSource.includes("×"), "the remove control renders the × glyph");
