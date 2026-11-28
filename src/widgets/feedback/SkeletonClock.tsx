@@ -240,11 +240,9 @@ export function SkeletonClock({ children, frozen = false }: SkeletonClockProps) 
     () => false,
   );
   const storeRef = useRef<SkeletonClockStore | null>(null);
-  if (storeRef.current === null) {
-    storeRef.current = createSkeletonClockStore(
-      frozen || webPrefersReducedMotion() || isDefaultSkeletonClockFrozen(),
-    );
-  }
+  storeRef.current ??= createSkeletonClockStore(
+    frozen || webPrefersReducedMotion() || isDefaultSkeletonClockFrozen(),
+  );
   useEffect(() => {
     storeRef.current?.setFrozen(frozen || webReducedMotion || defaultFrozen);
   }, [frozen, webReducedMotion, defaultFrozen]);

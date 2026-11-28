@@ -227,7 +227,7 @@ test("the icons module is internal — no ./icons subpath export (#246, #298)", 
     "the package root is the only export — pages only (#298)",
   );
   assert.ok(
-    pkg.dependencies["react-native-svg"] || pkg.peerDependencies["react-native-svg"],
+    pkg.dependencies["react-native-svg"] ?? pkg.peerDependencies["react-native-svg"],
     "react-native-svg is not declared as a dependency or peer",
   );
 });

@@ -306,6 +306,7 @@ export default function App() {
     LogBox.ignoreAllLogs(capture !== null);
   }, [capture]);
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean readiness: fontsLoaded=false must fall through to the fontError check; ?? would keep false.
   const ready = fontsLoaded || fontError != null;
 
   return (

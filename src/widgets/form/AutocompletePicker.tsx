@@ -236,6 +236,7 @@ export function AutocompletePicker({
     ? isSearching
       ? voice.autocompletePicker.searchingLabel
       : visibleResults.length === 0
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- an empty-string searchError must fall back to the no-results message; ?? would keep "".
         ? searchError || noResultsMessage
         : voice.autocompletePicker.resultsAvailableLabel(visibleResults.length)
     : null;

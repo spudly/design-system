@@ -99,6 +99,7 @@ test("the registered display font follows the brand config", () => {
 
   const memorizeConfig = createTamaguiConfig(memorizeTheme);
   assert.ok(
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean assertion disjunction; ?? does not apply to booleans.
     memorizeConfig.fonts.display.family.startsWith("Raleway") ||
       memorizeConfig.fonts.display.family === "UiSans",
     `Memorize config display font must stay on the UI sans, got: ${memorizeConfig.fonts.display.family}`,

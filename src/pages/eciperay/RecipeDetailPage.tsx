@@ -1140,15 +1140,13 @@ function HistoryPanel({
   return (
     <Col gap="l" p="l">
       <SectionHeading>Cook History</SectionHeading>
-      {form !== null && form !== undefined ? (
-        form
-      ) : history.onLogCookPress ? (
+      {form ?? (history.onLogCookPress ? (
         <ButtonRow>
           <Button variant="primary" size="sm" onPress={history.onLogCookPress}>
             Log a cook
           </Button>
         </ButtonRow>
-      ) : null}
+      ) : null)}
       {history.cookLogs.length === 0 ? (
         <Text variant="hint">{COOK_LOG_EMPTY_MESSAGE}</Text>
       ) : (

@@ -153,6 +153,7 @@ test("the en-XA fixture voice pseudo-localizes formatter results, not just plain
   assert.notEqual(pseudo, plain);
   assert.ok(pseudo.includes("⟦"), "the formatter result is pseudo-localized");
   assert.ok(
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean assertion disjunction; ?? does not apply to booleans.
     pseudo.replaceAll("⟦", "").replaceAll("⟧", "").includes(plain) || pseudo.length > plain.length,
     "the pseudo-localized result derives from the plain result",
   );

@@ -174,6 +174,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       const frame =
         content && typeof content.closest === "function" ? content.closest("dialog") : null;
       const insideOwnDialog = Boolean(
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean containment disjunction; ?? does not apply to booleans.
         (content && typeof content.contains === "function" && content.contains(activeElement)) ||
         (frame?.contains(activeElement)),
       );
