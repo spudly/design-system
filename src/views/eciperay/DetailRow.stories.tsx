@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { DetailRow } from "./DetailRow.js";
 
 const meta: Meta<typeof DetailRow> = {

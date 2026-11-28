@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
+
 import { loadInternalDist } from "../../../test/internalDist.js";
 describe("tabsAriaControls", () => {
   const here = dirname(fileURLToPath(import.meta.url));

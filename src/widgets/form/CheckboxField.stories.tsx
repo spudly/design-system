@@ -1,9 +1,11 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { CheckboxField } from "./CheckboxField.js";
+
 import { Text } from "../data/Text.js";
 import { TextLink } from "../actions/TextLink.js";
+
+import { CheckboxField } from "./CheckboxField.js";
 
 const meta: Meta<typeof CheckboxField> = {
   title: "Widgets/Form/CheckboxField",

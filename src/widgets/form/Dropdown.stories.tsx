@@ -1,13 +1,15 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, XStack, YStack } from "tamagui";
+
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
+import { Text } from "../data/Text.js";
+
 import { Dropdown, useDropdownClose } from "./Dropdown.js";
 import { DropdownButton } from "./DropdownButton.js";
-import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof Dropdown> = {
   title: "Widgets/Form/Dropdown",
@@ -106,8 +108,8 @@ export const IconOnlyTrigger: Story = {
       trigger={<DropdownButton icon="profile" accessibilityLabel="Account menu" />}
     >
       <YStack>
-        <MenuRow label="Profile" onAction={() => undefined} />
-        <MenuRow label="Sign out" onAction={() => undefined} />
+        <MenuRow label="Profile" onAction={() => {}} />
+        <MenuRow label="Sign out" onAction={() => {}} />
       </YStack>
     </Dropdown>
   ),
@@ -122,8 +124,8 @@ export const AlignEnd: Story = {
         align="end"
       >
         <YStack>
-          <MenuRow label="Open" onAction={() => undefined} />
-          <MenuRow label="Remove from board" destructive onAction={() => undefined} />
+          <MenuRow label="Open" onAction={() => {}} />
+          <MenuRow label="Remove from board" destructive onAction={() => {}} />
         </YStack>
       </Dropdown>
     </XStack>
@@ -139,8 +141,8 @@ export const SideTop: Story = {
         side="top"
       >
         <YStack>
-          <MenuRow label="First row" onAction={() => undefined} />
-          <MenuRow label="Second row" onAction={() => undefined} />
+          <MenuRow label="First row" onAction={() => {}} />
+          <MenuRow label="Second row" onAction={() => {}} />
         </YStack>
       </Dropdown>
     </YStack>
@@ -155,9 +157,9 @@ export const InitiallyOpen: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow icon="print" label="Print recipe" onAction={() => undefined} />
-        <MenuRow icon="share" label="Share recipe" onAction={() => undefined} />
-        <MenuRow label="Delete recipe" destructive onAction={() => undefined} />
+        <MenuRow icon="print" label="Print recipe" onAction={() => {}} />
+        <MenuRow icon="share" label="Share recipe" onAction={() => {}} />
+        <MenuRow label="Delete recipe" destructive onAction={() => {}} />
       </YStack>
     </Dropdown>
   ),
@@ -174,7 +176,7 @@ function ControlledMenu() {
         onOpenChange={setOpen}
       >
         <YStack>
-          <MenuRow label="Only row" onAction={() => undefined} />
+          <MenuRow label="Only row" onAction={() => {}} />
         </YStack>
       </Dropdown>
       <Text variant="hint">Menu is {open ? "open" : "closed"}</Text>
@@ -204,8 +206,8 @@ export const WidePanelShortButton: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow label="Move this recipe to another collection" onAction={() => undefined} />
-        <MenuRow label="Remove from this week's meal plan" onAction={() => undefined} />
+        <MenuRow label="Move this recipe to another collection" onAction={() => {}} />
+        <MenuRow label="Remove from this week's meal plan" onAction={() => {}} />
       </YStack>
     </Dropdown>
   ),
@@ -227,8 +229,8 @@ export const WideButtonShortPanel: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow label="Open" onAction={() => undefined} />
-        <MenuRow label="Print" onAction={() => undefined} />
+        <MenuRow label="Open" onAction={() => {}} />
+        <MenuRow label="Print" onAction={() => {}} />
       </YStack>
     </Dropdown>
   ),
@@ -312,8 +314,8 @@ export const EqualWidthButtonAndPanel: Story = {
       defaultOpen
     >
       <YStack>
-        <MatchedWidthRow label="Add recipe to a collection" onAction={() => undefined} />
-        <MenuRow label="Print recipe" onAction={() => undefined} />
+        <MatchedWidthRow label="Add recipe to a collection" onAction={() => {}} />
+        <MenuRow label="Print recipe" onAction={() => {}} />
       </YStack>
     </Dropdown>
   ),
@@ -336,8 +338,8 @@ export const ButtonWiderThanPanel: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow label="Open" onAction={() => undefined} />
-        <MenuRow label="Print" onAction={() => undefined} />
+        <MenuRow label="Open" onAction={() => {}} />
+        <MenuRow label="Print" onAction={() => {}} />
       </YStack>
     </Dropdown>
   ),

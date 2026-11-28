@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ShowLessView, type ShowLessEntry } from "./ShowLessView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { ShowLessView, type ShowLessEntry } from "./ShowLessView.js";
 
 const meta: Meta<typeof ShowLessView> = {
   title: "Views/Eciperay/ShowLessView",
@@ -17,7 +19,7 @@ const entries: ShowLessEntry[] = [
 ];
 
 const actions = {
-  onUndo: () => undefined,
+  onUndo: () => {},
 };
 
 export const WithEntries: Story = {

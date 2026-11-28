@@ -3,12 +3,13 @@ import { Col } from "../../widgets/layout/Col.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
+import { useVoice } from "../../voice/index.js";
+
 import { SectionMutedText } from "./SectionMutedText.js";
 import {
   RecipeExportPickerView,
   type RecipeExportPickerViewProps,
 } from "./RecipeExportPickerView.js";
-import { useVoice } from "../../voice/index.js";
 
 export type TransferRecipesViewProps = {
   /** Section heading. Defaults to the voice object's transferRecipesView title (#539). */

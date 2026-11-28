@@ -1,6 +1,8 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
 import { storyImageWide } from "../../storyFixtures.js";
+
 import { ImportReviewPage } from "./ImportReviewPage.js";
 
 const meta: Meta<typeof ImportReviewPage> = {
@@ -33,8 +35,8 @@ export const Ready: Story = {
         busy={false}
         acceptPending={false}
         editsPending={false}
-        onAccept={() => undefined}
-        onStartEdits={() => undefined}
+        onAccept={() => {}}
+        onStartEdits={() => {}}
       />
     </>
   ),
@@ -62,8 +64,8 @@ export const WithImage: Story = {
         busy={false}
         acceptPending={false}
         editsPending={false}
-        onAccept={() => undefined}
-        onStartEdits={() => undefined}
+        onAccept={() => {}}
+        onStartEdits={() => {}}
       />
     </>
   ),

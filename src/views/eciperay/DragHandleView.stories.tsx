@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { DragHandleView } from "./DragHandleView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { DragHandleView } from "./DragHandleView.js";
 
 const meta: Meta<typeof DragHandleView> = {
   title: "Views/Eciperay/DragHandleView",

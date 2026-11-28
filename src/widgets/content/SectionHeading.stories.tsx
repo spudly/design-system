@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { SectionHeading } from "./SectionHeading.js";
+
 import { Text } from "../data/Text.js";
+
+import { SectionHeading } from "./SectionHeading.js";
 
 const meta: Meta<typeof SectionHeading> = {
   title: "Widgets/Content/SectionHeading",

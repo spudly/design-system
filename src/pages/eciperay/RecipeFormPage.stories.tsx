@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
 import type { RecipeIngredientRow } from "../../views/eciperay/RecipeIngredientListView.js";
 import type { RecipeInstructionRow } from "../../views/eciperay/RecipeInstructionListView.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { storyImageWide } from "../../storyFixtures.js";
 import { recipeFormFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
 /**
@@ -50,7 +52,7 @@ const instructionRows: RecipeInstructionRow[] = [
  * in the apps this node is the drag container's activator. */
 function dragHandle(label: string) {
   return (
-    <Button variant="secondary" size="sm" accessibilityLabel={label} onPress={() => undefined}>
+    <Button variant="secondary" size="sm" accessibilityLabel={label} onPress={() => {}}>
       Drag
     </Button>
   );
@@ -95,7 +97,7 @@ function FormHarness({
   const [instructions, setInstructions] = useState<RecipeInstructionRow[]>(
     empty ? [] : instructionRows,
   );
-  const noop = () => undefined;
+  const noop = () => {};
   return (
     <RecipeFormPage
       footer={eciperayFooterFixture}

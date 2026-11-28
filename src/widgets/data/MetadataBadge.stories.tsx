@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { MetadataBadge } from "./MetadataBadge.js";
 
 const meta: Meta<typeof MetadataBadge> = {

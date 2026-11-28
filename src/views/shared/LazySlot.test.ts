@@ -26,16 +26,18 @@
  * Stephen, 2026-11-20) and the stories source scan (story
  * coverage is not runtime-observable from the built package).
  */
-import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
-import { Suspense } from "react";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+
+import { Suspense } from "react";
+
+import "../../../test/registerSvgStub.js";
 
 const distViews: Record<string, any> = await import("../../../dist/views/index.js");
 const distWidgets: Record<string, any> = await import("../../../dist/widgets/index.js");
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 // The built root's type surface (a dist artifact, not source):
 // views must not appear on it.
 const rootTypes = readFileSync(

@@ -27,9 +27,10 @@
  * script does both).
  */
 import "./registerSvgStub.js";
-import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "./internalDist.js";
 
 /** A Tamagui font family's raw value (string or Variable). */
 function familyOf(font: any) {

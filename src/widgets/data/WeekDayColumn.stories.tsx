@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { DetailRow } from "../../views/eciperay/DetailRow.js";
+import { Col } from "../layout/Col.js";
+
 import { ListItem } from "./ListItem.js";
 import { Text } from "./Text.js";
 import { WeekDayColumn, WeekDayColumns } from "./WeekDayColumn.js";
-import { Col } from "../layout/Col.js";
 
 const meta: Meta<typeof WeekDayColumn> = {
   title: "Widgets/Data Display/WeekDayColumn",

@@ -1,6 +1,7 @@
+import { useState } from "react";
+
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
-import { useState } from "react";
 import { Button } from "../../widgets/actions/Button.js";
 import { FormScreenLayout } from "../../widgets/layout/FormScreenLayout.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";

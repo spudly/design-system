@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
+
 import { Text } from "../widgets/data/Text.js";
+
 import { AddIcon } from "./AddIcon.js";
 import { BackIcon } from "./BackIcon.js";
 import { CollapsedIcon } from "./CollapsedIcon.js";

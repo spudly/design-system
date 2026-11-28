@@ -45,9 +45,10 @@
  * build` first (the `test` script does both).
  */
 import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "../../test/internalDist.js";
 
 test("the catalog views are exported from their built internal barrels", async () => {
   const distViews: Record<string, any> = await import("../../dist/views/index.js");

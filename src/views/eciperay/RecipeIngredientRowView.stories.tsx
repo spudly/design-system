@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { Button } from "../../widgets/actions/Button.js";
-import { RecipeIngredientRowView } from "./RecipeIngredientRowView.js";
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { RecipeIngredientRowView } from "./RecipeIngredientRowView.js";
 
 const meta: Meta<typeof RecipeIngredientRowView> = {
   title: "Views/Eciperay/RecipeIngredientRowView",
@@ -12,13 +14,13 @@ const meta: Meta<typeof RecipeIngredientRowView> = {
 export default meta;
 type Story = StoryObj<typeof RecipeIngredientRowView>;
 
-const noop = () => undefined;
+const noop = () => {};
 
 /** The host-bound drag handle stand-in: in the apps this node
  * is the drag container's activator (dnd-kit / DraggableFlatList). */
 function DragHandle() {
   return (
-    <Button variant="secondary" size="sm" accessibilityLabel="Reorder ingredient 1" onPress={() => undefined}>
+    <Button variant="secondary" size="sm" accessibilityLabel="Reorder ingredient 1" onPress={() => {}}>
       Drag
     </Button>
   );

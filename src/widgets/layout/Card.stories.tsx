@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { Badge } from "../data/Badge.js";
-import { Card } from "./Card.js";
 import { ListItem } from "../data/ListItem.js";
 import { Text } from "../data/Text.js";
+
+import { Card } from "./Card.js";
 
 const meta: Meta<typeof Card> = {
   title: "Widgets/Layout & Structure/Card",

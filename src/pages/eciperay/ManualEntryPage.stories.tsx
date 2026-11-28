@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { recipeFormFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { ManualEntryPage } from "./ManualEntryPage.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
@@ -45,9 +47,9 @@ function useFormProps(): RecipeFormPageProps {
     tagOptions: fixture.tagOptions,
     tagIds,
     onTagIdsChange: setTagIds,
-    onGenerateDescription: () => undefined,
+    onGenerateDescription: () => {},
     submitLabel: "Create Recipe",
-    onSubmit: () => undefined,
+    onSubmit: () => {},
   };
 }
 

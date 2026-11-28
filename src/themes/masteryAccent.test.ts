@@ -26,9 +26,10 @@
  * `test` script does both).
  */
 import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "../../test/internalDist.js";
 
 const { eciperayTheme, memorizeTheme, createTamaguiConfig }: Record<string, any> =
   await loadInternalDist();

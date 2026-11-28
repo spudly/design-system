@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
+import { Text } from "../data/Text.js";
+
 import { ScreenContainer } from "./ScreenContainer.js";
 import { Card } from "./Card.js";
-import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof ScreenContainer> = {
   title: "Widgets/Layout & Structure/ScreenContainer",

@@ -1,6 +1,8 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+
 import {
   MealPlanDetailPage,
   type MealPlanDetailPageDay,
@@ -406,7 +408,7 @@ const editableDays: MealPlanDetailPageDay[] = weekDays.map((day, index) => ({
   entries: index === 0 ? editableEntries : day.entries,
 }));
 
-const noop = () => undefined;
+const noop = () => {};
 
 export const Editable: Story = {
   render: () => (

@@ -41,12 +41,13 @@
  * checks SSR against the built output.
  */
 import "./registerSvgStub.js";
-import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+
+import { loadInternalDist } from "./internalDist.js";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")

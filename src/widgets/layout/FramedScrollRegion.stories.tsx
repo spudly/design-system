@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { Text } from "../data/Text.js";
+
 import { FramedScrollRegion } from "./FramedScrollRegion.js";
 
 const meta: Meta<typeof FramedScrollRegion> = {

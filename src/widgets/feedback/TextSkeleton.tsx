@@ -1,5 +1,7 @@
 import { View } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
+
 import { SkeletonBone } from "./SkeletonClock.js";
 
 /** The text sizes a line can stand in for (the type scale's keys). */

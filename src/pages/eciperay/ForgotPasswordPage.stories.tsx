@@ -1,7 +1,9 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
 import { Text } from "../../widgets/data/Text.js";
+
 import { ForgotPasswordPage } from "./ForgotPasswordPage.js";
 
 const meta: Meta<typeof ForgotPasswordPage> = {

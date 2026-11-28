@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { AuthorDisplayView } from "./AuthorDisplayView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { AuthorDisplayView } from "./AuthorDisplayView.js";
 
 const meta: Meta<typeof AuthorDisplayView> = {
   title: "Views/Eciperay/AuthorDisplayView",
@@ -12,8 +14,8 @@ export default meta;
 type Story = StoryObj<typeof AuthorDisplayView>;
 
 const actions = {
-  onChange: () => undefined,
-  onSave: () => undefined,
+  onChange: () => {},
+  onSave: () => {},
 };
 
 export const Named: Story = {

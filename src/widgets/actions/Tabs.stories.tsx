@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { Tabs } from "./Tabs.js";
+
 import { Text } from "../data/Text.js";
+
+import { Tabs } from "./Tabs.js";
 
 const meta: Meta<typeof Tabs> = {
   title: "Widgets/Actions & Navigation/Tabs",

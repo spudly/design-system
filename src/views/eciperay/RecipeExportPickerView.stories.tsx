@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { RecipeExportPickerView } from "./RecipeExportPickerView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { RecipeExportPickerView } from "./RecipeExportPickerView.js";
 
 const meta: Meta<typeof RecipeExportPickerView> = {
   title: "Views/Eciperay/RecipeExportPickerView",
@@ -23,13 +25,13 @@ export const WithSelection: Story = {
     <StoryFrame variant="panel">
       <RecipeExportPickerView
         search=""
-        onSearchChange={() => undefined}
+        onSearchChange={() => {}}
         items={items}
         selectedIds={["r1", "r3"]}
-        onToggle={() => undefined}
-        onSelectAll={() => undefined}
-        onClearSelection={() => undefined}
-        onExport={() => undefined}
+        onToggle={() => {}}
+        onSelectAll={() => {}}
+        onClearSelection={() => {}}
+        onExport={() => {}}
         exportLabel="Export selected (2)"
       />
     </StoryFrame>
@@ -41,14 +43,14 @@ export const Loading: Story = {
     <StoryFrame variant="panel">
       <RecipeExportPickerView
         search=""
-        onSearchChange={() => undefined}
+        onSearchChange={() => {}}
         items={[]}
         selectedIds={[]}
-        onToggle={() => undefined}
-        onSelectAll={() => undefined}
-        onClearSelection={() => undefined}
+        onToggle={() => {}}
+        onSelectAll={() => {}}
+        onClearSelection={() => {}}
         loading
-        onExport={() => undefined}
+        onExport={() => {}}
         exportLabel="Export selected (0)"
       />
     </StoryFrame>
@@ -62,13 +64,13 @@ export const LoadingOverlay: Story = {
       <YStack position="relative">
         <RecipeExportPickerView
           search=""
-          onSearchChange={() => undefined}
+          onSearchChange={() => {}}
           items={items}
           selectedIds={["r1", "r3"]}
-          onToggle={() => undefined}
-          onSelectAll={() => undefined}
-          onClearSelection={() => undefined}
-          onExport={() => undefined}
+          onToggle={() => {}}
+          onSelectAll={() => {}}
+          onClearSelection={() => {}}
+          onExport={() => {}}
           exportLabel="Export selected (2)"
         />
         <YStack
@@ -82,14 +84,14 @@ export const LoadingOverlay: Story = {
         >
           <RecipeExportPickerView
             search=""
-            onSearchChange={() => undefined}
+            onSearchChange={() => {}}
             items={items}
             selectedIds={["r1", "r3"]}
-            onToggle={() => undefined}
-            onSelectAll={() => undefined}
-            onClearSelection={() => undefined}
+            onToggle={() => {}}
+            onSelectAll={() => {}}
+            onClearSelection={() => {}}
             loading
-            onExport={() => undefined}
+            onExport={() => {}}
             exportLabel="Export selected (2)"
           />
         </YStack>

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { ConsentBannerView } from "./ConsentBannerView.js";
 import { StoryFrame } from "./storyFrame.js";
 
@@ -19,8 +20,8 @@ export const Default: Story = {
         linkLabel="Privacy Policy"
         linkHref="/privacy"
         messageAfterLink=" for details."
-        onAccept={() => undefined}
-        onDecline={() => undefined}
+        onAccept={() => {}}
+        onDecline={() => {}}
       />
     </StoryFrame>
   ),

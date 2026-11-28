@@ -5,9 +5,11 @@ import * as Linking from "expo-linking";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SET_CURRENT_STORY, STORY_RENDERED, UPDATE_GLOBALS } from "storybook/internal/core-events";
+
+import { setDefaultSkeletonClockFrozen } from "../../src/widgets/feedback/SkeletonClock.js";
+
 import StorybookUIRoot, { view } from "./Storybook";
 import { setCaptureModeActive, setCaptureThemeOverride } from "./captureTheme";
-import { setDefaultSkeletonClockFrozen } from "../../src/widgets/feedback/SkeletonClock.js";
 import { createStoryLinkOpenURL } from "./storyLinks";
 
 // App-side full-content capture module (design-system #137).

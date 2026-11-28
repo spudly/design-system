@@ -1,15 +1,16 @@
 import { useEffect } from "react";
 import type { Preview } from "@storybook/react";
 import { TamaguiProvider, View, YStack } from "tamagui";
+
 import { createStorybookTamaguiConfig, type StorybookThemeName } from "../src/tamagui.config.js";
+import { baseTheme, eciperayTheme, memorizeTheme } from "../src/themes/index.js";
+import { fixtureVoice } from "../src/voice/fixtures.js";
+import { VoiceProvider } from "../src/voice/index.js";
 
 // Created here, in Storybook-owned code: creating a config installs it
 // as Tamagui's global config, so the package must not create it at
 // module scope (see src/tamagui.config.ts).
 const storybookTamaguiConfig = createStorybookTamaguiConfig();
-import { baseTheme, eciperayTheme, memorizeTheme } from "../src/themes/index.js";
-import { VoiceProvider } from "../src/voice/index.js";
-import { fixtureVoice } from "../src/voice/fixtures.js";
 
 /**
  * The body/UI font stack for a Storybook theme, from the brand theme's

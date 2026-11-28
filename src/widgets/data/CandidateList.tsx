@@ -4,8 +4,9 @@ import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
-import { Text } from "./Text.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
+
+import { Text } from "./Text.js";
 
 type CandidateListItem = {
   /** Stable key for the candidate. */

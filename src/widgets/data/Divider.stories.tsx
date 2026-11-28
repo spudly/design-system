@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
+
 import { Divider } from "./Divider.js";
 import { Text } from "./Text.js";
 

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { LegalSection } from "./LegalSection.js";
+
 import { TextLink } from "../actions/TextLink.js";
+
+import { LegalSection } from "./LegalSection.js";
 
 const meta: Meta<typeof LegalSection> = {
   title: "Widgets/Content/LegalSection",

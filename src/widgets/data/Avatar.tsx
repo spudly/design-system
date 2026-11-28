@@ -1,9 +1,11 @@
 import { Image as TamaguiImage, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+
 import { Col } from "../layout/Col.js";
 import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
+
 import { Text } from "./Text.js";
 
 const StyledImage = styled(TamaguiImage, {

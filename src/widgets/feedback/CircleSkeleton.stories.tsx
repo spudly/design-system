@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack } from "tamagui";
+
 import { CircleSkeleton } from "./CircleSkeleton.js";
 
 const meta: Meta<typeof CircleSkeleton> = {

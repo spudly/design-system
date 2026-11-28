@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { Text } from "../../widgets/data/Text.js";
+
 import { FeedbackBubbleView } from "./FeedbackBubbleView.js";
 import { StoryFrame } from "./storyFrame.js";
-import { Text } from "../../widgets/data/Text.js";
 
 const meta: Meta<typeof FeedbackBubbleView> = {
   title: "Views/Shared/FeedbackBubbleView",

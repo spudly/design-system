@@ -4,8 +4,9 @@ import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
-import { SectionMutedText } from "./SectionMutedText.js";
 import { useVoice } from "../../voice/index.js";
+
+import { SectionMutedText } from "./SectionMutedText.js";
 
 export type AccountDataViewProps = {
   /** Section heading. Defaults to the voice object's accountDataView title (#539). */

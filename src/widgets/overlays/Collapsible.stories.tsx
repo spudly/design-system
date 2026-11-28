@@ -1,10 +1,12 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
 import { Button } from "../actions/Button.js";
-import { Collapsible } from "./Collapsible.js";
 import { Text } from "../data/Text.js";
+
+import { Collapsible } from "./Collapsible.js";
 
 const meta: Meta<typeof Collapsible> = {
   title: "Widgets/Overlays & Disclosure/Collapsible",

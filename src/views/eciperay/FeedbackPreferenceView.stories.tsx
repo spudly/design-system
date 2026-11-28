@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { FeedbackPreferenceView } from "./FeedbackPreferenceView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { FeedbackPreferenceView } from "./FeedbackPreferenceView.js";
 
 const meta: Meta<typeof FeedbackPreferenceView> = {
   title: "Views/Eciperay/FeedbackPreferenceView",
@@ -13,10 +15,10 @@ export default meta;
 type Story = StoryObj<typeof FeedbackPreferenceView>;
 
 const actions = {
-  onShortcutEnabledChange: () => undefined,
-  onAcceptConsent: () => undefined,
-  onDeclineConsent: () => undefined,
-  onWithdrawConsent: () => undefined,
+  onShortcutEnabledChange: () => {},
+  onAcceptConsent: () => {},
+  onDeclineConsent: () => {},
+  onWithdrawConsent: () => {},
   choicesHref: "/privacy/consent",
 };
 
@@ -114,7 +116,7 @@ export const NoConsent: Story = {
     <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled
-        onShortcutEnabledChange={() => undefined}
+        onShortcutEnabledChange={() => {}}
         choicesHref="/privacy/consent"
       />
     </StoryFrame>

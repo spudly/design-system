@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { eciperayFooterFixture, memorizeFooterFixture } from "../../pages/shared/fixtures.js";
-import { BigFooter, BigFooterShell } from "./BigFooter.js";
 import { Text } from "../data/Text.js";
+
+import { BigFooter, BigFooterShell } from "./BigFooter.js";
 
 const meta: Meta<typeof BigFooter> = {
   title: "Widgets/Content/BigFooter",

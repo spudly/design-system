@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { StepList } from "./StepList.js";
 
 const meta: Meta<typeof StepList> = {

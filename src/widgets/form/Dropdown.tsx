@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { Popover, View, styled } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 
@@ -132,7 +133,7 @@ export function useDropdownContext(): DropdownContextValue | null {
  */
 export function useDropdownClose(): () => void {
   const context = useContext(DropdownContext);
-  return context?.close ?? (() => undefined);
+  return context?.close ?? (() => {});
 }
 
 const StyledContent = styled(Popover.Content, {

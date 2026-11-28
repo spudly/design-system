@@ -1,4 +1,5 @@
 import { ScrollView } from "tamagui";
+
 import { Col } from "../layout/Col.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";

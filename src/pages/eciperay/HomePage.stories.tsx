@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
 import { homeFixture, eciperayFooterFixture } from "../shared/fixtures.js";
 import { storyImageWide } from "../../storyFixtures.js";
+
 import { HomePage } from "./HomePage.js";
 
 const meta: Meta<typeof HomePage> = {

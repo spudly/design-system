@@ -1,6 +1,7 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Fragment, useEffect, useRef } from "react";
 import type { LayoutChangeEvent } from "react-native";
+
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { isWeb } from "../../widgets/platform.js";
 import {

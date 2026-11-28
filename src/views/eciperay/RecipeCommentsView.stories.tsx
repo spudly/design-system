@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { RecipeCommentsView } from "./RecipeCommentsView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { RecipeCommentsView } from "./RecipeCommentsView.js";
 
 const meta: Meta<typeof RecipeCommentsView> = {
   title: "Views/Eciperay/RecipeCommentsView",
@@ -30,10 +32,10 @@ export const WithComposer: Story = {
         comments={comments}
         staleHintLabel="Based on an older version"
         draft=""
-        onDraftChange={() => undefined}
-        onPost={() => undefined}
-        onStartEdit={() => undefined}
-        onDeleteComment={() => undefined}
+        onDraftChange={() => {}}
+        onPost={() => {}}
+        onStartEdit={() => {}}
+        onDeleteComment={() => {}}
       />
     </StoryFrame>
   ),
@@ -46,9 +48,9 @@ export const Editing: Story = {
         comments={comments}
         editingCommentId="c1"
         editDraft="Doubled the paprika and added garlic."
-        onEditDraftChange={() => undefined}
-        onCancelEdit={() => undefined}
-        onSaveEdit={() => undefined}
+        onEditDraftChange={() => {}}
+        onCancelEdit={() => {}}
+        onSaveEdit={() => {}}
       />
     </StoryFrame>
   ),
@@ -60,8 +62,8 @@ export const Empty: Story = {
       <RecipeCommentsView
         comments={[]}
         draft=""
-        onDraftChange={() => undefined}
-        onPost={() => undefined}
+        onDraftChange={() => {}}
+        onPost={() => {}}
       />
     </StoryFrame>
   ),
@@ -84,10 +86,10 @@ export const LoadingOverlay: Story = {
           comments={comments}
           staleHintLabel="Based on an older version"
           draft=""
-          onDraftChange={() => undefined}
-          onPost={() => undefined}
-          onStartEdit={() => undefined}
-          onDeleteComment={() => undefined}
+          onDraftChange={() => {}}
+          onPost={() => {}}
+          onStartEdit={() => {}}
+          onDeleteComment={() => {}}
         />
         <YStack
           position="absolute"
@@ -103,10 +105,10 @@ export const LoadingOverlay: Story = {
             loading
             staleHintLabel="Based on an older version"
             draft=""
-            onDraftChange={() => undefined}
-            onPost={() => undefined}
-            onStartEdit={() => undefined}
-            onDeleteComment={() => undefined}
+            onDraftChange={() => {}}
+            onPost={() => {}}
+            onStartEdit={() => {}}
+            onDeleteComment={() => {}}
           />
         </YStack>
       </YStack>

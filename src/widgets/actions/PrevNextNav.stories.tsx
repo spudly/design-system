@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { PrevNextNav } from "./PrevNextNav.js";
 
 const meta: Meta<typeof PrevNextNav> = {

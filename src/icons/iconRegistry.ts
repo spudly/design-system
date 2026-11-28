@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+
 import { AddIcon } from "./AddIcon.js";
 import { ErrorIcon } from "./ErrorIcon.js";
 import { FeedbackIcon } from "./FeedbackIcon.js";

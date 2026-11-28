@@ -1,8 +1,9 @@
-import { AuthFormSubmit } from "./AuthFormSubmit.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { useVoice } from "../../voice/index.js";
+
+import { AuthFormSubmit } from "./AuthFormSubmit.js";
 
 /**
  * ForgotPasswordForm (#119): the reset-request form — the

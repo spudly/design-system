@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
 import { mealsHubFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { MealsHubPage, type MealsHubPageTab } from "./MealsHubPage.js";
 
 /**
@@ -32,8 +34,8 @@ function Hub({ initialTab }: { initialTab: MealsHubPageTab }) {
       loading={false}
       createMealHref="/meals/new"
       createPlanHref="/meal-plans/new"
-      onDeleteMeal={() => undefined}
-      onDeletePlan={() => undefined}
+      onDeleteMeal={() => {}}
+      onDeletePlan={() => {}}
     />
   );
 }
@@ -70,14 +72,14 @@ export const PlansTabLongListNarrow: Story = {
     <MealsHubPage
       footer={eciperayFooterFixture}
       activeTab="plans"
-      onSelectTab={() => undefined}
+      onSelectTab={() => {}}
       meals={mealsHubFixture.meals}
       plans={LONG_PLANS}
       loading={false}
       createMealHref="/meals/new"
       createPlanHref="/meal-plans/new"
-      onDeleteMeal={() => undefined}
-      onDeletePlan={() => undefined}
+      onDeleteMeal={() => {}}
+      onDeletePlan={() => {}}
     />
   ),
 };
@@ -88,14 +90,14 @@ export const PlansTabLongListNarrowLoading: Story = {
     <MealsHubPage
       footer={eciperayFooterFixture}
       activeTab="plans"
-      onSelectTab={() => undefined}
+      onSelectTab={() => {}}
       meals={mealsHubFixture.meals}
       plans={LONG_PLANS}
       loading
       createMealHref="/meals/new"
       createPlanHref="/meal-plans/new"
-      onDeleteMeal={() => undefined}
-      onDeletePlan={() => undefined}
+      onDeleteMeal={() => {}}
+      onDeletePlan={() => {}}
     />
   ),
 };
@@ -106,14 +108,14 @@ export const Empty: Story = {
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
-        onSelectTab={() => undefined}
+        onSelectTab={() => {}}
         meals={[]}
         plans={[]}
         loading={false}
         createMealHref="/meals/new"
         createPlanHref="/meal-plans/new"
-        onDeleteMeal={() => undefined}
-        onDeletePlan={() => undefined}
+        onDeleteMeal={() => {}}
+        onDeletePlan={() => {}}
       />
     </>
   ),
@@ -125,14 +127,14 @@ export const Loading: Story = {
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
-        onSelectTab={() => undefined}
+        onSelectTab={() => {}}
         meals={[]}
         plans={[]}
         loading
         createMealHref="/meals/new"
         createPlanHref="/meal-plans/new"
-        onDeleteMeal={() => undefined}
-        onDeletePlan={() => undefined}
+        onDeleteMeal={() => {}}
+        onDeletePlan={() => {}}
       />
     </>
   ),
@@ -145,14 +147,14 @@ export const LoadingOverlay: Story = {
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
-        onSelectTab={() => undefined}
+        onSelectTab={() => {}}
         meals={mealsHubFixture.meals}
         plans={mealsHubFixture.plans}
         loading={false}
         createMealHref="/meals/new"
         createPlanHref="/meal-plans/new"
-        onDeleteMeal={() => undefined}
-        onDeletePlan={() => undefined}
+        onDeleteMeal={() => {}}
+        onDeletePlan={() => {}}
       />
       <View
         position="absolute"
@@ -166,14 +168,14 @@ export const LoadingOverlay: Story = {
         <MealsHubPage
           footer={eciperayFooterFixture}
           activeTab="meals"
-          onSelectTab={() => undefined}
+          onSelectTab={() => {}}
           meals={mealsHubFixture.meals}
           plans={mealsHubFixture.plans}
           loading
           createMealHref="/meals/new"
           createPlanHref="/meal-plans/new"
-          onDeleteMeal={() => undefined}
-          onDeletePlan={() => undefined}
+          onDeleteMeal={() => {}}
+          onDeletePlan={() => {}}
         />
       </View>
     </View>

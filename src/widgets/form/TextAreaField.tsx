@@ -1,8 +1,10 @@
 import { TextArea as TamaguiTextArea, Label, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { useFieldA11y } from "../../views/shared/useFieldA11y.js";
+
 import { FieldError } from "./FieldError.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {

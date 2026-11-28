@@ -1,5 +1,7 @@
-import { memorizeFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { memorizeFooterFixture } from "../shared/fixtures.js";
+
 import {
   MemorizationSessionPage,
   type MemorizationSessionPageWord,
@@ -52,7 +54,7 @@ function wordsWithBlanks(
   );
 }
 
-const noop = () => undefined;
+const noop = () => {};
 
 export const FirstRound: Story = {
   // Round 1 of 7 blanks nothing — the engine's first round

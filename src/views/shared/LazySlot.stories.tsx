@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { Text } from "../../widgets/data/Text.js";
+
 import { LazySlot } from "./LazySlot.js";
 
 const meta: Meta<typeof LazySlot> = {

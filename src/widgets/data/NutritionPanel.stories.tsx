@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { NutritionPanel, type NutritionFacts } from "./NutritionPanel.js";
 
 const meta: Meta<typeof NutritionPanel> = {

@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
 import { eciperayFooterFixture } from "../../pages/shared/fixtures.js";
 import { Button } from "../actions/Button.js";
 import { TextLink } from "../actions/TextLink.js";
 import { Text } from "../data/Text.js";
+
 import { BigFooter } from "./BigFooter.js";
 import { CenteredText } from "./CenteredText.js";
 import { ChatTranscript } from "./ChatTranscript.js";

@@ -1,13 +1,15 @@
 import type { ReactNode } from "react";
 import { Anchor, View, isWeb } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Badge } from "./Badge.js";
 import { Card } from "../layout/Card.js";
 import { LinkOverlay } from "../linkOverlay.js";
+
+import { Badge } from "./Badge.js";
 import { Text } from "./Text.js";
 import { Thumbnail } from "./Thumbnail.js";
 

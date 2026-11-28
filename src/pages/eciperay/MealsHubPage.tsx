@@ -9,6 +9,7 @@ import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Tabs } from "../../widgets/actions/Tabs.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextActionCardRow } from "../../widgets/content/TextActionCardRow.js";
+
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 
 /**

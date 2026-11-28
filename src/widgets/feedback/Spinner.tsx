@@ -1,5 +1,6 @@
 import { Spinner as TamaguiSpinner, View } from "tamagui";
 import type { GetProps } from "tamagui";
+
 import { platformAccessibilityProps } from "../accessibility.js";
 
 type TamaguiSpinnerProps = GetProps<typeof TamaguiSpinner>;

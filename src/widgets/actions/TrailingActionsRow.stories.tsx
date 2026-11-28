@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { Badge } from "../data/Badge.js";
-import { Button } from "./Button.js";
 import { Text } from "../data/Text.js";
+
+import { Button } from "./Button.js";
 import { TrailingActionsRow } from "./TrailingActionsRow.js";
 
 const meta: Meta<typeof TrailingActionsRow> = {

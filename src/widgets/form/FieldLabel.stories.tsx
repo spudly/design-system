@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { FieldLabel } from "./FieldLabel.js";
+
 import { Text } from "../data/Text.js";
+
+import { FieldLabel } from "./FieldLabel.js";
 import { TextField } from "./TextField.js";
 
 const meta: Meta<typeof FieldLabel> = {

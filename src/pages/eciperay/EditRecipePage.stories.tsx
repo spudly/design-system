@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { recipeFormFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { EditRecipePage } from "./EditRecipePage.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
@@ -46,7 +48,7 @@ function useFormProps(): RecipeFormPageProps {
     tagIds,
     onTagIdsChange: setTagIds,
     submitLabel: "Save Changes",
-    onSubmit: () => undefined,
+    onSubmit: () => {},
   };
 }
 

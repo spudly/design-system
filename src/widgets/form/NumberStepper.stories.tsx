@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { NumberStepper } from "./NumberStepper.js";
 
 const meta: Meta<typeof NumberStepper> = {

@@ -1,11 +1,13 @@
 import { isWeb } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import type { RowProps } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import type { TagColorName } from "../../themes/tagColors.js";
-import { Text } from "./Text.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { useTagColorShadeResolver } from "../tagColors.js";
+
+import { Text } from "./Text.js";
 
 // Every tone takes the DARK step of its ramp as the background
 // and the LIGHT step as the label and border ink (Stephen's

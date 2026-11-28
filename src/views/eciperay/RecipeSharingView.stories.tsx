@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { RecipeSharingView } from "./RecipeSharingView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { RecipeSharingView } from "./RecipeSharingView.js";
 
 const meta: Meta<typeof RecipeSharingView> = {
   title: "Views/Eciperay/RecipeSharingView",
@@ -28,7 +30,7 @@ function PublicWithConsentDemo() {
       <RecipeSharingView
         options={options}
         value="public"
-        onValueChange={() => undefined}
+        onValueChange={() => {}}
         publicWarning="Public recipes can be discovered by anyone. Make sure you're happy to share this recipe before saving."
         consentDescription={[
           { type: "text", text: "I agree to publish this recipe under the " },
@@ -38,13 +40,13 @@ function PublicWithConsentDemo() {
         consentChecked={consentChecked}
         onConsentCheckedChange={setConsentChecked}
         consentRequired
-        onSave={() => undefined}
+        onSave={() => {}}
         shareLinkUrl="https://example.com/s/abc123"
-        onRotateShareLink={() => undefined}
+        onRotateShareLink={() => {}}
         rotateShareLinkLabel="Rotate share link"
-        onCopyShareLink={() => undefined}
+        onCopyShareLink={() => {}}
         permalinkUrl="https://example.com/recipes/skillet-chicken"
-        onCopyPermalink={() => undefined}
+        onCopyPermalink={() => {}}
       />
     </StoryFrame>
   );
@@ -60,9 +62,9 @@ export const Private: Story = {
       <RecipeSharingView
         options={options}
         value="private"
-        onValueChange={() => undefined}
-        onSave={() => undefined}
-        onRotateShareLink={() => undefined}
+        onValueChange={() => {}}
+        onSave={() => {}}
+        onRotateShareLink={() => {}}
       />
     </StoryFrame>
   ),
@@ -74,9 +76,9 @@ export const Loading: Story = {
       <RecipeSharingView
         options={options}
         value="private"
-        onValueChange={() => undefined}
-        onSave={() => undefined}
-        onRotateShareLink={() => undefined}
+        onValueChange={() => {}}
+        onSave={() => {}}
+        onRotateShareLink={() => {}}
         loading
       />
     </StoryFrame>
@@ -91,9 +93,9 @@ export const LoadingOverlay: Story = {
         <RecipeSharingView
           options={options}
           value="private"
-          onValueChange={() => undefined}
-          onSave={() => undefined}
-          onRotateShareLink={() => undefined}
+          onValueChange={() => {}}
+          onSave={() => {}}
+          onRotateShareLink={() => {}}
         />
         <YStack
           position="absolute"
@@ -107,9 +109,9 @@ export const LoadingOverlay: Story = {
           <RecipeSharingView
             options={options}
             value="private"
-            onValueChange={() => undefined}
-            onSave={() => undefined}
-            onRotateShareLink={() => undefined}
+            onValueChange={() => {}}
+            onSave={() => {}}
+            onRotateShareLink={() => {}}
             loading
           />
         </YStack>

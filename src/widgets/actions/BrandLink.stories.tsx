@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { BrandLink } from "./BrandLink.js";
 
 const meta: Meta<typeof BrandLink> = {

@@ -1,5 +1,6 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import type { ReactNode } from "react";
+
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { BrandLink } from "../../widgets/actions/BrandLink.js";
 import { BulletList } from "../../widgets/data/BulletList.js";
 import { Row } from "../../widgets/layout/Row.js";

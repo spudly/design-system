@@ -38,6 +38,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+
 import { makeRenderToHtml, verticalScrollers } from "../../../test/wholePageFlow.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(
@@ -152,14 +153,14 @@ const publicRecipeReadyFixture = {
   ctas: {
     variant: "signedOut",
   },
-  onSignUpPress: () => undefined,
-  onClonePress: () => undefined,
-  onGetAppPress: () => undefined,
+  onSignUpPress: () => {},
+  onClonePress: () => {},
+  onGetAppPress: () => {},
   ingredients: {
     servings: 4,
-    onServingsChange: () => undefined,
+    onServingsChange: () => {},
     scaleValue: "1",
-    onScaleChange: () => undefined,
+    onScaleChange: () => {},
     ingredients: [
       {
         id: "salt",
@@ -168,7 +169,7 @@ const publicRecipeReadyFixture = {
         isMissing: false,
       },
     ],
-    onIngredientPress: () => undefined,
+    onIngredientPress: () => {},
     substitutions: [],
   },
   instructions: {

@@ -1,6 +1,7 @@
 import { Anchor, Text as TamaguiText, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import type { ReactNode } from "react";
+
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 

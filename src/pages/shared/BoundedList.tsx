@@ -6,6 +6,7 @@ import type {
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from "react-native";
+
 import { tokens } from "../../tokens/index.js";
 
 /**

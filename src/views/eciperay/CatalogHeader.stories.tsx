@@ -1,9 +1,11 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
+import type { SelectOption } from "../../widgets/form/SelectField.js";
+
 import { CatalogFiltersBar, type CatalogFilterDefinition } from "./CatalogFiltersBar.js";
 import { CatalogHeader } from "./CatalogHeader.js";
-import type { SelectOption } from "../../widgets/form/SelectField.js";
 
 const meta: Meta<typeof CatalogHeader> = {
   title: "Views/Eciperay/CatalogHeader",

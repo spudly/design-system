@@ -2,11 +2,13 @@ import { forwardRef, useId } from "react";
 import type { ReactNode } from "react";
 import { Input as TamaguiInput, View, XStack, styled } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { FieldShell } from "./FieldShell.js";
 import { Text } from "../data/Text.js";
+
+import { FieldShell } from "./FieldShell.js";
 import { FieldError } from "./FieldError.js";
 
 /**

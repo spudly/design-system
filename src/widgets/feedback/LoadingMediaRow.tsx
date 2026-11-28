@@ -2,8 +2,9 @@ import { Col } from "../layout/Col.js";
 import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Card } from "../layout/Card.js";
+
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 // Structural flex only: the card's text block expands and may

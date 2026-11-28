@@ -1,4 +1,5 @@
 import { View } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { Spacer } from "../layout/Spacer.js";
@@ -8,9 +9,10 @@ import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
 import { Card } from "../layout/Card.js";
 import { Center } from "../layout/Center.js";
 import { StarRatingInput } from "../form/StarRatingInput.js";
-import { Text } from "./Text.js";
 import { useVoice } from "../../voice/index.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
+
+import { Text } from "./Text.js";
 
 export type RatingsCardCommunityRating = {
   /** Pre-rendered star string ("★★★★★"), app-formatted from the average. */

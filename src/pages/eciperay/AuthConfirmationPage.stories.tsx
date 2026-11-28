@@ -1,5 +1,7 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { AuthConfirmationPage } from "./AuthConfirmationPage.js";
 
 const meta: Meta<typeof AuthConfirmationPage> = {

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { InstallBannerView } from "./InstallBannerView.js";
 import { StoryFrame } from "./storyFrame.js";
 
@@ -20,7 +21,7 @@ export const Default: Story = {
           { label: "App Store", href: "https://example.com/app-store" },
           { label: "Google Play", href: "https://example.com/google-play" },
         ]}
-        onDismiss={() => undefined}
+        onDismiss={() => {}}
       />
     </StoryFrame>
   ),

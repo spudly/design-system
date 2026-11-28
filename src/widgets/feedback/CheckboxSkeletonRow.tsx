@@ -1,8 +1,9 @@
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
-import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Center } from "../layout/Center.js";
+
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "./TextSkeleton.js";
 
 export type CheckboxSkeletonRowProps = {

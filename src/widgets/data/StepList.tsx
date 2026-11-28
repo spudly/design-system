@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { View } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Text } from "./Text.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
+
+import { Text } from "./Text.js";
 
 type StepListStep = {
   /** Stable key for the step. */

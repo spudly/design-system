@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ConfirmActionView } from "./ConfirmActionView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { ConfirmActionView } from "./ConfirmActionView.js";
 
 const meta: Meta<typeof ConfirmActionView> = {
   title: "Views/Eciperay/ConfirmActionView",
@@ -16,12 +18,12 @@ export const DeleteConfirmation: Story = {
     <StoryFrame variant="dialog">
       <ConfirmActionView
         open
-        onOpenChange={() => undefined}
+        onOpenChange={() => {}}
         title="Delete this recipe?"
         description="This permanently deletes the recipe and its cook history."
         confirmLabel="Delete recipe"
         confirmPendingLabel="Deleting…"
-        onConfirm={() => undefined}
+        onConfirm={() => {}}
         cancelLabel="Cancel"
       />
     </StoryFrame>
@@ -33,12 +35,12 @@ export const WithError: Story = {
     <StoryFrame variant="dialog">
       <ConfirmActionView
         open
-        onOpenChange={() => undefined}
+        onOpenChange={() => {}}
         title="Delete this recipe?"
         description="This permanently deletes the recipe and its cook history."
         error="We couldn't delete this recipe. Try again."
         confirmLabel="Delete recipe"
-        onConfirm={() => undefined}
+        onConfirm={() => {}}
         cancelLabel="Cancel"
       />
     </StoryFrame>
@@ -50,12 +52,12 @@ export const Notice: Story = {
     <StoryFrame variant="dialog">
       <ConfirmActionView
         open
-        onOpenChange={() => undefined}
+        onOpenChange={() => {}}
         title="Nutrition unavailable"
         description="Nutrition couldn't be calculated for this version."
         confirmLabel="OK"
         confirmTone="primary"
-        onConfirm={() => undefined}
+        onConfirm={() => {}}
       />
     </StoryFrame>
   ),

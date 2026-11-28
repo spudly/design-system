@@ -1,5 +1,6 @@
 import { Text as TamaguiText, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
 
 const StyledVerseText = styled(TamaguiText, {

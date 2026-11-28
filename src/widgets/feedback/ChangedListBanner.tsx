@@ -4,8 +4,9 @@ import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Button } from "../actions/Button.js";
 import { Text } from "../data/Text.js";
-import { TextSkeleton } from "./TextSkeleton.js";
 import { useVoice } from "../../voice/index.js";
+
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type ChangedListBannerProps = {
   /** The host-formatted summary line (the parent summary is

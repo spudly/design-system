@@ -23,9 +23,10 @@
  * the error state; Select all enabled with visible items).
  */
 import "../../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "../../../test/internalDist.js";
 async function renderPicker(props: Record<string, unknown>): Promise<string> {
   const { createElement: h } = await import("react");
   const { renderToString } = await import("react-dom/server");

@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+
+import { useVoice } from "../../voice/index.js";
+
 import { DragHandleView } from "./DragHandleView.js";
 import { LabeledListSection } from "./LabeledListSection.js";
 import {
@@ -6,7 +9,6 @@ import {
   type RecipeIngredientField,
   type RecipeIngredientRow,
 } from "./RecipeIngredientRowView.js";
-import { useVoice } from "../../voice/index.js";
 
 export type { RecipeIngredientField, RecipeIngredientRow };
 

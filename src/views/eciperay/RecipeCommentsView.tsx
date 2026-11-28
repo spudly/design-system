@@ -4,10 +4,11 @@ import { Button } from "../../widgets/actions/Button.js";
 import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { Card } from "../../widgets/layout/Card.js";
-import { CommentItem } from "./CommentItem.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { useVoice } from "../../voice/index.js";
+
+import { CommentItem } from "./CommentItem.js";
 
 type RecipeCommentsViewComment = {
   id: string;

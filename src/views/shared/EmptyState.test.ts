@@ -5,9 +5,10 @@
  * link-form action are observable without reading source.
  */
 import "../../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "../../../test/internalDist.js";
 
 async function load() {
   const dist: Record<string, any> = await loadInternalDist();

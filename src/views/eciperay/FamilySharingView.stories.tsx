@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { FamilySharingView, type FamilySharingGrant } from "./FamilySharingView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { FamilySharingView, type FamilySharingGrant } from "./FamilySharingView.js";
 
 const meta: Meta<typeof FamilySharingView> = {
   title: "Views/Eciperay/FamilySharingView",
@@ -27,9 +29,9 @@ const grants: FamilySharingGrant[] = [
 ];
 
 const actions = {
-  onEmailChange: () => undefined,
-  onAdd: () => undefined,
-  onRemove: () => undefined,
+  onEmailChange: () => {},
+  onAdd: () => {},
+  onRemove: () => {},
 };
 
 export const WithGrants: Story = {

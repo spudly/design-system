@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { storyImageWide } from "../../storyFixtures.js";
-import { RecipeImageView } from "./RecipeImageView.js";
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { RecipeImageView } from "./RecipeImageView.js";
 
 const meta: Meta<typeof RecipeImageView> = {
   title: "Views/Eciperay/RecipeImageView",
@@ -13,7 +15,7 @@ const meta: Meta<typeof RecipeImageView> = {
 export default meta;
 type Story = StoryObj<typeof RecipeImageView>;
 
-const noop = () => undefined;
+const noop = () => {};
 
 /** No image yet: the dashed empty frame, pick / take-photo /
  * generate actions, and no remove action. */

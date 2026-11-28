@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { ScaledIngredientsView } from "./ScaledIngredientsView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { ScaledIngredientsView } from "./ScaledIngredientsView.js";
 
 const meta: Meta<typeof ScaledIngredientsView> = {
   title: "Views/Eciperay/ScaledIngredientsView",

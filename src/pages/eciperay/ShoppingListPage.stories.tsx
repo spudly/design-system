@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
 import { shoppingListFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { ShoppingListPage, type ShoppingListPageLine } from "./ShoppingListPage.js";
 
 /**
@@ -52,7 +54,7 @@ export const Loading: Story = {
         footer={eciperayFooterFixture}
         lines={[]}
         loading
-        onToggleLine={() => undefined}
+        onToggleLine={() => {}}
       />
     </>
   ),
@@ -61,7 +63,7 @@ export const Loading: Story = {
 export const Empty: Story = {
   render: () => (
     <>
-      <ShoppingListPage footer={eciperayFooterFixture} lines={[]} onToggleLine={() => undefined} />
+      <ShoppingListPage footer={eciperayFooterFixture} lines={[]} onToggleLine={() => {}} />
     </>
   ),
 };
@@ -73,7 +75,7 @@ export const LoadingOverlay: Story = {
       <ShoppingListPage
         footer={eciperayFooterFixture}
         lines={shoppingListFixture.lines}
-        onToggleLine={() => undefined}
+        onToggleLine={() => {}}
       />
       <View
         position="absolute"
@@ -88,7 +90,7 @@ export const LoadingOverlay: Story = {
           footer={eciperayFooterFixture}
           lines={shoppingListFixture.lines}
           loading
-          onToggleLine={() => undefined}
+          onToggleLine={() => {}}
         />
       </View>
     </View>

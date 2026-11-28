@@ -1,4 +1,5 @@
 import { Anchor, isWeb, styled } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import type { RowProps } from "../layout/Row.js";
 import { BrandMark, type BrandMarkName } from "../../icons/BrandMark.js";

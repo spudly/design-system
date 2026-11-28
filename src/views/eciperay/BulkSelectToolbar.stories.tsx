@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { BulkSelectToolbar } from "./BulkSelectToolbar.js";
 
 const meta: Meta<typeof BulkSelectToolbar> = {

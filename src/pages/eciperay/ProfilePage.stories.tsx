@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { ProfilePage } from "./ProfilePage.js";
 
 const meta: Meta<typeof ProfilePage> = {
@@ -23,30 +25,30 @@ export const WithSections: Story = {
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
-        onSignOut={() => undefined}
+        onSignOut={() => {}}
         tagsHref="/profile/tags"
         nutritionGoals={{
           goals: nutritionGoalsFixture,
-          onChange: () => undefined,
-          onSave: () => undefined,
+          onChange: () => {},
+          onSave: () => {},
         }}
         accessTokens={{
           tokens: accessTokensFixture.tokens,
           tokenName: "",
-          onTokenNameChange: () => undefined,
-          onCreate: () => undefined,
+          onTokenNameChange: () => {},
+          onCreate: () => {},
           createdSecret: null,
-          onDismissSecret: () => undefined,
-          onRevoke: () => undefined,
+          onDismissSecret: () => {},
+          onRevoke: () => {},
         }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
-          onShortcutEnabledChange: () => undefined,
+          onShortcutEnabledChange: () => {},
           consent: true,
           consentStatusText: "Analytics consent: Accepted",
-          onAcceptConsent: () => undefined,
-          onDeclineConsent: () => undefined,
-          onWithdrawConsent: () => undefined,
+          onAcceptConsent: () => {},
+          onDeclineConsent: () => {},
+          onWithdrawConsent: () => {},
           choicesHref: "/privacy/consent",
         }}
         legalLinks={[
@@ -67,17 +69,17 @@ export const Loading: Story = {
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
-        onSignOut={() => undefined}
+        onSignOut={() => {}}
         loading
         subscription={{
           planLabel: "Plus plan",
           statusText: "Your Plus plan is active and renews on Dec 1, 2026.",
-          onManage: () => undefined,
+          onManage: () => {},
         }}
         authorDisplay={{
           settings: { displayName: "Jamie Cook", showOnPublicRecipes: true },
-          onChange: () => undefined,
-          onSave: () => undefined,
+          onChange: () => {},
+          onSave: () => {},
         }}
         familySharing={{
           grants: [
@@ -89,37 +91,37 @@ export const Loading: Story = {
             },
           ],
           email: "",
-          onEmailChange: () => undefined,
-          onAdd: () => undefined,
-          onRemove: () => undefined,
+          onEmailChange: () => {},
+          onAdd: () => {},
+          onRemove: () => {},
         }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
-          onShortcutEnabledChange: () => undefined,
+          onShortcutEnabledChange: () => {},
           consent: true,
           consentStatusText: "Analytics consent: Accepted",
-          onAcceptConsent: () => undefined,
-          onDeclineConsent: () => undefined,
-          onWithdrawConsent: () => undefined,
+          onAcceptConsent: () => {},
+          onDeclineConsent: () => {},
+          onWithdrawConsent: () => {},
           choicesHref: "/privacy/consent",
         }}
         accountData={{
-          onExportData: () => undefined,
-          onDeleteAccount: () => undefined,
+          onExportData: () => {},
+          onDeleteAccount: () => {},
         }}
         nutritionGoals={{
           goals: nutritionGoalsFixture,
-          onChange: () => undefined,
-          onSave: () => undefined,
+          onChange: () => {},
+          onSave: () => {},
         }}
         accessTokens={{
           tokens: accessTokensFixture.tokens,
           tokenName: "",
-          onTokenNameChange: () => undefined,
-          onCreate: () => undefined,
+          onTokenNameChange: () => {},
+          onCreate: () => {},
           createdSecret: null,
-          onDismissSecret: () => undefined,
-          onRevoke: () => undefined,
+          onDismissSecret: () => {},
+          onRevoke: () => {},
         }}
         legalLinks={[
           { label: "Terms of Service", href: "/terms" },
@@ -143,23 +145,23 @@ export const WithCoverageSections: Story = {
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
-        onSignOut={() => undefined}
+        onSignOut={() => {}}
         subscription={{
           planLabel: "Plus plan",
           statusText: "Your Plus plan is active and renews on Dec 1, 2026.",
-          onManage: () => undefined,
+          onManage: () => {},
         }}
         showLess={{
           entries: [
             { sourceRecipeId: "recipe-1", title: "Spicy Tuna Casserole" },
             { sourceRecipeId: "recipe-2", title: "Liver and Onions" },
           ],
-          onUndo: () => undefined,
+          onUndo: () => {},
         }}
         authorDisplay={{
           settings: { displayName: "Jamie Cook", showOnPublicRecipes: true },
-          onChange: () => undefined,
-          onSave: () => undefined,
+          onChange: () => {},
+          onSave: () => {},
         }}
         familySharing={{
           grants: [
@@ -171,54 +173,54 @@ export const WithCoverageSections: Story = {
             },
           ],
           email: "",
-          onEmailChange: () => undefined,
-          onAdd: () => undefined,
-          onRemove: () => undefined,
+          onEmailChange: () => {},
+          onAdd: () => {},
+          onRemove: () => {},
         }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
-          onShortcutEnabledChange: () => undefined,
+          onShortcutEnabledChange: () => {},
           consent: true,
           consentStatusText: "Analytics consent: Accepted",
-          onAcceptConsent: () => undefined,
-          onDeclineConsent: () => undefined,
-          onWithdrawConsent: () => undefined,
+          onAcceptConsent: () => {},
+          onDeclineConsent: () => {},
+          onWithdrawConsent: () => {},
           choicesHref: "/privacy/consent",
         }}
         transfer={{
           exportPicker: {
             search: "",
-            onSearchChange: () => undefined,
+            onSearchChange: () => {},
             items: [
               { id: "r1", label: "Skillet Chicken" },
               { id: "r2", label: "First Soup" },
             ],
             selectedIds: ["r1"],
-            onToggle: () => undefined,
-            onSelectAll: () => undefined,
-            onClearSelection: () => undefined,
-            onExport: () => undefined,
+            onToggle: () => {},
+            onSelectAll: () => {},
+            onClearSelection: () => {},
+            onExport: () => {},
             exportLabel: "Export selected (1)",
           },
-          onImportPress: () => undefined,
+          onImportPress: () => {},
         }}
         accountData={{
-          onExportData: () => undefined,
-          onDeleteAccount: () => undefined,
+          onExportData: () => {},
+          onDeleteAccount: () => {},
         }}
         nutritionGoals={{
           goals: nutritionGoalsFixture,
-          onChange: () => undefined,
-          onSave: () => undefined,
+          onChange: () => {},
+          onSave: () => {},
         }}
         accessTokens={{
           tokens: accessTokensFixture.tokens,
           tokenName: "",
-          onTokenNameChange: () => undefined,
-          onCreate: () => undefined,
+          onTokenNameChange: () => {},
+          onCreate: () => {},
           createdSecret: null,
-          onDismissSecret: () => undefined,
-          onRevoke: () => undefined,
+          onDismissSecret: () => {},
+          onRevoke: () => {},
         }}
         legalLinks={[
           { label: "Terms of Service", href: "/terms" },

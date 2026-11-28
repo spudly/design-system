@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { isWeb } from "tamagui";
+
+import { tokens } from "../../tokens/index.js";
+
 import { Col } from "./Col.js";
 import { Spacer } from "./Spacer.js";
-import { tokens } from "../../tokens/index.js";
 import { ScrollRegion } from "./ScrollRegion.js";
 
 export type SessionShellProps = {

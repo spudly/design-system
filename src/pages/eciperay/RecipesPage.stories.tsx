@@ -1,9 +1,12 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
-import { storyImageWide } from "../../storyFixtures.js";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "../../widgets/data/Text.js";
 import { View } from "tamagui";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+import { storyImageWide } from "../../storyFixtures.js";
+import { Text } from "../../widgets/data/Text.js";
+
+
 import {
   RecipesPage,
   type RecipesPageDiscoveryItem,
@@ -238,7 +241,7 @@ function RecipesPageDemo({
               ...(onDiscoveryLoadMoreRetry ? { onDiscoveryLoadMoreRetry } : {}),
             })}
         isFetchingNextPage={isFetchingNextPage}
-        onLogCookPress={() => undefined}
+        onLogCookPress={() => {}}
         {...(expandedRecipeId
           ? {
               // The expanded row's cook-log form as data (#687):
@@ -246,8 +249,8 @@ function RecipesPageDemo({
               // row, which also hides that row's log-cook control.
               cookLogForm: {
                 recipeId: expandedRecipeId,
-                onSubmit: () => undefined,
-                onSkip: () => undefined,
+                onSubmit: () => {},
+                onSkip: () => {},
                 isPending: false,
               },
             }
@@ -361,8 +364,8 @@ export const DiscoveryWithActions: Story = {
       discoveryRecipes={discoveryItems.map((item) => ({
         ...item,
         actions: [
-          { id: "hide", label: "Hide this recipe", onSelect: () => undefined },
-          { id: "show-less", label: "Show less like this", onSelect: () => undefined },
+          { id: "hide", label: "Hide this recipe", onSelect: () => {} },
+          { id: "show-less", label: "Show less like this", onSelect: () => {} },
         ],
       }))}
     />
@@ -389,7 +392,7 @@ export const DiscoveryLoadMoreError: Story = {
   render: () => (
     <RecipesPageDemo
       discoveryLoadMoreErrorMessage="We couldn't load more public recipes. Check your connection and try again."
-      onDiscoveryLoadMoreRetry={() => undefined}
+      onDiscoveryLoadMoreRetry={() => {}}
     />
   ),
 };

@@ -12,5 +12,5 @@
  * from the apps' trees.
  */
 export function getAssetByID(): undefined {
-  return undefined;
+  return;
 }

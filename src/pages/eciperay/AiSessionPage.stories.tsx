@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import {
   aiSessionGenerateConfigFixture,
   aiSessionPlanningFixture,
   aiSessionPreviewFixture,
   eciperayFooterFixture,
 } from "../shared/fixtures.js";
+
 import { AiSessionPage } from "./AiSessionPage.js";
 
 const meta: Meta<typeof AiSessionPage> = {
@@ -17,14 +19,14 @@ export default meta;
 type Story = StoryObj<typeof AiSessionPage>;
 
 const noopHandlers = {
-  onPromptChange: () => undefined,
-  onFollowUpChange: () => undefined,
-  onStart: () => undefined,
-  onSendMessage: () => undefined,
-  onApprovePlan: () => undefined,
-  onFinalize: () => undefined,
-  onCancel: () => undefined,
-  onEmptyCancel: () => undefined,
+  onPromptChange: () => {},
+  onFollowUpChange: () => {},
+  onStart: () => {},
+  onSendMessage: () => {},
+  onApprovePlan: () => {},
+  onFinalize: () => {},
+  onCancel: () => {},
+  onEmptyCancel: () => {},
 };
 
 export const Start: Story = {

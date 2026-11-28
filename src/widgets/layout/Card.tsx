@@ -1,11 +1,13 @@
 import { YStack } from "tamagui";
 import type { GetProps } from "tamagui";
-import { Col } from "./Col.js";
-import type { ColProps } from "./Col.js";
+
 import type { LayoutSize } from "../layout.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
+
+import type { ColProps } from "./Col.js";
+import { Col } from "./Col.js";
 
 type CardVariant = "default" | "bordered" | "muted" | "elevated" | "compact";
 

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { RecipePreviewView } from "./RecipePreviewView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { RecipePreviewView } from "./RecipePreviewView.js";
 
 const meta: Meta<typeof RecipePreviewView> = {
   title: "Views/Eciperay/RecipePreviewView",

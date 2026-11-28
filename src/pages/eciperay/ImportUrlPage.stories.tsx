@@ -1,8 +1,10 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
 import { Text } from "../../widgets/data/Text.js";
+
 import { ImportUrlPage } from "./ImportUrlPage.js";
 
 const meta: Meta<typeof ImportUrlPage> = {
@@ -20,8 +22,8 @@ export const Filled: Story = {
       <ImportUrlPage
         footer={eciperayFooterFixture}
         url="https://example.com/recipes/mushroom-stroganoff"
-        onUrlChange={() => undefined}
-        onSubmit={() => undefined}
+        onUrlChange={() => {}}
+        onSubmit={() => {}}
       />
     </>
   ),

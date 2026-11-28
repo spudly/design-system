@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
 import type { TagColorName } from "../../themes/tagColors.js";
 import { tagsFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { TagsPage, type TagsPageTag } from "./TagsPage.js";
 
 const meta: Meta<typeof TagsPage> = {
@@ -45,10 +47,10 @@ export const WithTags: Story = {
           name="Baking"
           color="purple"
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => undefined}
-          onColorChange={() => undefined}
-          onCreate={() => undefined}
-          onDelete={() => undefined}
+          onNameChange={() => {}}
+          onColorChange={() => {}}
+          onCreate={() => {}}
+          onDelete={() => {}}
           editingTagId={editingTagId}
           editName={editName}
           editColor={editColor}
@@ -99,10 +101,10 @@ export const Editing: Story = {
           name=""
           color={tagsFixture.colorOptions[0] ?? "indigo"}
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => undefined}
-          onColorChange={() => undefined}
-          onCreate={() => undefined}
-          onDelete={() => undefined}
+          onNameChange={() => {}}
+          onColorChange={() => {}}
+          onCreate={() => {}}
+          onDelete={() => {}}
           editingTagId={editingTagId}
           editName={editName}
           editColor={editColor}
@@ -159,8 +161,8 @@ export const FailingSaves: Story = {
           name="Baking"
           color="purple"
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => undefined}
-          onColorChange={() => undefined}
+          onNameChange={() => {}}
+          onColorChange={() => {}}
           onCreate={() => false}
           onDelete={() => false}
           initialFailedOperation="create"
@@ -194,10 +196,10 @@ export const Loading: Story = {
         name=""
         color={tagsFixture.colorOptions[0] ?? "indigo"}
         colorOptions={tagsFixture.colorOptions}
-        onNameChange={() => undefined}
-        onColorChange={() => undefined}
-        onCreate={() => undefined}
-        onDelete={() => undefined}
+        onNameChange={() => {}}
+        onColorChange={() => {}}
+        onCreate={() => {}}
+        onDelete={() => {}}
       />
     </>
   ),
@@ -213,11 +215,11 @@ export const LoadingOverlay: Story = {
         name=""
         color={tagsFixture.colorOptions[0] ?? "indigo"}
         colorOptions={tagsFixture.colorOptions}
-        onNameChange={() => undefined}
-        onColorChange={() => undefined}
-        onCreate={() => undefined}
-        onDelete={() => undefined}
-        onStartEdit={() => undefined}
+        onNameChange={() => {}}
+        onColorChange={() => {}}
+        onCreate={() => {}}
+        onDelete={() => {}}
+        onStartEdit={() => {}}
       />
       <View
         position="absolute"
@@ -235,11 +237,11 @@ export const LoadingOverlay: Story = {
           name=""
           color={tagsFixture.colorOptions[0] ?? "indigo"}
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => undefined}
-          onColorChange={() => undefined}
-          onCreate={() => undefined}
-          onDelete={() => undefined}
-          onStartEdit={() => undefined}
+          onNameChange={() => {}}
+          onColorChange={() => {}}
+          onCreate={() => {}}
+          onDelete={() => {}}
+          onStartEdit={() => {}}
         />
       </View>
     </View>

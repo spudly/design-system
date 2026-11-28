@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
-import { CenteredText } from "./CenteredText.js";
 import { Text } from "../data/Text.js";
+
+import { CenteredText } from "./CenteredText.js";
 
 const meta: Meta<typeof CenteredText> = {
   title: "Widgets/Content/CenteredText",

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import type { TagColorName } from "../../themes/tagColors.js";
+
 import { ColorPickerField } from "./ColorPickerField.js";
 
 const meta: Meta<typeof ColorPickerField> = {

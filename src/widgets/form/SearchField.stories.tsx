@@ -1,6 +1,7 @@
 import { useState, type ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { SearchField } from "./SearchField.js";
 
 const meta: Meta<typeof SearchField> = {

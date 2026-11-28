@@ -1,9 +1,10 @@
-import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { PasswordField } from "../../widgets/form/PasswordField.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { useVoice } from "../../voice/index.js";
+
+import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 
 /**
  * SignInForm (#119): the sign-in form — the fields and their

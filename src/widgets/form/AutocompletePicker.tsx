@@ -1,6 +1,7 @@
 import { useId, useRef } from "react";
 import { XStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
@@ -8,11 +9,12 @@ import { politeLiveRegionProps } from "../accessibility.js";
 import { Alert } from "../feedback/Alert.js";
 import { Badge } from "../data/Badge.js";
 import { ListItem } from "../data/ListItem.js";
-import { SearchField } from "./SearchField.js";
 import { Spinner } from "../feedback/Spinner.js";
 import { Text } from "../data/Text.js";
-import { FieldError } from "./FieldError.js";
 import { useVoice } from "../../voice/index.js";
+
+import { FieldError } from "./FieldError.js";
+import { SearchField } from "./SearchField.js";
 
 /**
  * The bordered field frame holding the selected chips and the

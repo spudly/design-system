@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { Button } from "../../widgets/actions/Button.js";
+import { StoryFrame } from "../shared/storyFrame.js";
+
 import {
   RecipeInstructionListView,
   type RecipeInstructionRow,
 } from "./RecipeInstructionListView.js";
-import { StoryFrame } from "../shared/storyFrame.js";
 
 const meta: Meta<typeof RecipeInstructionListView> = {
   title: "Views/Eciperay/RecipeInstructionListView",
@@ -55,7 +57,7 @@ function Harness({
                 variant="secondary"
                 size="sm"
                 accessibilityLabel={`Reorder step ${index + 1}`}
-                onPress={() => undefined}
+                onPress={() => {}}
               >
                 Drag
               </Button>

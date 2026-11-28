@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { isWeb } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { EyeIcon } from "../../icons/EyeIcon.js";
 import { EyeOffIcon } from "../../icons/EyeOffIcon.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
+
 import { TextField, type TextFieldProps } from "./TextField.js";
 
 export type PasswordFieldProps = Omit<TextFieldProps, "secureTextEntry" | "type" | "trailing"> & {

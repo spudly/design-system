@@ -1,7 +1,9 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
-import { storyImageWide } from "../../storyFixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+import { storyImageWide } from "../../storyFixtures.js";
+
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 
 /**
@@ -67,7 +69,7 @@ export const Default: Story = {
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => undefined}
+        onPlanDelete={() => {}}
       />
     </>
   ),
@@ -84,7 +86,7 @@ export const WithLeadImage: Story = {
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => undefined}
+        onPlanDelete={() => {}}
       />
     </>
   ),
@@ -98,7 +100,7 @@ export const Empty: Story = {
         plans={[]}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => undefined}
+        onPlanDelete={() => {}}
       />
     </>
   ),
@@ -131,7 +133,7 @@ export const LoadingOverlay: Story = {
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => undefined}
+        onPlanDelete={() => {}}
       />
       <View
         position="absolute"
@@ -147,7 +149,7 @@ export const LoadingOverlay: Story = {
           plans={planItems}
           loading
           createHref="/meal-plans/new"
-          onPlanDelete={() => undefined}
+          onPlanDelete={() => {}}
         />
       </View>
     </View>

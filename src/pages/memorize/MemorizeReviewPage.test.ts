@@ -20,13 +20,14 @@
  * and stays.
  */
 import "../../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { register } from "node:module";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+
+import { loadInternalDist } from "../../../test/internalDist.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
