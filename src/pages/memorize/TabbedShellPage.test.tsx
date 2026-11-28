@@ -195,7 +195,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     contentKey: "verse-42",
   });
   assert.equal(
-    keyed.props.children.props.children[3].key,
+    keyed.props.children.props.children[4].key,
     "verse-42",
     "the host's contentKey wins",
   );
@@ -310,7 +310,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     onTabSelect: () => {},
   });
   assert.equal(
-    bare.props.children.props.children[2],
+    bare.props.children.props.children[3],
     null,
     "no notice data — no notice renders between the tab bar and the content",
   );
@@ -328,7 +328,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
       action: { label: "Try again", onPress },
     },
   });
-  const noticeEl = withNotice.props.children.props.children[2];
+  const noticeEl = withNotice.props.children.props.children[3];
   assert.equal(noticeEl.type, distWidgets.Row, "the notice renders through the banner Row (#746)");
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(

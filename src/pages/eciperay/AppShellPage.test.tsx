@@ -93,7 +93,7 @@ test("the top bar is one shared chrome: TabbedShellPage renders it too", async (
     activeTabId: "verses",
     onTabSelect: () => {},
   });
-  const header = tree.props.children.props.children[0];
+  const header = tree.props.children.props.children[1];
   assert.equal(
     header.type,
     distWidgets.AppTopBar,
@@ -206,7 +206,7 @@ test("the slot renders the page content, keyed by the active nav item; contentKe
     children: surface,
   });
   assert.equal(
-    keyed.props.children.props.children[2].key,
+    keyed.props.children.props.children[3].key,
     "recipe-42",
     "the host's contentKey wins",
   );
@@ -280,7 +280,7 @@ test("search data forwards from the page to the top bar; SSR renders the landmar
     children: <span>PAGE SURFACE</span>,
   });
   assert.equal(
-    bare.props.children.props.children[0].props.search,
+    bare.props.children.props.children[1].props.search,
     undefined,
     "no search data — no search in the bar",
   );
@@ -405,7 +405,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     children: <span>PAGE SURFACE</span>,
   });
   assert.equal(
-    bare.props.children.props.children[1],
+    bare.props.children.props.children[2],
     null,
     "no notice data — no notice renders between the top bar and the content",
   );
@@ -423,7 +423,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     },
     children: <span>PAGE SURFACE</span>,
   });
-  const noticeEl = withNotice.props.children.props.children[1];
+  const noticeEl = withNotice.props.children.props.children[2];
   assert.equal(noticeEl.type, distWidgets.Row, "the notice renders through the banner Row (#746)");
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(
@@ -445,7 +445,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     children: <span>PAGE SURFACE</span>,
   });
   assert.equal(
-    messageOnly.props.children.props.children[1].props.children[1],
+    messageOnly.props.children.props.children[2].props.children[1],
     null,
     "a notice without an action renders no Button",
   );
