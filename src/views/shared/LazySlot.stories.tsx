@@ -15,8 +15,8 @@ export default meta;
 type Story = StoryObj<typeof LazySlot>;
 
 /** A child that suspends the way a pending lazy chunk does. */
-// eslint-disable-next-line @typescript-eslint/only-throw-error -- throwing a promise is the React Suspense protocol this fixture simulates
 function PendingChild(): never {
+  // eslint-disable-next-line @typescript-eslint/only-throw-error -- throwing a promise is the React Suspense protocol this fixture simulates
   throw new Promise(() => { /* noop */ });
 }
 

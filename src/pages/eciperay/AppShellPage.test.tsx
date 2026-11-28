@@ -354,8 +354,8 @@ test("SSR: footer data renders the one BigFooter band", async () => {
 });
 test("SSR: a pending surface shows the loading state; a failed one stays in the slot", async () => {
   const { AppShellPage } = await loadRuntime();
-  // eslint-disable-next-line @typescript-eslint/only-throw-error -- throwing a promise is the React Suspense protocol this fixture simulates
   function PendingContent(): never {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- throwing a promise is the React Suspense protocol this fixture simulates
     throw new Promise(() => { /* noop */ });
   }
   function FailingContent(): never {
