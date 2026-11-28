@@ -718,6 +718,7 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
       window.removeEventListener("scroll", check);
       window.removeEventListener("resize", check);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once listener registration: fireAllSections/fireSection read only refs (sectionsRef/requestedRefs), so there is no reactive value to depend on.
   }, []);
   // The recheck, per section: a section becoming available, or
   // that section's fetch state changing, can each leave a

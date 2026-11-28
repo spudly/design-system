@@ -227,7 +227,7 @@ export function StepOverlay({
         layerRef.current = null;
       }
     };
-  }, [parentLayerToken]);
+  }, [layerToken, parentLayerToken]);
 
   // The mount focus move (web): the shell is focusable without
   // being a tab stop (tabIndex={-1} below), and focus lands on

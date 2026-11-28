@@ -23,6 +23,7 @@ import { SearchField } from "./SearchField.js";
  * $textMuted border (≥3:1, WCAG 1.4.11, as in SearchField) and
  * the focus-within ring — so the composite reads as one field.
  */
+// eslint-disable-next-line design-system/no-direct-stacks -- the field frame is a single-purpose bordered container carrying the SearchField container's own border/focus-within treatment (#805, see the doc comment above); it is a frame, not a layout stack composing children with spacing.
 const StyledFieldFrame = styled(XStack, {
   name: "AutocompletePickerFieldFrame",
 

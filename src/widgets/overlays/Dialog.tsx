@@ -445,7 +445,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         layerRef.current = null;
       }
     };
-  }, [open, parentLayerToken]);
+  }, [open, layerToken, parentLayerToken]);
 
   // Focus containment for a dialog with nothing tabbable (#391):
   // the primitive's focus scope traps Tab between the dialog's

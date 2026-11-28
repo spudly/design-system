@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case -- the directory name "dsvr-capture" is the Expo module's registered name (its package.json name and native module lookup); renaming the directory would break native module resolution. */
 import { requireNativeModule } from "expo-modules-core";
 
 /** Geometry of one app-side full-content capture, as measured and

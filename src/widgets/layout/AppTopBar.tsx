@@ -430,6 +430,7 @@ export function AppTopBar({
           </Row>
         ) : null}
         {actions !== undefined && actions.length > 0 ? (
+          // eslint-disable-next-line design-system/no-margin-spacing -- #209 exemption pattern: the auto left margin pushes the actions group to the end of the top-bar row — alignment within a row, not space between items.
           <Row wrap middle gap="s" marginLeft="auto">
             {actions.map((action) =>
               action.href === undefined ? (

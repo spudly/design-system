@@ -96,6 +96,7 @@ export function FullBleed({ children }: FullBleedProps) {
   if (!isWeb) {
     return <Col>{children}</Col>;
   }
+  /* eslint-disable design-system/no-margin-spacing -- full-bleed breakout: the calc(50% - 50vw) margins ARE the viewport-breakout technique (the column escapes its centered parent to span the viewport width), not space between items. */
   return (
     <Col
       style={{
@@ -106,4 +107,5 @@ export function FullBleed({ children }: FullBleedProps) {
       {children}
     </Col>
   );
+  /* eslint-enable design-system/no-margin-spacing */
 }
