@@ -220,6 +220,7 @@ test("SSR: title, tab bar, and the active surface render; the inactive surface d
 });
 test("SSR: a pending surface shows the loading state; a failed one the boundary fallback", async () => {
   const { TabbedShellPage } = await loadRuntime();
+  // eslint-disable-next-line @typescript-eslint/only-throw-error -- throwing a promise is the React Suspense protocol this fixture simulates
   function PendingContent(): never {
     throw new Promise(() => { /* noop */ });
   }
