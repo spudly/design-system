@@ -195,7 +195,7 @@ test("the rule only applies where the config scopes it (components and pages)", 
 
 test("eslint.config.ts wires the rule at error for components and pages, off for stories", async () => {
   const jiti = createJiti(import.meta.url);
-  const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
+  const config = await jiti.import<Linter.Config[]>(join(repoRoot, "eslint.config.ts"));
   const componentsBlock = config.find(
     (block: any) => block.files?.includes("src/widgets/**/*.tsx") && block.rules,
   );
@@ -221,7 +221,7 @@ test("eslint.config.ts wires the rule at error for components and pages, off for
 
 test("dormant today: the real config reports nothing for violating components or pages", async () => {
   const jiti = createJiti(import.meta.url);
-  const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
+  const config = await jiti.import<Linter.Config[]>(join(repoRoot, "eslint.config.ts"));
   for (const filename of ["src/widgets/Example.tsx", "src/pages/ExamplePage.tsx"]) {
     const messages = linter.verify(`<YStack marginTop="$4" />`, config, { filename });
     const ruleReports = messages.filter(

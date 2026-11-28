@@ -756,7 +756,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       );
       if (!inside) {
         const wrapper = frame
-          ? (frame.querySelector('[tabindex="-1"]') as HTMLElement | null)
+          ? frame.querySelector<HTMLElement>('[tabindex="-1"]')
           : null;
         const landing = wrapper ?? content;
         if (typeof landing.focus === "function") {

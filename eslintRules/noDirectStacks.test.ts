@@ -101,7 +101,7 @@ test("the rule only applies where the config scopes it", () => {
 
 test("eslint.config.ts wires the rule at error, with the recorded allowlist off", async () => {
   const jiti = createJiti(import.meta.url);
-  const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
+  const config = await jiti.import<Linter.Config[]>(join(repoRoot, "eslint.config.ts"));
   const componentsBlock = config.find(
     (block: any) =>
       block.files?.includes("src/widgets/**/*.tsx") &&
@@ -133,7 +133,7 @@ test("eslint.config.ts wires the rule at error, with the recorded allowlist off"
 
 test("dormant today: the real config reports nothing for violating components", async () => {
   const jiti = createJiti(import.meta.url);
-  const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
+  const config = await jiti.import<Linter.Config[]>(join(repoRoot, "eslint.config.ts"));
   for (const filename of ["src/widgets/Example.tsx", "src/views/Example.tsx"]) {
     const messages = linter.verify(`<YStack gap="$3" />`, config, { filename });
     const ruleReports = messages.filter(

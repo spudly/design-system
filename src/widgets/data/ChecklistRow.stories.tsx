@@ -17,7 +17,6 @@ type Story = StoryObj<typeof ChecklistRow>;
 
 function RowDemo(props: React.ComponentProps<typeof ChecklistRow>) {
   const { checked: initialChecked, onCheckedChange: _ignored, ...rest } = props;
-  _ignored;
   const [checked, setChecked] = useState(initialChecked);
   return <ChecklistRow {...rest} checked={checked} onCheckedChange={setChecked} />;
 }

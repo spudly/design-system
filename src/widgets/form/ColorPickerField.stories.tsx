@@ -22,7 +22,6 @@ const tagColors: TagColorName[] = ["orange", "green", "indigo", "amber", "pink",
 
 function ColorDemo(props: React.ComponentProps<typeof ColorPickerField>) {
   const { value: initialValue, onChange: _ignored, ...rest } = props;
-  _ignored;
   const [value, setValue] = useState<TagColorName | undefined>(initialValue);
   return (
     <ColorPickerField {...rest} {...(value === undefined ? {} : { value })} onChange={setValue} />

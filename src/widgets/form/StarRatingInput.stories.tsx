@@ -23,7 +23,6 @@ type Story = StoryObj<typeof StarRatingInput>;
 
 function RatingDemo(props: React.ComponentProps<typeof StarRatingInput>) {
   const { value: initialValue, onChange: _ignored, ...rest } = props;
-  _ignored;
   const [value, setValue] = useState(initialValue);
   return <StarRatingInput {...rest} value={value} onChange={setValue} />;
 }
