@@ -17,7 +17,7 @@ test("verticalScrollers detects an inline-style scroller", () => {
 });
 test("verticalScrollers detects a class-based scroller (negative control)", () => {
   const html =
-    `<style>.bounded { overflow-y: scroll; }</style>` + `<div class="bounded"><p>content</p></div>`;
+    `<style>.bounded { overflow-y: scroll; }</style><div class="bounded"><p>content</p></div>`;
   assert.equal(verticalScrollers(html).length, 1);
 });
 test("verticalScrollers reads the overflow shorthand's vertical value", () => {

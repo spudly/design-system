@@ -175,7 +175,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         content && typeof content.closest === "function" ? content.closest("dialog") : null;
       const insideOwnDialog = Boolean(
         (content && typeof content.contains === "function" && content.contains(activeElement)) ||
-        (frame && frame.contains(activeElement)),
+        (frame?.contains(activeElement)),
       );
       if (!insideOwnDialog) {
         // Retain the yielded-to control as the restore target: it
@@ -573,7 +573,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         focusedElement &&
         focusedElement !== document.body &&
         !content.contains(focusedElement) &&
-        !(frame && frame.contains(focusedElement)) &&
+        !(frame?.contains(focusedElement)) &&
         typeof focusedElement.closest === "function"
       ) {
         const foreignModal = focusedElement.closest('[role="dialog"][aria-modal="true"]');
@@ -752,7 +752,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       const activeElement = document.activeElement as HTMLElement | null;
       const inside = Boolean(
         activeElement &&
-        (content.contains(activeElement) || (frame && frame.contains(activeElement))),
+        (content.contains(activeElement) || (frame?.contains(activeElement))),
       );
       if (!inside) {
         const wrapper = frame

@@ -12,5 +12,5 @@
  * from the apps' trees.
  */
 export function getAssetByID(): undefined {
-  
+  // Stub: resolves nothing by design (see header comment).
 }

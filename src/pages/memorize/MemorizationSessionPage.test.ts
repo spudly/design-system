@@ -214,7 +214,7 @@ test("the rendered tree has no demo inventions, loading state, or text entry", a
       return;
     }
     if (Array.isArray(node)) {
-      node.forEach(walk);
+      for (const child of node) walk(child);
       return;
     }
     if (typeof node.type === "function") types.push(node.type.name);

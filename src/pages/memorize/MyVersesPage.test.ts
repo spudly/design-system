@@ -209,7 +209,7 @@ test("the rendered tree has no loading state or render-slot content", async () =
   const walk = (node: any): void => {
     if ((node === null || node === undefined) || typeof node !== "object") return;
     if (Array.isArray(node)) {
-      node.forEach(walk);
+      for (const child of node) walk(child);
       return;
     }
     if (typeof node.type === "function") types.push(node.type.name);

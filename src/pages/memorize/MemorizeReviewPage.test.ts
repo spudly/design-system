@@ -183,7 +183,7 @@ test("the rendered tree has no invented dashboard, extra actions, badge, or load
       return;
     }
     if (Array.isArray(node)) {
-      node.forEach(walk);
+      for (const child of node) walk(child);
       return;
     }
     if (typeof node.type === "function") types.push(node.type.name);

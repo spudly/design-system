@@ -1045,7 +1045,7 @@ export function RecipesPage(props: RecipesPageProps) {
       case "ownRecipe": {
         const item = row.item;
         const accessory =
-          cookLogForm && cookLogForm.recipeId === item.id ? (
+          cookLogForm?.recipeId === item.id ? (
             <RatingForm
               variant="light"
               onSubmit={cookLogForm.onSubmit}
