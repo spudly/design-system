@@ -51,8 +51,13 @@ const actionBar = readCode("src/widgets/actions/ActionBar.tsx");
 test("FixedActionBanner selects viewport pinning and passes no style props (#405)", () => {
   assert.match(
     banner,
-    /pinning="viewport"/,
-    "FixedActionBanner must select ActionBar's viewport pinning through the semantic pinning prop",
+    /pinning = "viewport"/,
+    "FixedActionBanner must default to ActionBar's viewport pinning (#405); callers may override it through the pinning prop (#903 flow mode)",
+  );
+  assert.match(
+    banner,
+    /pinning=\{pinning\}/,
+    "FixedActionBanner must pass its pinning prop through to ActionBar",
   );
   for (const styleProp of ["position=", "maxHeight=", "overflow="]) {
     assert.ok(
@@ -67,8 +72,13 @@ test("ActionBar owns the viewport pinning styles in its pinning computation (#40
   // the pinning prop behind the isViewport flag.
   assert.match(
     actionBar,
-    /position=\{isViewport \? \{ default: "absolute", web: "fixed" \} : "absolute"\}/,
+    /isViewport \? \{ default: "absolute", web: "fixed" \} : "absolute"/,
     "ActionBar's viewport pinning must carry the platform-conditional position (fixed on web, absolute on native)",
+  );
+  assert.match(
+    actionBar,
+    /isFlow \? "relative"/,
+    "ActionBar's flow pinning (#903) must render in normal document flow (position relative, no edge insets)",
   );
   assert.match(
     actionBar,
@@ -89,7 +99,7 @@ test("ActionBar owns the viewport pinning styles in its pinning computation (#40
 test("ActionBar's base stays absolute and pinning defaults to container (#405)", () => {
   assert.match(
     actionBar,
-    /: "absolute"\}/,
+    /: "absolute"/,
     "ActionBar's base must keep absolute positioning for plain (non-banner) use",
   );
   assert.match(

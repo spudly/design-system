@@ -17,6 +17,13 @@ export type InstallBannerViewProps = {
   onDismiss: () => void;
   /** Defaults to the voice object's installBannerView dismissLabel (#539). */
   dismissAriaLabel?: string;
+  /**
+   * How the banner attaches. Defaults to the FixedActionBanner
+   * viewport pinning (#405) for direct use; pages that render the
+   * banner as page chrome pass "flow" so it sits in the document
+   * flow above the page header instead of overlaying it (#903).
+   */
+  pinning?: "container" | "viewport" | "flow";
 };
 
 /**
@@ -37,12 +44,14 @@ export function InstallBannerView({
   links,
   onDismiss,
   dismissAriaLabel: dismissAriaLabelProp,
+  pinning,
 }: InstallBannerViewProps) {
   const voice = useVoice();
   const dismissAriaLabel = dismissAriaLabelProp ?? voice.installBannerView.dismissLabel;
   return (
     <FixedActionBanner
       position="top"
+      {...(pinning !== undefined ? { pinning } : null)}
       message={
         <Row middle wrap gap="s">
           <Text>{message}</Text>

@@ -47,11 +47,12 @@ WithNoticeAction, WithConsentBanner, WithInstallBanner.
    consent banner pins to the bottom of the viewport with its
    message, its privacy-policy link (a real link), and Decline
    / Accept buttons that fire the host's callbacks.
-   WithInstallBanner — the install banner pins to the top of
+   WithInstallBanner — the install banner renders in flow at the top of
    the viewport with its message, its app-store links (real
    links), and a dismiss button that fires the host's
    callback. WithBanners (AppShellPage): both banners render
-   at once, each pinned to its own edge. Without banner data
+   at once — the install banner in flow at the top, the consent
+   banner pinned to the bottom edge. Without banner data
    supplied, neither banner renders.
 
 **Run when:** `src/pages/eciperay/AppShellPage.tsx`,

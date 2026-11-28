@@ -141,7 +141,7 @@ test("the slot renders only the active tab's content, keyed by the active surfac
     onTabSelect,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
-  const [title, tabBar, , slot] = tree.props.children.props.children;
+  const [, title, tabBar, , slot] = tree.props.children.props.children;
   // #437: the header is the shared AppTopBar view, with the
   // shell's title as its brand (no href — the title navigates
   // nowhere).
@@ -183,7 +183,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     onTabSelect: () => {},
     children: override,
   });
-  const [, tabBar, , slot] = tree.props.children.props.children;
+  const [, , tabBar, , slot] = tree.props.children.props.children;
   assert.equal(tabBar.props.value, "", "no tab is selected while the override shows");
   assert.equal(slot.key, "override");
   assert.equal(slot.props.children, override);
@@ -195,7 +195,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     contentKey: "verse-42",
   });
   assert.equal(
-    keyed.props.children.props.children[3].key,
+    keyed.props.children.props.children[4].key,
     "verse-42",
     "the host's contentKey wins",
   );
@@ -310,7 +310,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     onTabSelect: () => {},
   });
   assert.equal(
-    bare.props.children.props.children[2],
+    bare.props.children.props.children[3],
     null,
     "no notice data — no notice renders between the tab bar and the content",
   );
@@ -328,7 +328,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
       action: { label: "Try again", onPress },
     },
   });
-  const noticeEl = withNotice.props.children.props.children[2];
+  const noticeEl = withNotice.props.children.props.children[3];
   assert.equal(noticeEl.type, distWidgets.Row, "the notice renders through the banner Row (#746)");
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(
@@ -371,7 +371,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
     onTabSelect: () => {},
   });
   const bareChildren = bare.props.children.props.children;
-  assert.equal(bareChildren[4], null, "no install banner data — no install banner renders");
+  assert.equal(bareChildren[0], null, "no install banner data — no install banner renders");
   assert.equal(bareChildren[5], null, "no consent banner data — no consent banner renders");
   let accepts = 0;
   let dismissals = 0;
@@ -402,11 +402,15 @@ test("banners (#879): absent by default; when present the shell renders the bann
   });
   const children = withBanners.props.children.props.children;
   assert.equal(
-    children[4].type,
+    children[0].type,
     distViews.InstallBannerView,
     "the install banner renders through InstallBannerView",
   );
-  assert.deepEqual(children[4].props, installBanner, "the install banner data crosses unchanged");
+  assert.deepEqual(
+    children[0].props,
+    { ...installBanner, pinning: "flow" },
+    "the install banner data crosses unchanged, rendered in flow above the top bar (#903)",
+  );
   assert.equal(
     children[5].type,
     distViews.ConsentBannerView,
@@ -414,7 +418,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
   );
   assert.deepEqual(children[5].props, consentBanner, "the consent banner data crosses unchanged");
   children[5].props.onAccept();
-  children[4].props.onDismiss();
+  children[0].props.onDismiss();
   assert.equal(accepts, 1, "the accept callback fires");
   assert.equal(dismissals, 1, "the dismiss callback fires");
 });

@@ -11,9 +11,13 @@ export type ActionBarProps = ColProps & {
    * the screen edge regardless of page scroll (consent bars, install
    * prompts): on web the bar is viewport-fixed, capped at the viewport
    * height, and scrolls internally; on native it pins absolute inside
-   * its container, exactly like container pinning.
+   * its container, exactly like container pinning. "flow" renders the
+   * bar in normal document flow instead of pinning it (#903): no
+   * positioning, no edge insets, no viewport cap — for bars a page
+   * renders as its own first element, where a pinned bar would overlay
+   * the page's header.
    */
-  pinning?: "container" | "viewport";
+  pinning?: "container" | "viewport" | "flow";
 };
 
 /**
@@ -47,11 +51,14 @@ export function ActionBar({
   // platform-split position/max-height/overflow ride the props
   // they rode in the styled config.
   const isViewport = pinning === "viewport";
+  const isFlow = pinning === "flow";
   return (
     <Col
       name="ActionBar"
-      position={isViewport ? { default: "absolute", web: "fixed" } : "absolute"}
-      zIndex={1}
+      position={
+        isFlow ? "relative" : isViewport ? { default: "absolute", web: "fixed" } : "absolute"
+      }
+      {...(isFlow ? {} : { zIndex: 1 })}
       backgroundColor="$surface"
       borderColor="$borderColor"
       borderWidth={0}
@@ -71,11 +78,15 @@ export function ActionBar({
       p="l"
       gap="m"
       style={[
-        {
-          left: 0,
-          right: 0,
-          ...(placement === "top" ? { top: 0 } : { bottom: 0 }),
-        },
+        ...(isFlow
+          ? []
+          : [
+              {
+                left: 0,
+                right: 0,
+                ...(placement === "top" ? { top: 0 } : { bottom: 0 }),
+              },
+            ]),
         ...composedStyle,
       ]}
       {...rest}

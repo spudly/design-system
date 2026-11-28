@@ -308,6 +308,7 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
   return (
     <BigFooterShell footer={footer} scrollMode="content">
       <ScreenContainer>
+        {installBanner ? <InstallBannerView {...installBanner} pinning="flow" /> : null}
         <AppTopBar brand={{ label: title }} />
         {tabBar}
         {notice ? (
@@ -326,7 +327,6 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
             {content}
           </LazySlot>
         ) : null}
-        {installBanner ? <InstallBannerView {...installBanner} /> : null}
         {consentBanner ? <ConsentBannerView {...consentBanner} /> : null}
       </ScreenContainer>
     </BigFooterShell>

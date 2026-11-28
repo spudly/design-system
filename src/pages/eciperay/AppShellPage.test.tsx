@@ -93,7 +93,7 @@ test("the top bar is one shared chrome: TabbedShellPage renders it too", async (
     activeTabId: "verses",
     onTabSelect: () => {},
   });
-  const header = tree.props.children.props.children[0];
+  const header = tree.props.children.props.children[1];
   assert.equal(
     header.type,
     distWidgets.AppTopBar,
@@ -183,7 +183,7 @@ test("the slot renders the page content, keyed by the active nav item; contentKe
     children: surface,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
-  const [topBarEl, , slot] = tree.props.children.props.children;
+  const [, topBarEl, , slot] = tree.props.children.props.children;
   assert.equal(topBarEl.type, distWidgets.AppTopBar, "the header is the shared top-bar widget");
   assert.deepEqual(topBarEl.props.brand, {
     label: "Eciperay",
@@ -206,7 +206,7 @@ test("the slot renders the page content, keyed by the active nav item; contentKe
     children: surface,
   });
   assert.equal(
-    keyed.props.children.props.children[2].key,
+    keyed.props.children.props.children[3].key,
     "recipe-42",
     "the host's contentKey wins",
   );
@@ -268,7 +268,7 @@ test("search data forwards from the page to the top bar; SSR renders the landmar
     search,
     children: <span>PAGE SURFACE</span>,
   });
-  const [topBarEl] = tree.props.children.props.children;
+  const [, topBarEl] = tree.props.children.props.children;
   assert.deepEqual(topBarEl.props.search, search, "the page forwards search data to the bar");
   const bare = AppShellPage({
     brand: {
@@ -280,7 +280,7 @@ test("search data forwards from the page to the top bar; SSR renders the landmar
     children: <span>PAGE SURFACE</span>,
   });
   assert.equal(
-    bare.props.children.props.children[0].props.search,
+    bare.props.children.props.children[1].props.search,
     undefined,
     "no search data — no search in the bar",
   );
@@ -405,7 +405,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     children: <span>PAGE SURFACE</span>,
   });
   assert.equal(
-    bare.props.children.props.children[1],
+    bare.props.children.props.children[2],
     null,
     "no notice data — no notice renders between the top bar and the content",
   );
@@ -423,7 +423,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     },
     children: <span>PAGE SURFACE</span>,
   });
-  const noticeEl = withNotice.props.children.props.children[1];
+  const noticeEl = withNotice.props.children.props.children[2];
   assert.equal(noticeEl.type, distWidgets.Row, "the notice renders through the banner Row (#746)");
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(
@@ -445,7 +445,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     children: <span>PAGE SURFACE</span>,
   });
   assert.equal(
-    messageOnly.props.children.props.children[1].props.children[1],
+    messageOnly.props.children.props.children[2].props.children[1],
     null,
     "a notice without an action renders no Button",
   );
@@ -479,7 +479,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
     children: <span>PAGE SURFACE</span>,
   });
   const bareChildren = bare.props.children.props.children;
-  assert.equal(bareChildren[3], null, "no install banner data — no install banner renders");
+  assert.equal(bareChildren[0], null, "no install banner data — no install banner renders");
   assert.equal(bareChildren[4], null, "no consent banner data — no consent banner renders");
   let accepts = 0;
   let declines = 0;
@@ -512,14 +512,18 @@ test("banners (#879): absent by default; when present the shell renders the bann
     children: <span>PAGE SURFACE</span>,
   });
   const children = withBanners.props.children.props.children;
-  const installEl = children[3];
+  const installEl = children[0];
   const consentEl = children[4];
   assert.equal(
     installEl.type,
     distViews.InstallBannerView,
     "the install banner renders through InstallBannerView",
   );
-  assert.deepEqual(installEl.props, installBanner, "the install banner data crosses unchanged");
+  assert.deepEqual(
+    installEl.props,
+    { ...installBanner, pinning: "flow" },
+    "the install banner data crosses unchanged, rendered in flow above the top bar (#903)",
+  );
   assert.equal(
     consentEl.type,
     distViews.ConsentBannerView,
