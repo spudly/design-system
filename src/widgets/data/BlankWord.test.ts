@@ -38,23 +38,23 @@ const text = readFileSync(srcPath, "utf8");
 
 test("the blank line anchor is platform-conditional: web 4, native -1 (#93)", () => {
   assert.ok(
-    /const blankLineBottom = isWeb \? 4 : -1;/.test(text),
+    text.includes('const blankLineBottom = isWeb ? 4 : -1;'),
     "BlankWord must define blankLineBottom as `isWeb ? 4 : -1` — a single fixed offset cannot sit at the bottom of both the web line box and the tighter native glyph box (#93)",
   );
 });
 
 test("the blank line overlay uses the conditional anchor, not a fixed bottom", () => {
   assert.ok(
-    /bottom=\{blankLineBottom\}/.test(text),
+    text.includes('bottom={blankLineBottom}'),
     "the blank line overlay must anchor with bottom={blankLineBottom} (#93)",
   );
   assert.ok(
-    !/bottom=\{4\}/.test(text),
+    !text.includes('bottom={4}'),
     "a fixed bottom={4} on the overlay is the #93 defect form on native",
   );
 });
 
 test("the sizing word still guarantees zero layout shift (overlay stays absolute, word invisible)", () => {
-  assert.ok(/position="absolute"/.test(text), "the blank line must stay an absolute overlay");
-  assert.ok(/opacity=\{0\}/.test(text), "the sizing word must stay invisible");
+  assert.ok(text.includes('position="absolute"'), "the blank line must stay an absolute overlay");
+  assert.ok(text.includes('opacity={0}'), "the sizing word must stay invisible");
 });

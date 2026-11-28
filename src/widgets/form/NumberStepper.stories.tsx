@@ -20,7 +20,7 @@ type Story = StoryObj<typeof NumberStepper>;
 
 function StepperDemo(props: React.ComponentProps<typeof NumberStepper>) {
   const { value: initialValue, onChange: _ignored, ...rest } = props;
-  void _ignored;
+  _ignored;
   const [value, setValue] = useState(initialValue);
   return <NumberStepper {...rest} value={value} onChange={setValue} />;
 }

@@ -23,6 +23,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(
   join(here, "../../..", "src", "widgets", "data", "Thumbnail.tsx"),
@@ -50,7 +51,7 @@ test("the hero frame is aspect-preserving: the measured image ratio, clamped, wi
   assert.match(code, /backgroundColor=\{tokens\.colors\.gray\.gray1\}/);
   assert.match(code, /borderRadius=\{tokens\.radii\.lg\}/);
   assert.match(code, /overflow="hidden"/);
-  assert.ok(!/height: 256,/.test(code), "the fixed 256px hero height is gone (#721)");
+  assert.ok(!code.includes('height: 256,'), "the fixed 256px hero height is gone (#721)");
   assert.match(code, /const HERO_FALLBACK_ASPECT = 4 \/ 3;/);
   assert.match(code, /const HERO_MIN_ASPECT = 0\.75;/);
   assert.match(code, /const HERO_MAX_ASPECT = 2\.25;/);

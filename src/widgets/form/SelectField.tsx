@@ -126,7 +126,7 @@ export function SelectField({
           }
           onValueChange?.(v);
         }}
-        zIndex={200000}
+        zIndex={200_000}
       >
         <StyledTrigger
           {...(grow ? { flex: 1 } : {})}

@@ -52,7 +52,7 @@ export function EmptyState({
   icon,
   announce,
 }: EmptyStateProps) {
-  const Glyph = icon !== undefined ? iconsByName[icon] : undefined;
+  const Glyph = icon === undefined ? undefined : iconsByName[icon];
   const glyphInk = tokens.colors.primary.primary8;
   return (
     <Col center middle gap="s" p="xl" {...(announce ? politeLiveRegionProps : null)}>

@@ -115,7 +115,7 @@ export function Card({
         ? tokens.shadows.sm.elevation
         : undefined;
   const gapStyle = typeof gap === "number" ? { gap } : undefined;
-  const composedStyle = [elevation !== undefined ? { elevation } : undefined, gapStyle, style];
+  const composedStyle = [elevation === undefined ? undefined : { elevation }, gapStyle, style];
   // The scope this card provides combines its own flag with any
   // enclosing scope: a plain Card nested inside a loading
   // composite must not reset the scope to false for its subtree

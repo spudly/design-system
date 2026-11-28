@@ -53,6 +53,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 // Collect, in document order, every element in a tree whose

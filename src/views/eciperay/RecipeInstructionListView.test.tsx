@@ -42,6 +42,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 test("the views ship in the built surface; the list stays internal, the row is public (#671)", async () => {
   const distRuntime = await loadInternalDist();
   assert.equal(typeof distRuntime.RecipeInstructionListView, "function");

@@ -231,9 +231,9 @@ export function AppShellPage({
           brand={brand}
           navItems={navItems}
           activeItemId={activeItemId}
-          {...(navLabel !== undefined ? { navLabel } : null)}
-          {...(search !== undefined ? { search } : null)}
-          {...(actions !== undefined ? { actions } : null)}
+          {...(navLabel === undefined ? null : { navLabel })}
+          {...(search === undefined ? null : { search })}
+          {...(actions === undefined ? null : { actions })}
         />
         {notice ? (
           <Row middle between gap="l">
@@ -245,7 +245,7 @@ export function AppShellPage({
         ) : null}
         <LazySlot
           key={contentKey ?? activeItemId ?? "page"}
-          {...(onReload !== undefined ? { onReload } : null)}
+          {...(onReload === undefined ? null : { onReload })}
         >
           {children}
         </LazySlot>

@@ -107,5 +107,5 @@ test("splitScope rejects invalid shard coordinates and malformed decisions", () 
   assert.throws(() => splitScope(d, 0, 0));
   assert.throws(() => splitScope(d, 4, 4));
   assert.throws(() => splitScope(d, -1, 4));
-  assert.throws(() => splitScope({ mode: "full", reasons: [] } as never, 0, 2));
+  assert.throws(() => splitScope({ mode: "full", reasons: [] }, 0, 2));
 });

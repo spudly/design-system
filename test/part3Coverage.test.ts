@@ -58,13 +58,13 @@ test("Part 3 views are exported from the views barrel and stay off the public su
   for (const name of NEW_VIEWS) {
     assert.match(
       viewsBarrel,
-      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./(?:eciperay|shared|memorize)/${name}\\.js"`),
+      new RegExp(String.raw`export \{[^}]*\b${name}\b[^}]*\} from "\./(?:eciperay|shared|memorize)/${name}\.js"`),
       `${name} is exported from src/views/index.ts`,
     );
     assert.equal(existsSync(`src/views/eciperay/${name}.tsx`) || existsSync(`src/views/shared/${name}.tsx`), true, `${name}.tsx exists`);
     assert.equal(existsSync(`src/views/eciperay/${name}.stories.tsx`) || existsSync(`src/views/shared/${name}.stories.tsx`), true, `${name} has stories`);
-    assert.doesNotMatch(pagesBarrel, new RegExp(`\\b${name}\\b`), `${name} is not a page export`);
-    assert.doesNotMatch(root, new RegExp(`\\b${name}\\b`), `${name} is not root-exported`);
+    assert.doesNotMatch(pagesBarrel, new RegExp(String.raw`\b${name}\b`), `${name} is not a page export`);
+    assert.doesNotMatch(root, new RegExp(String.raw`\b${name}\b`), `${name} is not root-exported`);
   }
 });
 
@@ -73,7 +73,7 @@ test("Part 3 pages are exported from the pages barrel, with stories", () => {
   for (const name of NEW_PAGES) {
     assert.match(
       pagesBarrel,
-      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./eciperay/${name}\\.js"`),
+      new RegExp(String.raw`export \{[^}]*\b${name}\b[^}]*\} from "\./eciperay/${name}\.js"`),
       `${name} is exported from src/pages/index.ts`,
     );
     assert.equal(existsSync(`src/pages/eciperay/${name}.tsx`), true, `${name}.tsx exists`);
@@ -142,7 +142,7 @@ test("CookingModePage composes StepOverlay with the ingredients accessory; StepO
   assert.match(overlay, /accessory\?: ReactNode/);
   const accessoryAt = overlay.indexOf("{accessory ?");
   const bodyAt = overlay.indexOf('fontSize={tokens.typography.fontSize["2xl"]}');
-  assert.ok(accessoryAt >= 0 && bodyAt > accessoryAt, "the accessory renders above the body");
+  assert.ok(accessoryAt !== -1 && bodyAt > accessoryAt, "the accessory renders above the body");
 });
 
 test("ConfirmActionView locks dismissal while pending", () => {

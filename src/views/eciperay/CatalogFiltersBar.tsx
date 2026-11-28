@@ -240,15 +240,18 @@ function NumberFilter({
 function isNonDefault<FilterId extends string>(definition: CatalogFilterDefinition<FilterId>) {
   switch (definition.kind) {
     case "select":
-    case "text":
+    case "text": {
       return definition.value !== definition.defaultValue;
-    case "range":
+    }
+    case "range": {
       return definition.minValue !== "" || definition.maxValue !== "";
-    case "sort":
+    }
+    case "sort": {
       return (
         definition.sortValue !== definition.defaultSortValue ||
         definition.dirValue !== definition.defaultDirValue
       );
+    }
   }
 }
 
@@ -257,17 +260,20 @@ function isNonDefault<FilterId extends string>(definition: CatalogFilterDefiniti
 function clearFilter<FilterId extends string>(definition: CatalogFilterDefinition<FilterId>) {
   switch (definition.kind) {
     case "select":
-    case "text":
+    case "text": {
       definition.onChange(definition.defaultValue);
       break;
-    case "range":
+    }
+    case "range": {
       definition.onMinChange("");
       definition.onMaxChange("");
       break;
-    case "sort":
+    }
+    case "sort": {
       definition.onSortChange(definition.defaultSortValue);
       definition.onDirChange(definition.defaultDirValue);
       break;
+    }
   }
 }
 
@@ -278,7 +284,7 @@ function FilterControl<FilterId extends string>({
   definition: CatalogFilterDefinition<FilterId>;
 }) {
   switch (definition.kind) {
-    case "select":
+    case "select": {
       return (
         <SelectField
           label={definition.label}
@@ -287,17 +293,19 @@ function FilterControl<FilterId extends string>({
           onValueChange={definition.onChange}
         />
       );
-    case "text":
+    }
+    case "text": {
       return (
         <TextField
           label={definition.label}
           accessibilityLabel={definition.label}
           value={definition.value}
           onChangeText={definition.onChange}
-          {...(definition.placeholder !== undefined ? { placeholder: definition.placeholder } : {})}
+          {...(definition.placeholder === undefined ? {} : { placeholder: definition.placeholder })}
         />
       );
-    case "range":
+    }
+    case "range": {
       return (
         <FieldRow>
           <NumberFilter
@@ -312,7 +320,8 @@ function FilterControl<FilterId extends string>({
           />
         </FieldRow>
       );
-    case "sort":
+    }
+    case "sort": {
       return (
         <Col gap="m">
           <SelectField
@@ -329,6 +338,7 @@ function FilterControl<FilterId extends string>({
           />
         </Col>
       );
+    }
   }
 }
 

@@ -45,6 +45,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = await loadInternalDist();
 // The Props type check reads the built dist type surface (a
@@ -163,7 +164,7 @@ test("SSR: a LabeledField renders its error below the field, keyed by the field'
   assert.ok(html.includes("Title is required"), "the error line renders");
   assert.ok(html.includes('id="recipe-title-error"'), "the error carries the field's error id");
   assert.ok(
-    html.indexOf("Tuscan") === -1 &&
+    !html.includes("Tuscan") &&
       html.indexOf('id="recipe-title"') < html.indexOf("Title is required"),
     "the error renders below the field",
   );

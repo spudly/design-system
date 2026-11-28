@@ -6,7 +6,7 @@ import { DragHandleView } from "./DragHandleView.js";
 import { LabeledListSection } from "./LabeledListSection.js";
 import { RecipeInstructionRowView, type RecipeInstructionRow } from "./RecipeInstructionRowView.js";
 
-export type { RecipeInstructionRow };
+
 
 export type RecipeInstructionListViewProps = {
   /** Section label. Defaults to the voice object's recipeInstructionListView label (#539). */
@@ -100,3 +100,5 @@ export function RecipeInstructionListView({
     </LabeledListSection>
   );
 }
+
+export {type RecipeInstructionRow} from "./RecipeInstructionRowView.js";

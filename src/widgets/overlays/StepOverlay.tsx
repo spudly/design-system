@@ -1,8 +1,7 @@
 /* eslint-disable max-lines -- single cohesive overlay component (step state and render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useContext, useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, Ref  } from "react";
 import { ScrollView, isWeb } from "tamagui";
-import type { Ref } from "react";
 import type { TamaguiElement } from "tamagui";
 
 import { Col } from "../layout/Col.js";
@@ -172,11 +171,9 @@ function activeShellNode(
 }
 
 function shellTabbables(node: HTMLElement): HTMLElement[] {
-  return Array.from(
-    node.querySelectorAll<HTMLElement>(
+  return [...node.querySelectorAll<HTMLElement>(
       'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
-    ),
-  ).filter(
+    )].filter(
     (element) =>
       element.tabIndex >= 0 &&
       (element.offsetParent !== null || element === document.activeElement),
@@ -278,7 +275,7 @@ export function StepOverlay({
     }
     const focusables = shellTabbables(node);
     const first = focusables[0];
-    const last = focusables[focusables.length - 1];
+    const last = focusables.at(-1);
     if (!first || !last) {
       event.preventDefault();
       node.focus();
@@ -352,7 +349,7 @@ export function StepOverlay({
       event.preventDefault();
       const focusables = shellTabbables(node);
       const landing = event.shiftKey
-        ? (focusables[focusables.length - 1] ?? node)
+        ? (focusables.at(-1) ?? node)
         : (focusables[0] ?? node);
       landing.focus();
     };
@@ -392,8 +389,8 @@ export function StepOverlay({
         backgroundColor={tokens.colors.gray.gray10}
         tabIndex={-1}
         onKeyDown={handleShellKeyDown}
-        {...(dialogRoleProps as Record<string, unknown>)}
-        {...(platformAccessibilityProps({ accessibilityLabel: title }) as Record<string, unknown>)}
+        {...(dialogRoleProps)}
+        {...(platformAccessibilityProps({ accessibilityLabel: title }))}
       >
         <ScrollView
           flex={1}

@@ -285,7 +285,7 @@ function NavItem({
   active: boolean;
   glyphInks: { active: string; inactive: string };
 }) {
-  const Glyph = item.kind !== undefined ? iconsByName[navItemIconsByKind[item.kind]] : undefined;
+  const Glyph = item.kind === undefined ? undefined : iconsByName[navItemIconsByKind[item.kind]];
   const glyph = Glyph ? (
     <Glyph size={20} color={active ? glyphInks.active : glyphInks.inactive} />
   ) : null;
@@ -376,19 +376,19 @@ export function AppTopBar({
   return (
     <PageContentColumn>
       <Row wrap middle gap="m">
-        {brand.href !== undefined ? (
-          <BrandLink
-            label={brand.label}
-            href={brand.href}
-            {...(brand.mark !== undefined ? { mark: brand.mark } : null)}
-          />
-        ) : brand.mark !== undefined ? (
+        {brand.href === undefined ? brand.mark === undefined ? (
+          <Text variant="heading">{brand.label}</Text>
+        ) : (
           <Row middle gap="s">
             <BrandMark mark={brand.mark} size={28} />
             <Text variant="heading">{brand.label}</Text>
           </Row>
         ) : (
-          <Text variant="heading">{brand.label}</Text>
+          <BrandLink
+            label={brand.label}
+            href={brand.href}
+            {...(brand.mark === undefined ? null : { mark: brand.mark })}
+          />
         )}
         {navItems !== undefined && navItems.length > 0 ? (
           // The nav list (#564): items wrap onto multiple lines
@@ -424,7 +424,7 @@ export function AppTopBar({
               value={search.value}
               onChangeText={search.onValueChange}
               onSubmitEditing={search.onSubmit}
-              {...(search.placeholder !== undefined ? { placeholder: search.placeholder } : null)}
+              {...(search.placeholder === undefined ? null : { placeholder: search.placeholder })}
               {...platformAccessibilityProps({ accessibilityLabel: search.label })}
             />
           </Row>
@@ -432,12 +432,12 @@ export function AppTopBar({
         {actions !== undefined && actions.length > 0 ? (
           <Row wrap middle gap="s" marginLeft="auto">
             {actions.map((action) =>
-              action.href !== undefined ? (
-                <Button key={action.id} ghost href={action.href}>
+              action.href === undefined ? (
+                <Button key={action.id} ghost onPress={action.onPress}>
                   {action.label}
                 </Button>
               ) : (
-                <Button key={action.id} ghost onPress={action.onPress}>
+                <Button key={action.id} ghost href={action.href}>
                   {action.label}
                 </Button>
               ),

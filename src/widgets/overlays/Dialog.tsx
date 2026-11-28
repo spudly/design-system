@@ -589,7 +589,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
       if (frame) {
         const dsFrames = registeredModalFrames();
-        const covered = Array.from(document.querySelectorAll("dialog")).some((other) => {
+        const covered = [...document.querySelectorAll("dialog")].some((other) => {
           if (other === frame || frame.contains(other) || dsFrames.has(other)) {
             return false;
           }
@@ -626,7 +626,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       const candidates = content.querySelectorAll(
         'a[href], area[href], button, input, select, textarea, details, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
       );
-      const hasTabbable = Array.from(candidates).some((candidate) => {
+      const hasTabbable = [...candidates].some((candidate) => {
         // :disabled only — the disabled ATTRIBUTE has no effect
         // on elements that are not disableable (an <a href
         // disabled> or a <div tabindex="0" disabled> is still a
@@ -666,7 +666,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           // summary is the stop (counted on its own candidate
           // pass) and the details element is not (Copilot review
           // on PR #392, head fbf5aea).
-          const hasOwnSummary = Array.from(candidate.children).some(
+          const hasOwnSummary = [...candidate.children].some(
             (child) => child.tagName === "SUMMARY",
           );
           // An explicitly editable details is itself an editing
@@ -701,7 +701,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
             if (!(parent instanceof HTMLDetailsElement)) {
               return false;
             }
-            const firstSummary = Array.from(parent.children).find(
+            const firstSummary = [...parent.children].find(
               (child) => child.tagName === "SUMMARY",
             );
             if (firstSummary !== candidate) {
@@ -714,7 +714,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           if (!mapName) {
             return false;
           }
-          return Array.from(content.querySelectorAll("img[usemap]")).some((image) => {
+          return [...content.querySelectorAll("img[usemap]")].some((image) => {
             if (image.getAttribute("usemap") !== `#${mapName}`) {
               return false;
             }

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Toast as TamaguiToast, toast } from "tamagui";
+import { Toast as TamaguiToast,  } from "tamagui";
 
 import { Col } from "../layout/Col.js";
 import type { ColProps } from "../layout/Col.js";
@@ -115,4 +115,6 @@ export function ToastProvider({ children }: ToastProviderProps) {
   );
 }
 
-export { toast };
+
+
+export {toast} from "tamagui";

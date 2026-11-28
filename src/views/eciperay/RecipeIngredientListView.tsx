@@ -10,7 +10,7 @@ import {
   type RecipeIngredientRow,
 } from "./RecipeIngredientRowView.js";
 
-export type { RecipeIngredientField, RecipeIngredientRow };
+
 
 export type RecipeIngredientListViewProps = {
   /** Section label. Defaults to the voice object's recipeIngredientListView label (#539). */
@@ -103,3 +103,5 @@ export function RecipeIngredientListView({
     </LabeledListSection>
   );
 }
+
+export {type RecipeIngredientField, type RecipeIngredientRow} from "./RecipeIngredientRowView.js";

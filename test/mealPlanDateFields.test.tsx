@@ -42,6 +42,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "./internalDist.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")
@@ -159,7 +160,7 @@ function inputTags(html: string) {
 function placeholderColorOf(html: string, inputTag: any) {
   const ptc = inputTag.match(/_ptc-(\d+)/);
   assert.ok(ptc, `expected a placeholder-color class on the input: ${inputTag}`);
-  const rule = html.match(new RegExp(String.raw`\._ptc-${ptc[1]}::placeholder\{color:([^;]+);`));
+  const rule = new RegExp(String.raw`\._ptc-${ptc[1]}::placeholder\{color:([^;]+);`).exec(html);
   assert.ok(rule, `expected a ::placeholder rule for _ptc-${ptc[1]} in the SSR CSS`);
   return rule[1];
 }

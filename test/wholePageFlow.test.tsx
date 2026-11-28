@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { verticalScrollers } from "./wholePageFlow.js";
+
 test("verticalScrollers detects an inline-style scroller", () => {
   const html = `<div style="overflow-y: auto"><p>content</p></div>`;
   assert.equal(verticalScrollers(html).length, 1);

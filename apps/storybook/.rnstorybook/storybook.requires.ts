@@ -45,14 +45,14 @@ module?.hot?.accept?.();
 
 const options = {}
 
-if (!globalThis.view) {
+if (globalThis.view) {
+  updateView(globalThis.view, annotations, normalizedStories, options);
+} else {
   globalThis.view = start({
     annotations,
     storyEntries: normalizedStories,
     options,
   });
-} else {
-  updateView(globalThis.view, annotations, normalizedStories, options);
 }
 
 export const view: View = globalThis.view;

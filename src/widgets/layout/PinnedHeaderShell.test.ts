@@ -81,7 +81,7 @@ test("the story demonstrates the pinning: bound frame, overflowing content, head
   assert.match(storyCode, /height=\{480\}/);
   // The content decisively overflows the frame — with too few
   // lines nothing scrolls and the pinning is unobservable.
-  const count = storyCode.match(/length: (\d+)/);
+  const count = /length: (\d+)/.exec(storyCode);
   assert.ok(count, "the story must generate its content lines from a length");
   assert.ok(
     Number(count[1]) >= 25,
@@ -93,7 +93,7 @@ test("the story demonstrates the pinning: bound frame, overflowing content, head
   // header prop, outside that scroller.
   assert.match(storyCode, /<ScrollView flex=\{1\} minHeight=\{0\}>/);
   const headerIndex = storyCode.indexOf("header={");
-  assert.ok(headerIndex >= 0, "the story must compose the shell's header prop");
+  assert.ok(headerIndex !== -1, "the story must compose the shell's header prop");
   assert.ok(
     headerIndex < storyCode.indexOf("<ScrollView"),
     "the header must be composed outside the story's scroller",

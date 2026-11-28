@@ -92,7 +92,7 @@ const glyphSizes = {
 export const DropdownButton = forwardRef<
   TamaguiElement,
   DropdownButtonProps & DropdownButtonTriggerProps
->(function DropdownButton(
+>((
   {
     label,
     icon,
@@ -107,7 +107,7 @@ export const DropdownButton = forwardRef<
     onMouseEnter,
   }: DropdownButtonProps & DropdownButtonTriggerProps,
   ref,
-) {
+) => {
   const context = useDropdownContext();
   const open = context?.open ?? false;
   const chevronInk = useVariantGlyphInk(variant, ghost);
@@ -174,7 +174,7 @@ export const DropdownButton = forwardRef<
       size={size}
       disabled={disabled}
       {...(icon ? { icon } : null)}
-      {...(accessibilityLabel !== undefined ? { accessibilityLabel } : null)}
+      {...(accessibilityLabel === undefined ? null : { accessibilityLabel })}
       accessibilityState={{ expanded: open }}
       aria-haspopup="dialog"
       gap={tokens.spacing[2]}

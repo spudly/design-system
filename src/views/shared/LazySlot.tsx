@@ -54,7 +54,7 @@ export type LazySlotProps = {
  */
 export function LazySlot({ children, onReload }: LazySlotProps) {
   return (
-    <ChunkErrorBoundary {...(onReload !== undefined ? { onReload } : null)}>
+    <ChunkErrorBoundary {...(onReload === undefined ? null : { onReload })}>
       <Suspense
         fallback={
           <SkeletonPanel {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>

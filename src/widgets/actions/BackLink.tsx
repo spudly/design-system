@@ -31,7 +31,7 @@ import { useVoice } from "../../voice/index.js";
  */
 function useBackArrowInk(): string {
   const theme = useTheme();
-  const variable = theme["link"];
+  const variable = theme.link;
   return typeof variable?.val === "string" ? variable.val : tokens.colors.primary.primary8;
 }
 

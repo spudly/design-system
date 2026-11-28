@@ -621,5 +621,5 @@ export type StorybookThemeName =
 type AppConfig = ReturnType<typeof createTamaguiConfig>;
 
 declare module "tamagui" {
-  interface TamaguiCustomConfig extends AppConfig {}
+  type TamaguiCustomConfig = {} & AppConfig
 }

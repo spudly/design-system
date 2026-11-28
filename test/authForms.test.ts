@@ -148,7 +148,7 @@ const PAGE_FORM_PROPS: Record<string, string[]> = {
 test("auth pages forward their props to their forms", () => {
   for (const [form, page] of Object.entries(FORM_PAGES)) {
     const pageSource = read(`src/pages/eciperay/${page}.tsx`);
-    const invocation = pageSource.match(new RegExp(String.raw`<${form}\b[\s\S]*?/>`));
+    const invocation = new RegExp(String.raw`<${form}\b[\s\S]*?/>`).exec(pageSource);
     assert.ok(invocation, `${page} invokes ${form}`);
     for (const prop of PAGE_FORM_PROPS[page]) {
       assert.ok(invocation[0].includes(prop), `${page} forwards ${prop}`);
@@ -204,9 +204,9 @@ test("each form's submit button is named for the label it renders, in both state
   for (const [form, voiceKey] of Object.entries(BUTTON_VOICE)) {
     const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
-      source.replace(/\s+/g, " "),
+      source.replaceAll(/\s+/g, " "),
       new RegExp(
-        `const submitLabel = loading \\? voice\\.${voiceKey}\\.submitPendingLabel : voice\\.${voiceKey}\\.submitLabel;`,
+        String.raw`const submitLabel = loading \? voice\.${voiceKey}\.submitPendingLabel : voice\.${voiceKey}\.submitLabel;`,
       ),
       `${form} resolves its submit label from the voice slots for the state it renders`,
     );

@@ -76,7 +76,7 @@ describe("textFontContext", () => {
     ]) {
       const source = readSrc(file);
       assert.ok(
-        !/fontFamily/.test(source),
+        !source.includes('fontFamily'),
         `${file} must not set fontFamily locally — the primitives own the font context (#69)`,
       );
     }

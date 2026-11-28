@@ -48,6 +48,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")
@@ -114,7 +115,7 @@ test("the container resolves the caller's gap over its own 16px default (#299)",
     code.indexOf("style={composedStyle}"),
   );
   assert.ok(
-    !/gap=\{gap\}/.test(outerCol),
+    !outerCol.includes('gap={gap}'),
     "an unconditional gap={gap} passes gap={undefined} when no caller gap exists, clobbering the static 16px gap on web",
   );
   // #746 (Option B): there is no styled static gap to protect —
@@ -167,13 +168,13 @@ async function renderToHtml(element: any) {
 
 /** The generated CSS declarations for one class in the SSR style block. */
 function declarationsFor(html: string, className: any) {
-  const match = html.match(new RegExp(String.raw`\.${className}\{([^}]*)\}`));
+  const match = new RegExp(String.raw`\.${className}\{([^}]*)\}`).exec(html);
   return match ? match[1] : "";
 }
 
 /** The gap value (e.g. "16px") the named element's classes generate, or null. */
 function renderedGap(html: string, elementName: any) {
-  const element = html.match(new RegExp(`<div name="${elementName}" class="([^"]*)"`));
+  const element = new RegExp(`<div name="${elementName}" class="([^"]*)"`).exec(html);
   assert.ok(element, `expected a rendered element named ${elementName} in: ${html.slice(-600)}`);
   for (const className of element[1].split(/\s+/)) {
     const declarations = declarationsFor(html, className);
@@ -194,7 +195,7 @@ async function renderShell(props: any) {
 }
 /** The flex declaration (e.g. "1 0px") the named element's classes generate, or null. */
 function renderedFlex(html: string, elementName: any) {
-  const element = html.match(new RegExp(`<div name="${elementName}" class="([^"]*)"`));
+  const element = new RegExp(`<div name="${elementName}" class="([^"]*)"`).exec(html);
   assert.ok(element, `expected a rendered element named ${elementName} in: ${html.slice(-600)}`);
   for (const className of element[1].split(/\s+/)) {
     // Tamagui emits one rule block per declaration group under the
@@ -202,7 +203,7 @@ function renderedFlex(html: string, elementName: any) {
     // first (declarationsFor returns the first block only).
     const blocks = html.match(new RegExp(String.raw`\.${className}\{[^}]*\}`, "g")) ?? [];
     for (const block of blocks) {
-      const flex = block.match(/\{flex:([^;}]+)/);
+      const flex = /\{flex:([^;}]+)/.exec(block);
       if (flex) return flex[1];
     }
   }

@@ -6,6 +6,7 @@ import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 describe("tabsAriaControls", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const root = join(here, "../../..");
@@ -120,7 +121,7 @@ describe("tabsIcon", () => {
   }
   const tabs = codeOf("src/widgets/actions/Tabs.tsx");
   function typeBlock(source: string, name: string): string {
-    const match = new RegExp(`type ${name} = \\{([\\s\\S]*?)\\n\\};`).exec(source);
+    const match = new RegExp(String.raw`type ${name} = \{([\s\S]*?)\n\};`).exec(source);
     assert.ok(match, `${name} type block found`);
     return match[1]!;
   }

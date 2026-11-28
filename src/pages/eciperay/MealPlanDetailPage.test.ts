@@ -165,7 +165,7 @@ test("the actions are the app screen's — no plan delete; entry editing is opt-
     "onDeleteMember",
     "onMemberServingsChange",
   ]) {
-    assert.match(code, new RegExp(`${cb}\\??:`), `the editing callback ${cb} must be declared`);
+    assert.match(code, new RegExp(String.raw`${cb}\??:`), `the editing callback ${cb} must be declared`);
   }
 });
 

@@ -107,7 +107,7 @@ export function registerModalLayer(token: symbol, parentToken: symbol | null): M
 
 export function unregisterModalLayer(layer: ModalLayer): void {
   const index = modalLayers.indexOf(layer);
-  if (index >= 0) {
+  if (index !== -1) {
     modalLayers.splice(index, 1);
   }
 }

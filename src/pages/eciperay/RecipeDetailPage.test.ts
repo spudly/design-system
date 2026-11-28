@@ -150,7 +150,7 @@ test("the status/version bar sits below Start Cooking inside a single scroll reg
   // — including the status badge + version picker — moves below
   // Start Cooking, inside the scroll region (no pinned chrome).
   const readyCode = code.replace(
-    /if \(props\.state === "loading"\) \{[\s\S]*?(?=\n  const \{ status, versions)/,
+    /if \(props\.state === "loading"\) \{[\s\S]*?(?=\n {2}const \{ status, versions)/,
     "",
   );
   const scrollAt = readyCode.indexOf("<ScrollRegion>");
@@ -211,7 +211,7 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
   // (a separate union state, #278 tranche 4) renders its own
   // headings in the same order but is excised here, as above.
   const readyCode = code.replace(
-    /if \(props\.state === "loading"\) \{[\s\S]*?(?=\n  const \{ status, versions)/,
+    /if \(props\.state === "loading"\) \{[\s\S]*?(?=\n {2}const \{ status, versions)/,
     "",
   );
   let lastAt = -1;
@@ -613,7 +613,7 @@ test("print/share name the icons module's Feather icons, not text glyphs (#187, 
   ] as const) {
     assert.match(
       code,
-      new RegExp(String.raw`icon="${name}"`),
+      new RegExp(`icon="${name}"`),
       "the button's icon slot takes the name as data",
     );
     assert.ok(

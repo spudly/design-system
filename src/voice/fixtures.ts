@@ -148,10 +148,10 @@ export const fixtureVoice: Voice = {
   showLessView: {
     title: "Show less like this",
     description:
-      "Recipes you marked \u201cShow less like this\u201d. You\u2019ll see fewer recipes like each one — similar recipes are shown less often, never removed. Undo an entry to restore them.",
+      "Recipes you marked \u201CShow less like this\u201D. You\u2019ll see fewer recipes like each one — similar recipes are shown less often, never removed. Undo an entry to restore them.",
     loadingLabel: "Loading\u2026",
     emptyMessage:
-      "You haven\u2019t marked any recipes yet. When you choose \u201cShow less like this\u201d on a recipe, it will appear here.",
+      "You haven\u2019t marked any recipes yet. When you choose \u201CShow less like this\u201D on a recipe, it will appear here.",
     undoLabel: "Undo",
     loadFailedMessage: "Could not load your show-less list. Try again later.",
     undoLabelFor: (recipeTitle: string) => `Undo show less for ${recipeTitle}`,
@@ -420,7 +420,7 @@ export const fixtureVoice: Voice = {
 
 /** Pseudo-localize one string the en-XA way: bracketed, accented, lengthened. */
 function pseudoLocalize(value: string): string {
-  const accented = value.replace(/[aeiou]/gi, (ch) => {
+  const accented = value.replaceAll(/[aeiou]/gi, (ch) => {
     const map: Record<string, string> = {
       a: "à",
       e: "ë",

@@ -74,10 +74,10 @@ test("the slot composes the internal boundary around a Suspense", () => {
   assert.ok(fallback, "the Suspense carries a fallback");
   assert.equal(fallback.type, distWidgets.SkeletonPanel, "the fallback is a skeleton panel");
   const bones = fallback.props.children;
-  const boneTypes = (Array.isArray(bones) ? bones : [bones]).map((b: any) => b?.type);
-  assert.ok(boneTypes.includes(distWidgets.BoxSkeleton), "the fallback renders box skeletons");
-  assert.ok(boneTypes.includes(distWidgets.TextSkeleton), "the fallback renders text skeletons");
-  assert.ok(!boneTypes.includes(distWidgets.Spinner), "the fallback renders no spinner");
+  const boneTypes = new Set((Array.isArray(bones) ? bones : [bones]).map((b: any) => b?.type));
+  assert.ok(boneTypes.has(distWidgets.BoxSkeleton), "the fallback renders box skeletons");
+  assert.ok(boneTypes.has(distWidgets.TextSkeleton), "the fallback renders text skeletons");
+  assert.ok(!boneTypes.has(distWidgets.Spinner), "the fallback renders no spinner");
 });
 
 test("a caller-supplied onReload is forwarded to the boundary", () => {

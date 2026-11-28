@@ -43,7 +43,7 @@ function resolveGap(gap: LayoutSize | number): { size?: LayoutSize; style?: { ga
     return { size: gap };
   }
   const size = gapSizeByPixels[gap];
-  return size !== undefined ? { size } : { style: { gap } };
+  return size === undefined ? { style: { gap } } : { size };
 }
 
 /**
@@ -161,16 +161,16 @@ export function ScreenContainer({
   const outerGap = resolveGap(gap ?? "l");
   const topOffset = variant === "padded" ? tokens.spacing[8] : variant === "auth" ? 80 : undefined;
   const composedStyle = [
-    topOffset !== undefined ? { paddingTop: topOffset } : undefined,
+    topOffset === undefined ? undefined : { paddingTop: topOffset },
     outerGap.style,
     style,
   ];
   return (
     <Col
       name="ScreenContainer"
-      {...(variant !== "list" ? { px: variant === "default" ? "l" : "xl" } : null)}
-      {...(variant !== "list" ? { py: "l" } : null)}
-      {...(outerGap.size !== undefined ? { gap: outerGap.size } : null)}
+      {...(variant === "list" ? null : { px: variant === "default" ? "l" : "xl" })}
+      {...(variant === "list" ? null : { py: "l" })}
+      {...(outerGap.size === undefined ? null : { gap: outerGap.size })}
       {...(variant === "auth" ? { backgroundColor: "$surface" as const, center: true } : null)}
       {...(variant === "list" && !isWeb ? boundedFlexProps : null)}
       {...(variant === "default" && !isWeb ? defaultFlexProps : null)}
@@ -200,8 +200,8 @@ function AuthContent({
       name="ScreenContainerAuthContent"
       width="100%"
       maxWidth={480}
-      {...(authGap.size !== undefined ? { gap: authGap.size } : null)}
-      {...(authGap.style !== undefined ? { style: authGap.style } : null)}
+      {...(authGap.size === undefined ? null : { gap: authGap.size })}
+      {...(authGap.style === undefined ? null : { style: authGap.style })}
     >
       {children}
     </Col>

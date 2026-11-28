@@ -26,7 +26,7 @@ const statusOptions = [
 
 function SelectDemo(props: React.ComponentProps<typeof SelectField>) {
   const { value: initialValue, onValueChange: _ignored, options, ...rest } = props;
-  void _ignored;
+  _ignored;
   const [value, setValue] = useState(initialValue ?? "");
   return (
     <YStack maxWidth={320}>

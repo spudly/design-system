@@ -51,7 +51,7 @@ function screenChildren(tree: any): any[] {
 
 function textOf(element: any): string {
   const children = element.props.children;
-  return (Array.isArray(children) ? children : [children]).map((c) => String(c)).join("");
+  return (Array.isArray(children) ? children : [children]).map(String).join("");
 }
 
 const WORDS = [

@@ -27,6 +27,7 @@ import {
   renderLegalDocumentToHtml,
 } from "../../test/legalDocumentSsr.js";
 import { loadInternalDist } from "../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
 const source = readFileSync(

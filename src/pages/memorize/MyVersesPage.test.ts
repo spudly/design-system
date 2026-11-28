@@ -39,13 +39,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const reactNativeStubUrl =
   "data:text/javascript,export%20function%20FlatList()%7Breturn%20null%3B%7D%0Aexport%20function%20View()%7Breturn%20null%3B%7D%0A";
 register(
-  "data:text/javascript," +
+  `data:text/javascript,${ 
     encodeURIComponent(
       `export async function resolve(specifier, context, nextResolve) {\n` +
         `  if (specifier === "react-native") return { shortCircuit: true, url: ${JSON.stringify(reactNativeStubUrl)} };\n` +
         `  return nextResolve(specifier, context);\n` +
         `}`,
-    ),
+    )}`,
 );
 
 async function loadPage() {

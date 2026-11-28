@@ -498,32 +498,45 @@ type RecipesPageRow =
 
 function recipesPageRowKey(row: RecipesPageRow): string {
   switch (row.kind) {
-    case "ownHeading":
+    case "ownHeading": {
       return "own-heading";
-    case "ownRecipe":
+    }
+    case "ownRecipe": {
       return `own-recipe-${row.item.id}`;
-    case "loadingOwn":
+    }
+    case "loadingOwn": {
       return "own-loading";
-    case "ownError":
+    }
+    case "ownError": {
       return "own-error";
-    case "ownEmpty":
+    }
+    case "ownEmpty": {
       return "own-empty";
-    case "loadingOwnMore":
+    }
+    case "loadingOwnMore": {
       return "own-loading-more";
-    case "ownLoadMoreError":
+    }
+    case "ownLoadMoreError": {
       return "own-load-more-error";
-    case "discoveryHeading":
+    }
+    case "discoveryHeading": {
       return "discovery-heading";
-    case "discoveryRecipe":
+    }
+    case "discoveryRecipe": {
       return `discovery-recipe-${row.item.id}`;
-    case "discoveryLoadMoreError":
+    }
+    case "discoveryLoadMoreError": {
       return "discovery-load-more-error";
-    case "loadingDiscovery":
+    }
+    case "loadingDiscovery": {
       return "discovery-loading";
-    case "discoveryError":
+    }
+    case "discoveryError": {
       return "discovery-error";
-    case "discoveryEmpty":
+    }
+    case "discoveryEmpty": {
       return "discovery-empty";
+    }
   }
 }
 
@@ -636,18 +649,18 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
     handler();
   };
   const fireAllSections = () => {
-    sectionsRef.current.forEach((_, index) => {
+    for (const [index, _] of sectionsRef.current.entries()) {
       fireSection(index);
-    });
+    }
   };
   const clearAllLatches = () => {
     requestedRefs.current = sectionsRef.current.map(() => false);
   };
   const markScrolled = () => {
     hasScrolledRef.current = true;
-    sectionsRef.current.forEach((section) => {
+    for (const section of sectionsRef.current) {
       section.onScrollSignal?.();
-    });
+    }
   };
   useEffect(() => {
     sectionsRef.current = sections;
@@ -729,7 +742,7 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
     sections.map((section) => section.onVisible !== undefined),
   );
   useEffect(() => {
-    sections.forEach((section, index) => {
+    for (const [index, section] of sections.entries()) {
       const fetching = section.isFetchingNextPage ?? false;
       const available = section.onVisible !== undefined;
       const fetchingChanged = prevFetchingRefs.current[index] !== fetching;
@@ -742,7 +755,7 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
       if ((fetchingChanged || availableChanged) && visibleRef.current && hasScrolledRef.current) {
         fireSection(index);
       }
-    });
+    }
   });
   if (!isWeb) return null;
   return <ScrollSentinel sentinelRef={ref} />;
@@ -844,7 +857,7 @@ export function RecipesPage(props: RecipesPageProps) {
   } = useCatalogPagination({
     onLoadMore,
     isFetchingNextPage,
-    itemCount: discoveryRecipes !== undefined ? discoveryRecipes.length : 0,
+    itemCount: discoveryRecipes === undefined ? 0 : discoveryRecipes.length,
     canPaginate:
       hasDiscovery && !loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,
   });
@@ -896,7 +909,7 @@ export function RecipesPage(props: RecipesPageProps) {
   const publicPagination = useCatalogPagination({
     onLoadMore,
     isFetchingNextPage,
-    itemCount: publicRecipes !== undefined ? publicRecipes.length : 0,
+    itemCount: publicRecipes === undefined ? 0 : publicRecipes.length,
     canPaginate: variant === "public" && !publicLoading && !publicErrorMessage,
   });
 
@@ -1022,13 +1035,14 @@ export function RecipesPage(props: RecipesPageProps) {
 
   const renderRow = (row: RecipesPageRow) => {
     switch (row.kind) {
-      case "ownHeading":
+      case "ownHeading": {
         return (
           <Col>
             <SectionHeading>{ownTitle}</SectionHeading>
             <Spacer y="m" />
           </Col>
         );
+      }
       case "ownRecipe": {
         const item = row.item;
         const accessory =
@@ -1045,17 +1059,21 @@ export function RecipesPage(props: RecipesPageProps) {
           ) : null;
         return <RecipeRow item={item} onLogCookPress={onLogCookPress} accessory={accessory} />;
       }
-      case "loadingOwn":
+      case "loadingOwn": {
         return <LoadingOwnRows />;
-      case "ownError":
+      }
+      case "ownError": {
         return <Alert severity="error">{row.message}</Alert>;
-      case "ownEmpty":
+      }
+      case "ownEmpty": {
         return (
           <EmptyState title={ownEmptyTitle} {...(ownEmptyBody ? { body: ownEmptyBody } : {})} />
         );
-      case "loadingOwnMore":
+      }
+      case "loadingOwnMore": {
         return <LoadingOwnRows />;
-      case "ownLoadMoreError":
+      }
+      case "ownLoadMoreError": {
         return (
           <Alert
             severity="error"
@@ -1067,13 +1085,15 @@ export function RecipesPage(props: RecipesPageProps) {
               : {})}
           />
         );
-      case "discoveryHeading":
+      }
+      case "discoveryHeading": {
         return (
           <Col>
             <SectionHeading>{row.title}</SectionHeading>
             <Spacer y="m" />
           </Col>
         );
+      }
       case "discoveryRecipe": {
         const item = row.item;
         return (
@@ -1089,7 +1109,7 @@ export function RecipesPage(props: RecipesPageProps) {
           </Col>
         );
       }
-      case "discoveryLoadMoreError":
+      case "discoveryLoadMoreError": {
         return (
           <Alert
             severity="error"
@@ -1103,17 +1123,21 @@ export function RecipesPage(props: RecipesPageProps) {
               : {})}
           />
         );
-      case "loadingDiscovery":
+      }
+      case "loadingDiscovery": {
         return <LoadingDiscoveryRows variant="section" />;
-      case "discoveryError":
+      }
+      case "discoveryError": {
         return <Alert severity="error">{row.message}</Alert>;
-      case "discoveryEmpty":
+      }
+      case "discoveryEmpty": {
         return (
           <EmptyState
             title={discoveryEmptyTitle}
             {...(discoveryEmptyBody ? { body: discoveryEmptyBody } : {})}
           />
         );
+      }
     }
   };
 
@@ -1127,9 +1151,9 @@ export function RecipesPage(props: RecipesPageProps) {
       filters={catalogFilters}
       {...(activeFilters ? { activeFilters } : {})}
       {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
-      {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
+      {...(filterChooserOpen === undefined ? {} : { filterChooserOpen })}
       {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
-      {...(filtersLoading !== undefined ? { loading: filtersLoading } : {})}
+      {...(filtersLoading === undefined ? {} : { loading: filtersLoading })}
     />
   );
 

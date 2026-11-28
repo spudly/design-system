@@ -34,6 +34,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const componentsDir = join(here, "../../..", "src", "widgets");
 const cardRowSource = readFileSync(join(componentsDir, "layout/CardRow.tsx"), "utf8");

@@ -196,7 +196,7 @@ export function platformAccessibilityProps(
     // there), so it is dropped rather than forwarded to a native view.
     return Object.fromEntries(
       Object.entries(input).filter(([key, value]) => value !== undefined && key !== "aria-level"),
-    ) as PlatformAccessibilityProps;
+    );
   }
 
   const {

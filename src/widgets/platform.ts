@@ -1,4 +1,4 @@
-import { isWeb } from "tamagui";
+
 
 /**
  * The platform flag, re-exported through the widgets layer
@@ -8,4 +8,6 @@ import { isWeb } from "tamagui";
  * inside reusable components under src/widgets. This module
  * is the one bridge: it carries no styling, only the flag.
  */
-export { isWeb };
+
+
+export {isWeb} from "tamagui";

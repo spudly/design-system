@@ -157,15 +157,15 @@ export function BoundedList<Item>({
       renderItem={renderItem}
       ItemSeparatorComponent={separator === "none" ? undefined : separators[separator]}
       {...(contentInset === "page" ? { contentContainerStyle: pageContentStyle } : null)}
-      {...(ListHeaderComponent !== undefined ? { ListHeaderComponent } : null)}
-      {...(ListEmptyComponent !== undefined ? { ListEmptyComponent } : null)}
-      {...(ListFooterComponent !== undefined ? { ListFooterComponent } : null)}
-      {...(onEndReached !== undefined ? { onEndReached } : null)}
-      {...(onEndReachedThreshold !== undefined ? { onEndReachedThreshold } : null)}
-      {...(onScroll !== undefined ? { onScroll } : null)}
-      {...(onLayout !== undefined ? { onLayout } : null)}
-      {...(onContentSizeChange !== undefined ? { onContentSizeChange } : null)}
-      {...(keyboardShouldPersistTaps !== undefined ? { keyboardShouldPersistTaps } : null)}
+      {...(ListHeaderComponent === undefined ? null : { ListHeaderComponent })}
+      {...(ListEmptyComponent === undefined ? null : { ListEmptyComponent })}
+      {...(ListFooterComponent === undefined ? null : { ListFooterComponent })}
+      {...(onEndReached === undefined ? null : { onEndReached })}
+      {...(onEndReachedThreshold === undefined ? null : { onEndReachedThreshold })}
+      {...(onScroll === undefined ? null : { onScroll })}
+      {...(onLayout === undefined ? null : { onLayout })}
+      {...(onContentSizeChange === undefined ? null : { onContentSizeChange })}
+      {...(keyboardShouldPersistTaps === undefined ? null : { keyboardShouldPersistTaps })}
     />
   );
 }

@@ -1250,12 +1250,12 @@ function CtaBar({
 function OverviewSection({ overview }: { overview: RecipeDetailPageGuestOverviewProps }) {
   return (
     <RecipeOverviewPanel
-      {...(overview.imageUrl !== undefined ? { imageUrl: overview.imageUrl } : {})}
+      {...(overview.imageUrl === undefined ? {} : { imageUrl: overview.imageUrl })}
       title={overview.title}
-      {...(overview.description !== undefined ? { description: overview.description } : {})}
+      {...(overview.description === undefined ? {} : { description: overview.description })}
       servingsLabel={overview.servingsLabel}
-      {...(overview.prepTimeLabel !== undefined ? { prepTimeLabel: overview.prepTimeLabel } : {})}
-      {...(overview.cookTimeLabel !== undefined ? { cookTimeLabel: overview.cookTimeLabel } : {})}
+      {...(overview.prepTimeLabel === undefined ? {} : { prepTimeLabel: overview.prepTimeLabel })}
+      {...(overview.cookTimeLabel === undefined ? {} : { cookTimeLabel: overview.cookTimeLabel })}
       tags={overview.tags}
     />
   );

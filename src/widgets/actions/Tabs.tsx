@@ -243,7 +243,7 @@ export function Tabs(props: TabsProps) {
       <StyledList {...platformAccessibilityProps({ accessibilityLabel: label })}>
         {tabs.map((tab) => {
           const active = tab.value === value;
-          const Glyph = tab.icon !== undefined ? iconsByName[tab.icon] : undefined;
+          const Glyph = tab.icon === undefined ? undefined : iconsByName[tab.icon];
           return (
             <StyledTab
               key={tab.value}

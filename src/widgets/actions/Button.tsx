@@ -1,8 +1,7 @@
 /* eslint-disable max-lines -- single cohesive component (variants, sizes, and states in one definition); splitting it would scatter one component across files (#902 T4) */
 import { Children, forwardRef } from "react";
 import type { ReactNode, Ref } from "react";
-import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";
-import { isWeb } from "tamagui";
+import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme, isWeb  } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 
 import { tokens } from "../../tokens/index.js";
@@ -594,11 +593,11 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
     accessibilityState,
     accessibilityValue,
     ...rest
-  } = props as ButtonRenderProps;
+  } = props;
   // The icon slot takes a NAME (#438 Part 4): resolve it to the
   // registry's glyph component here; an absent name renders no
   // glyph, exactly as an absent icon prop did before.
-  const IconGlyph = icon !== undefined ? iconsByName[icon] : undefined;
+  const IconGlyph = icon === undefined ? undefined : iconsByName[icon];
   // Loading (#278): inside an active LoadingScope the button is
   // part of a loading composite, so it renders as a RECTANGLE
   // SKELETON of itself (Stephen on #551) — the same frame at the
@@ -847,17 +846,17 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
       // `aria-pressed` a toggle button is announced by; native gets
       // `accessibilityState.selected` merged over the state the
       // helper spread above already carries.
-      {...(selected !== undefined
-        ? isWeb
+      {...(selected === undefined
+        ? null
+        : isWeb
           ? { "aria-pressed": selected }
-          : { accessibilityState: { disabled, selected, ...accessibilityState } }
-        : null)}
+          : { accessibilityState: { disabled, selected, ...accessibilityState } })}
       onPress={scopedLoading ? undefined : onPress}
       disabled={effectiveDisabled}
       variant={variant}
       {...(ghost ? { ghost: true } : null)}
       size={size}
-      {...(selected !== undefined ? { selected } : null)}
+      {...(selected === undefined ? null : { selected })}
       // The shared frame treatment (label color, #459 border,
       // danger fill, skeleton fill) — see buttonFrameTreatment.
       {...buttonFrameTreatment({
@@ -925,7 +924,7 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
  * (#480), so label ink is purely variant/tone-derived and Button
  * owns its styles completely.
  */
-export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(props, ref) {
+export const Button = forwardRef<TamaguiElement, ButtonProps>((props, ref) => {
   return ButtonImpl(props as ButtonRenderProps, ref);
 });
 
@@ -943,7 +942,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(pr
 export type ButtonInternalProps = ButtonProps & { internalInk?: string };
 
 export const ButtonInternal = forwardRef<TamaguiElement, ButtonInternalProps>(
-  function ButtonInternal(props, ref) {
+  (props, ref) => {
     return ButtonImpl(props as ButtonRenderProps, ref);
   },
 );

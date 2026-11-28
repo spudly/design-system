@@ -266,13 +266,13 @@ export function BigFooter({ footer }: BigFooterProps) {
   );
   return (
     <Col backgroundColor="$footerBackground" p="xl" gap="xl" {...contentInfoRoleProps}>
-      {brand.mark !== undefined ? (
+      {brand.mark === undefined ? (
+        brandAnchor
+      ) : (
         <Row middle gap="m">
           <BrandMark mark={brand.mark} size={40} />
           {brandAnchor}
         </Row>
-      ) : (
-        brandAnchor
       )}
       <Row wrap gap="xl" stretch>
         {columns.length > 0 ? (
@@ -505,11 +505,11 @@ export function BigFooterShell({
   const headerNode = header ? (
     <AppTopBar
       brand={header.brand}
-      {...(header.navItems !== undefined ? { navItems: header.navItems } : null)}
-      {...(header.navLabel !== undefined ? { navLabel: header.navLabel } : null)}
-      {...(header.activeItemId !== undefined ? { activeItemId: header.activeItemId } : null)}
-      {...(header.search !== undefined ? { search: header.search } : null)}
-      {...(header.actions !== undefined ? { actions: header.actions } : null)}
+      {...(header.navItems === undefined ? null : { navItems: header.navItems })}
+      {...(header.navLabel === undefined ? null : { navLabel: header.navLabel })}
+      {...(header.activeItemId === undefined ? null : { activeItemId: header.activeItemId })}
+      {...(header.search === undefined ? null : { search: header.search })}
+      {...(header.actions === undefined ? null : { actions: header.actions })}
     />
   ) : null;
   if (!isWeb) {

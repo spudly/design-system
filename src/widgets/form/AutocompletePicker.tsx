@@ -233,13 +233,13 @@ export function AutocompletePicker({
   // matches / the count of results on offer. A failed search
   // (searchError set, no results) announces the error, never
   // the no-results message (#393).
-  const statusMessage = !hasSearchText
-    ? null
-    : isSearching
+  const statusMessage = hasSearchText
+    ? isSearching
       ? voice.autocompletePicker.searchingLabel
       : visibleResults.length === 0
         ? searchError || noResultsMessage
-        : voice.autocompletePicker.resultsAvailableLabel(visibleResults.length);
+        : voice.autocompletePicker.resultsAvailableLabel(visibleResults.length)
+    : null;
 
   // Both the select and remove paths unmount the control the
   // user just activated (the result row is filtered out as
@@ -343,7 +343,7 @@ export function AutocompletePicker({
               <ListItem
                 key={result.id}
                 title={result.label}
-                {...(result.detail !== undefined ? { subtitle: result.detail } : {})}
+                {...(result.detail === undefined ? {} : { subtitle: result.detail })}
                 isDisabled={disabled}
                 onPress={() => {
                   handleSelectResult(result.id);

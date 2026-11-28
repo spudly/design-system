@@ -72,6 +72,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../../..");
 const dist: Record<string, any> = await loadInternalDist();
@@ -323,7 +324,7 @@ test("SSR: the track renders at the spacing[3] height, not the primitive's 6px",
     .split(/\s+/)
     .map((c) => rules.get(c.replace(/^_/, "")))
     .filter((r) => r && /(^|;)height:/.test(r))
-    .map((r) => /(?:^|;)height:([^;]+)/.exec(r as string)?.[1]);
+    .map((r) => /(?:^|;)height:([^;]+)/.exec(r!)?.[1]);
   assert.deepEqual(heights, ["12px"], `track height must be 12px, got ${JSON.stringify(heights)}`);
 });
 test("SSR: the active track's right end renders square, its left end round", async () => {
@@ -339,12 +340,12 @@ test("SSR: the active track's right end renders square, its left end round", asy
   const active = /<div[^>]*name="SliderTrackActive"[^>]*class="([^"]*)"/.exec(html);
   assert.ok(active, "the active track element must render");
   const classes = new Set(active[1].split(/\s+/).map((c) => c.replace(/^_/, "")));
-  const corners = [
+  const corners = new Set([
     "border-top-left-radius",
     "border-top-right-radius",
     "border-bottom-right-radius",
     "border-bottom-left-radius",
-  ];
+  ]);
   const effective = new Map<string, string>();
   for (const m of html.matchAll(/\._([a-zA-Z0-9_-]+)[^{]*\{([^}]*)\}/g)) {
     if (!classes.has(m[1])) continue;
@@ -353,7 +354,7 @@ test("SSR: the active track's right end renders square, its left end round", asy
       if (!prop || !val) continue;
       if (prop === "border-radius") {
         for (const corner of corners) effective.set(corner, val);
-      } else if (corners.includes(prop)) {
+      } else if (corners.has(prop)) {
         effective.set(prop, val);
       }
     }

@@ -47,10 +47,10 @@ test("the box is unfilled in both states with a $primary outline and a $primary 
   assert.match(code, /color: "\$primary",\s+fontSize: tokens\.typography\.fontSize\.sm,/);
   assert.ok(!code.includes("$onPrimary"), "the glyph is no longer white on a filled box");
   assert.ok(
-    !/checked \? "\$primary" : "\$textMuted"/.test(code),
+    !code.includes('checked ? "$primary" : "$textMuted"'),
     "the outline no longer changes color between states",
   );
-  assert.ok(!/backgroundColor=\{checked/.test(code), "the box no longer fills when checked");
+  assert.ok(!code.includes('backgroundColor={checked'), "the box no longer fills when checked");
 });
 
 test("the list shape's accessible name composes the detail after the label (the row family's rule)", () => {
@@ -102,6 +102,6 @@ test("the box aligns to the label's first line via a first-line-height container
   // fix round).
   assert.match(code, /const FIRST_LINE_BOX_CONTAINER_HEIGHT = FIRST_LINE_HEIGHT - 8;/);
   assert.match(code, /<Row\s+height=\{FIRST_LINE_BOX_CONTAINER_HEIGHT\}\s+middle\s+center\s*>/);
-  assert.ok(!/paddingTop/.test(code), "no hand-tuned paddingTop offset (#713)");
-  assert.ok(!/margin/.test(code), "CheckboxField must not carry margins (#119)");
+  assert.ok(!code.includes('paddingTop'), "no hand-tuned paddingTop offset (#713)");
+  assert.ok(!code.includes('margin'), "CheckboxField must not carry margins (#119)");
 });

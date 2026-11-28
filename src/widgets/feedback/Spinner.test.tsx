@@ -44,6 +44,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 function codeOf(rel: string) {
   const source = readFileSync(join(here, "../../..", rel), "utf8");

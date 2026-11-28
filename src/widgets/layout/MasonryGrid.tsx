@@ -93,9 +93,9 @@ export function distributeMasonryItems<Item>(
     return [];
   }
   const columns: Item[][] = Array.from({ length: count }, () => []);
-  items.forEach((item, index) => {
+  for (const [index, item] of items.entries()) {
     columns[index % count]?.push(item);
-  });
+  }
   return columns;
 }
 

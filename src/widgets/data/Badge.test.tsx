@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import "../../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 describe("badgeBorder", () => {
   const srcPath = join(
     dirname(fileURLToPath(import.meta.url)),
@@ -18,13 +19,13 @@ describe("badgeBorder", () => {
   const text = readFileSync(srcPath, "utf8");
   test("the badge pill has a 1px border (#174)", () => {
     assert.ok(
-      /borderWidth=\{1\}/.test(text),
+      text.includes('borderWidth={1}'),
       "Badge's Row must set borderWidth 1 so the Badge renders a 1px border (#174)",
     );
   });
   test("the badge border uses the tone's text color (#174)", () => {
     assert.ok(
-      /borderColor = isSelected \? "\$primary" : \(tagLight \?\? styles\.text\)/.test(text),
+      text.includes('borderColor = isSelected ? "$primary" : (tagLight ?? styles.text)'),
       "Badge must compute borderColor from the tag light shade while unselected (tagLight ?? styles.text — the tone fallback when no tag color resolves) so the border is the same color as the badge text for every tone (#174, inverted tag form #799); the selectable form's selected state takes the primary fill instead (the badgeSelectable block in this file)",
     );
   });
