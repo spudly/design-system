@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- one cohesive accessibility-helper module; its small shared utilities are consumed as a single unit (#902 T4) */
 import type { AccessibilityRole, AccessibilityState, AccessibilityValue, Role } from "react-native";
 import { isWeb } from "tamagui";
 

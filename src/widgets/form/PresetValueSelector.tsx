@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive selector component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useId, useRef, useState } from "react";
 import type { ComponentProps, Ref } from "react";
 import { isWeb } from "tamagui";

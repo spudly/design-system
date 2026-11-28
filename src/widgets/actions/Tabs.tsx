@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive tabs component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { Anchor, Tabs as TamaguiTabs, isWeb, styled, useTheme } from "tamagui";
 
 import { Row } from "../layout/Row.js";

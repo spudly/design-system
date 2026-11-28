@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive card component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { View } from "tamagui";
 
 import { Row } from "../layout/Row.js";

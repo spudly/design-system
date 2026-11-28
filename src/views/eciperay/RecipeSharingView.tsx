@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive view component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CheckboxSkeletonRow } from "../../widgets/feedback/CheckboxSkeletonRow.js";

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive form-field component whose input, list and selection state are one unit; splitting it would fragment the field (#902 T4) */
 import { useId, useRef } from "react";
 import { XStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";

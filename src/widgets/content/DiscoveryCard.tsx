@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive card component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { Anchor, View, isWeb } from "tamagui";
 
 import { Col } from "../layout/Col.js";

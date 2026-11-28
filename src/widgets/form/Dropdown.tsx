@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive dropdown component whose trigger, menu and selection state are one unit; splitting it would fragment the control (#902 T4) */
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { Popover, View, styled } from "tamagui";
 

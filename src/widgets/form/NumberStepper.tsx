@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive form-field component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useId, useState } from "react";
 import { Input as TamaguiInput, styled } from "tamagui";
 
