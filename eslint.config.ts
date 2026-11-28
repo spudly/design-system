@@ -1,4 +1,4 @@
-import { base, react, typescriptPendingIgnores } from "@spudly/eslint-config";
+import { base, react, typescript } from "@spudly/eslint-config";
 
 import pageStyling from "./eslintRules/noPageStyling.mjs";
 import marginSpacing from "./eslintRules/noMarginSpacing.mjs";
@@ -36,13 +36,13 @@ export default [
       "**/storybook-static/**",
     ],
   },
-  // typescript-eslint does not support TypeScript 7 yet (it caps
-  // TypeScript at <6.1) and it was the only TS parser, so TS/TSX files
-  // are not linted for now — `npm run typecheck` is the correctness
-  // gate until typescript-eslint ships TS7 support and the package
-  // gains a real typescript section (see the package README's restore
-  // path). Plain JS files (.js/.mjs) are still linted.
-  ...typescriptPendingIgnores,
+  // TypeScript linting restored (#902) under the side-by-side shape
+  // (eslint-config #67, @spudly/eslint-config 0.8.0): typescript-eslint
+  // resolves the `typescript` alias (@typescript/typescript6, the TS 6
+  // API it supports) while builds/typecheck run the TS 7 compiler from
+  // the `typescript7` alias by path. TS/TSX files are linted again,
+  // including the type-aware rules.
+  ...typescript,
   ...base,
   ...react,
   {
@@ -81,12 +81,9 @@ export default [
     // apply styling directly — no direct Tamagui imports, no
     // className, no inline style prop. Styling belongs in
     // reusable components under src/widgets, driven by semantic
-    // props. DORMANT today: the typescriptPendingIgnores block above
-    // ignores every .ts/.tsx file (typescript-eslint has no TS7 parser
-    // yet), so this cannot fire until the TS lint restoration removes
-    // that block — at which point it activates with no further change.
-    // The pages are being fixed proactively from the audit on #119 so
-    // activation is a non-event. Rule: eslintRules/noPageStyling.mjs.
+    // props. The pages were fixed proactively from the audit on #119
+    // so the TS lint restoration (#902) activated this as a non-event.
+    // Rule: eslintRules/noPageStyling.mjs.
     // #698 extends the same rule to views: only widgets add styling,
     // so views compose data and callbacks exactly like pages. The
     // violating views are being fixed proactively from the #698
@@ -104,12 +101,9 @@ export default [
     // express it with gap (stacks) and padding (containers), so no
     // element in a component or a page carries a margin prop (or a
     // margin key in a style object) to create space between
-    // siblings. DORMANT today, beside the #119 rule: the
-    // typescriptPendingIgnores block above ignores every .ts/.tsx
-    // file, so this cannot fire until the TS lint restoration —
-    // at which point it activates with no further change. The
-    // codebase was swept proactively on #209 so activation is a
-    // non-event. Rule: eslintRules/noMarginSpacing.mjs.
+    // siblings. The codebase was swept proactively on #209 so the
+    // TS lint restoration (#902) activated this as a non-event.
+    // Rule: eslintRules/noMarginSpacing.mjs.
     files: ["src/widgets/**/*.tsx", "src/views/**/*.tsx"],
     plugins: { "design-system": designSystem },
     rules: { "design-system/no-margin-spacing": "error" },
@@ -119,10 +113,8 @@ export default [
     // XStack/YStack elements and no styled() derivations from
     // them anywhere in shipped components, views, pages, or
     // icons. The conversion tranches (#820–#827) rebuilt every
-    // surface, so this is a non-event at activation. DORMANT
-    // today, beside the sibling rules: typescriptPendingIgnores
-    // above ignores every .ts/.tsx file until the TS lint
-    // restoration. Rule: eslintRules/noDirectStacks.mjs.
+    // surface, so the TS lint restoration (#902) activated this
+    // as a non-event. Rule: eslintRules/noDirectStacks.mjs.
     files: [
       "src/widgets/**/*.tsx",
       "src/views/**/*.tsx",
@@ -157,8 +149,8 @@ export default [
     // Adopted WARN-first; promotion to error waits until #733's
     // conversion tranches burn the warnings down. Reads of dist
     // output, declaration files, and data files stay allowed (the
-    // audit's LEGIT class). DORMANT in CI beside the other local
-    // rules until the TS lint restoration. Rule:
+    // audit's LEGIT class). Active since the TS lint restoration
+    // (#902). Rule:
     // eslintRules/noSourceReadsInTests.mjs.
     files: ["src/**/*.test.ts", "src/**/*.test.tsx", "test/**/*.ts", "test/**/*.tsx"],
     plugins: { "design-system": designSystem },
