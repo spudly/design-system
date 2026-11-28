@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- one test suite per module; its cases share fixtures and helpers and read as a single spec (#902 T4) */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

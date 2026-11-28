@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- one test suite per module; its cases share fixtures and helpers and read as a single spec (#902 T4) */
 /**
  * Contract test for RecipeDetailPage (spudly/design-system#49,
  * wave A): Eciperay's recipe detail screen as a controlled DS page

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- one test suite per module; its cases share fixtures and helpers and read as a single spec (#902 T4) */
 import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";

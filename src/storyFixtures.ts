@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- shared fixture data set; a single declarative data table consumed as one unit (#902 T4) */
 /**
  * Inline image fixtures for stories (issue #352).
  *

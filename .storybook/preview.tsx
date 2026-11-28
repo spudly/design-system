@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single declarative configuration object; splitting it would fragment one config definition (#902 T4) */
 import { useEffect } from "react";
 import type { Preview } from "@storybook/react";
 import { TamaguiProvider, View, YStack } from "tamagui";
