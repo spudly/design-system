@@ -353,7 +353,11 @@ test("banners (#879): absent by default; when present the page renders the banne
   assert.equal(consentEls.length, 1, "the consent banner renders through ConsentBannerView");
   assert.deepEqual(consentEls[0].props, consentBanner, "the consent banner data crosses unchanged");
   assert.equal(installEls.length, 1, "the install banner renders through InstallBannerView");
-  assert.deepEqual(installEls[0].props, installBanner, "the install banner data crosses unchanged");
+  assert.deepEqual(
+    installEls[0].props,
+    { ...installBanner, pinning: "flow" },
+    "the install banner data crosses unchanged, rendered in flow above the hero (#903)",
+  );
   consentEls[0].props.onAccept();
   installEls[0].props.onDismiss();
   assert.equal(accepts, 1, "the accept callback fires");

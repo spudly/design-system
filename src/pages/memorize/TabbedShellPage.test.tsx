@@ -371,7 +371,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
     onTabSelect: () => {},
   });
   const bareChildren = bare.props.children.props.children;
-  assert.equal(bareChildren[4], null, "no install banner data — no install banner renders");
+  assert.equal(bareChildren[0], null, "no install banner data — no install banner renders");
   assert.equal(bareChildren[5], null, "no consent banner data — no consent banner renders");
   let accepts = 0;
   let dismissals = 0;
@@ -402,11 +402,15 @@ test("banners (#879): absent by default; when present the shell renders the bann
   });
   const children = withBanners.props.children.props.children;
   assert.equal(
-    children[4].type,
+    children[0].type,
     distViews.InstallBannerView,
     "the install banner renders through InstallBannerView",
   );
-  assert.deepEqual(children[4].props, installBanner, "the install banner data crosses unchanged");
+  assert.deepEqual(
+    children[0].props,
+    { ...installBanner, pinning: "flow" },
+    "the install banner data crosses unchanged, rendered in flow above the top bar (#903)",
+  );
   assert.equal(
     children[5].type,
     distViews.ConsentBannerView,
@@ -414,7 +418,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
   );
   assert.deepEqual(children[5].props, consentBanner, "the consent banner data crosses unchanged");
   children[5].props.onAccept();
-  children[4].props.onDismiss();
+  children[0].props.onDismiss();
   assert.equal(accepts, 1, "the accept callback fires");
   assert.equal(dismissals, 1, "the dismiss callback fires");
 });

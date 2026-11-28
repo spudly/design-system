@@ -226,6 +226,7 @@ export function AppShellPage({
   return (
     <BigFooterShell footer={footer} scrollMode="content">
       <ScreenContainer>
+        {installBanner ? <InstallBannerView {...installBanner} pinning="flow" /> : null}
         <AppTopBar
           brand={brand}
           navItems={navItems}
@@ -248,7 +249,6 @@ export function AppShellPage({
         >
           {children}
         </LazySlot>
-        {installBanner ? <InstallBannerView {...installBanner} /> : null}
         {consentBanner ? <ConsentBannerView {...consentBanner} /> : null}
       </ScreenContainer>
     </BigFooterShell>

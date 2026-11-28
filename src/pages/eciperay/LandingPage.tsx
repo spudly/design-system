@@ -156,6 +156,7 @@ export function LandingPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
+        {installBanner ? <InstallBannerView {...installBanner} pinning="flow" /> : null}
         <Col center gap="m">
           <Text variant="heading" textAlign="center">
             {heroTitle}
@@ -183,7 +184,6 @@ export function LandingPage({
             </Card>
           ))}
         </CardGrid>
-        {installBanner ? <InstallBannerView {...installBanner} /> : null}
         {consentBanner ? <ConsentBannerView {...consentBanner} /> : null}
       </ScreenContainer>
     </BigFooterShell>

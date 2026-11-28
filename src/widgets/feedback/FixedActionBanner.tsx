@@ -21,6 +21,12 @@ export type FixedActionBannerProps = {
   dismissAriaLabel?: string;
   /** Which screen edge the bar pins to (the ActionBar placement). */
   position?: "top" | "bottom";
+  /**
+   * How the bar attaches (the ActionBar pinning). Defaults to
+   * "viewport" (#405); "flow" renders the banner in normal document
+   * flow (#903) for pages that place it as their first element.
+   */
+  pinning?: "container" | "viewport" | "flow";
 };
 
 /**
@@ -54,11 +60,12 @@ export function FixedActionBanner({
   onDismiss,
   dismissAriaLabel,
   position = "bottom",
+  pinning = "viewport",
 }: FixedActionBannerProps) {
   const voice = useVoice();
   const resolvedDismissAriaLabel = dismissAriaLabel ?? voice.fixedActionBanner.dismissLabel;
   return (
-    <ActionBar placement={position} pinning="viewport">
+    <ActionBar placement={position} pinning={pinning}>
       <Col width="100%" maxWidth={1024} alignSelf="center" gap="m">
         <Alert severity="info">{message}</Alert>
         <Row wrap middle gap="s">

@@ -479,7 +479,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
     children: <span>PAGE SURFACE</span>,
   });
   const bareChildren = bare.props.children.props.children;
-  assert.equal(bareChildren[3], null, "no install banner data — no install banner renders");
+  assert.equal(bareChildren[0], null, "no install banner data — no install banner renders");
   assert.equal(bareChildren[4], null, "no consent banner data — no consent banner renders");
   let accepts = 0;
   let declines = 0;
@@ -512,14 +512,18 @@ test("banners (#879): absent by default; when present the shell renders the bann
     children: <span>PAGE SURFACE</span>,
   });
   const children = withBanners.props.children.props.children;
-  const installEl = children[3];
+  const installEl = children[0];
   const consentEl = children[4];
   assert.equal(
     installEl.type,
     distViews.InstallBannerView,
     "the install banner renders through InstallBannerView",
   );
-  assert.deepEqual(installEl.props, installBanner, "the install banner data crosses unchanged");
+  assert.deepEqual(
+    installEl.props,
+    { ...installBanner, pinning: "flow" },
+    "the install banner data crosses unchanged, rendered in flow above the top bar (#903)",
+  );
   assert.equal(
     consentEl.type,
     distViews.ConsentBannerView,
