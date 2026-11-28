@@ -104,7 +104,8 @@ describe("switchThumb", () => {
   }
 
   async function renderSwitch(checked: boolean): Promise<string> {
-    const React = (await import("react")).default;
+    const reactModule = await import("react");
+    const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();

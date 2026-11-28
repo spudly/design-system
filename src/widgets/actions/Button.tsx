@@ -834,7 +834,7 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
   // number, an element — is a real label. With an icon and no
   // renderable label, the button is icon-only.
   const hasLabel = Children.toArray(children).some((child) => child !== "");
-  const iconOnly = IconGlyph != null && !hasLabel;
+  const iconOnly = IconGlyph !== null && IconGlyph !== undefined && !hasLabel;
   const glyphSize = glyphSizes[size as keyof typeof glyphSizes] ?? glyphSizes.md;
   const iconOnlyBox = iconOnlyBoxes[size as keyof typeof iconOnlyBoxes] ?? iconOnlyBoxes.md;
   return (

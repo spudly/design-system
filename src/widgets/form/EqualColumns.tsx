@@ -25,7 +25,7 @@ export function EqualColumns({ children }: EqualColumnsProps) {
   return (
     <Row gap="m">
       {Children.map(children, (child) =>
-        child == null || typeof child === "boolean" ? null : (
+        (child === null || child === undefined) || typeof child === "boolean" ? null : (
           <Col grow shrink>
             {child}
           </Col>

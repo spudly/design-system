@@ -20,7 +20,8 @@ import { loadInternalDist } from "../../../test/internalDist.js";
 let runtimePromise: Promise<Record<string, any>> | undefined;
 function loadRuntime() {
   runtimePromise ??= (async () => {
-    const React = (await import("react")).default;
+    const reactModule = await import("react");
+    const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();

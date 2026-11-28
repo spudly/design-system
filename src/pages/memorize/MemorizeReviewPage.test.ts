@@ -178,7 +178,7 @@ test("the rendered tree has no invented dashboard, extra actions, badge, or load
   const types: string[] = [];
   const labels: string[] = [];
   const walk = (node: any): void => {
-    if (node == null || typeof node !== "object") {
+    if ((node === null || node === undefined) || typeof node !== "object") {
       if (typeof node === "string") labels.push(node);
       return;
     }

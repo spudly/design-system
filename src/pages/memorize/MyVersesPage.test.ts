@@ -207,7 +207,7 @@ test("the rendered tree has no loading state or render-slot content", async () =
   const tree = MyVersesPage(baseProps());
   const types: string[] = [];
   const walk = (node: any): void => {
-    if (node == null || typeof node !== "object") return;
+    if ((node === null || node === undefined) || typeof node !== "object") return;
     if (Array.isArray(node)) {
       node.forEach(walk);
       return;

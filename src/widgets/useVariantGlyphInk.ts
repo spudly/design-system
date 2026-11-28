@@ -40,7 +40,6 @@ export function useVariantGlyphInk(
         // matching its label ink from Button's ghostLabelColors.
         return roleValue("accent") ?? "#b45309";
       }
-      case "primary":
       default: {
         return roleValue("primary") ?? tokens.colors.primary.primary7;
       }
@@ -61,7 +60,6 @@ export function useVariantGlyphInk(
       // glyph takes the same ink.
       return "#ffffff";
     }
-    case "primary":
     default: {
       return roleValue("onPrimary") ?? "#ffffff";
     }

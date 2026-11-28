@@ -209,7 +209,7 @@ test("the rendered tree has no demo inventions, loading state, or text entry", a
   const types: string[] = [];
   const labels: string[] = [];
   const walk = (node: any): void => {
-    if (node == null || typeof node !== "object") {
+    if ((node === null || node === undefined) || typeof node !== "object") {
       if (typeof node === "string") labels.push(node);
       return;
     }
