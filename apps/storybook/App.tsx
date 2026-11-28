@@ -112,6 +112,7 @@ function logStoryLink(url: string) {
   const path = parsed.queryParams?.path;
   const isBrowse = parsed.hostname === "browse" || parsed.path === "browse";
   if (isBrowse && typeof path === "string") {
+    // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
     console.log(`DS LINK ${path}`);
   }
 }
@@ -150,8 +151,11 @@ function useStoryIndexLog() {
       const stories = Object.values(entries).filter((e) => e.type === "story");
       if (stories.length === 0) return;
       logged = true;
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       console.log(`DSVR INDEX_BEGIN ${stories.length}`);
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       for (const story of stories) console.log(`DSVR INDEX_ITEM ${story.id}`);
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       console.log("DSVR INDEX_END");
     }, 500);
     return () => { clearInterval(timer); };
@@ -211,6 +215,7 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
     const fire = () => {
       if (fired) return;
       fired = true;
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       console.log(`DSVR READY ${nonce} ${storyId}`);
     };
     const handler = (payload?: { storyId?: string }) => {
@@ -248,12 +253,14 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
         }
         const r = await captureFullPageNative(`dsvr-appcap-${nonce}.png`);
         if (!cancelled) {
+          // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
           console.log(
             `DSVR APPCAP ${nonce} ${storyId} path=${r.path} ipath=${r.internalPath} w=${r.width} h=${r.height} content=${r.contentHeight} viewport=${r.viewportHeight} root=${r.rootHeight} mode=${r.mode} scrolls=${r.scrollViews} chain=${r.chainDepth} ms=${r.drawMs} settle=${r.settleDraws}`,
           );
         }
       } catch (error) {
         if (!cancelled) {
+          // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
           console.log(
             `DSVR APPCAP_ERROR ${nonce} ${storyId} ${error instanceof Error ? error.message : String(error)}`,
           );

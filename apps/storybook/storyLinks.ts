@@ -79,6 +79,7 @@ export function createStoryLinkOpenURL(openURL: OpenURL, browseUrl: string): Ope
     const resolved = resolveStoryLink(url, browseUrl);
     if (resolved === url) return openURL(url);
     return openURL(resolved).catch(() => {
+      // eslint-disable-next-line no-console -- unresolved deep links are reported to the Storybook host console by design
       console.log(`DS LINK unresolved ${url}`);
     });
   };

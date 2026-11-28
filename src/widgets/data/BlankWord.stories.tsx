@@ -24,6 +24,7 @@ export const Hidden: Story = {
     revealed: false,
     index: 0,
     total: 3,
+    // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
     onReveal: () => { console.log("revealed"); },
   },
 };
