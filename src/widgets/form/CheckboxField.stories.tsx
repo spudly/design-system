@@ -22,6 +22,7 @@ type Story = StoryObj<typeof CheckboxField>;
 
 export const Default: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(false);
     return (
       <CheckboxField label="Email me new recipes" checked={checked} onCheckedChange={setChecked} />
@@ -31,6 +32,7 @@ export const Default: Story = {
 
 export const WithDescription: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(false);
     return (
       <CheckboxField
@@ -45,6 +47,7 @@ export const WithDescription: Story = {
 
 export const Checked: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(true);
     return (
       <CheckboxField label="2 tbsp olive oil" checked={checked} onCheckedChange={setChecked} />
@@ -54,6 +57,7 @@ export const Checked: Story = {
 
 export const WithRichDescription: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(false);
     return (
       <CheckboxField
@@ -73,6 +77,7 @@ export const WithRichDescription: Story = {
 
 export const WithChildren: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(false);
     return (
       <CheckboxField
@@ -91,6 +96,7 @@ export const WithChildren: Story = {
 
 export const WithError: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(false);
     return (
       <CheckboxField
@@ -105,6 +111,7 @@ export const WithError: Story = {
 
 export const ListShape: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(false);
     return (
       <YStack maxWidth={430}>
@@ -138,6 +145,7 @@ export const ListShapeChecked: Story = {
 
 export const ListShapeWrappedLabel: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [checked, setChecked] = useState(false);
     return (
       <YStack maxWidth={260}>

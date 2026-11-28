@@ -31,6 +31,7 @@ export const WithValue: Story = {
 
 export const Empty: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("");
     return (
       <YStack maxWidth={360}>
@@ -47,6 +48,7 @@ export const Empty: Story = {
 
 export const WithoutLabel: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("");
     return (
       <YStack maxWidth={360}>
@@ -63,6 +65,7 @@ export const WithoutLabel: Story = {
 
 export const WithError: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("");
     return (
       <YStack maxWidth={360}>

@@ -48,6 +48,7 @@ export const Revealed: Story = {
 
 export const WithError: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("");
     return (
       <YStack maxWidth={360}>

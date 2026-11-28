@@ -36,6 +36,7 @@ const importOptions = [
 
 export const Default: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("url");
     return (
       <RadioOptionGroup
@@ -50,6 +51,7 @@ export const Default: Story = {
 
 export const WithoutDescriptions: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("medium");
     return (
       <RadioOptionGroup
@@ -68,6 +70,7 @@ export const WithoutDescriptions: Story = {
 
 export const WithError: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("");
     return (
       <RadioOptionGroup
@@ -83,6 +86,7 @@ export const WithError: Story = {
 
 export const Disabled: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("url");
     return (
       <RadioOptionGroup

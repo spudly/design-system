@@ -13,6 +13,7 @@ type Story = StoryObj<typeof BulkSelectToolbar>;
 
 export const Default: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [search, setSearch] = useState("");
     return (
       <BulkSelectToolbar
@@ -29,6 +30,7 @@ export const Default: Story = {
 
 export const NothingFiltered: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [search, setSearch] = useState("zzz");
     return (
       <BulkSelectToolbar

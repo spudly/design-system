@@ -16,6 +16,7 @@ type Story = StoryObj<typeof MarkableRow>;
 
 export const Default: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [marked, setMarked] = useState<Record<string, boolean>>({ rice: true });
     const toggle = (id: string) => {
       setMarked((current) => ({ ...current, [id]: !current[id] }));

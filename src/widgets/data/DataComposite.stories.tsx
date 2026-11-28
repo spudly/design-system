@@ -178,6 +178,7 @@ export const BadgesAndStats: Story = {
  * ratings card, and the nutrition panel in one detail column. */
 export const StructuredContent: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [viewer, setViewer] = useState<number | null>(4);
     return (
       <YStack maxWidth={430} gap={16}>

@@ -59,6 +59,7 @@ const STEPS = [
  * treatments side by side. */
 export const Disclosure: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [isOpen, setOpen] = useState(true);
     return (
       <YStack maxWidth={430} gap={20}>
@@ -93,6 +94,7 @@ export const Disclosure: Story = {
  * body, and actions as a user meets them mid-task. */
 export const DialogOpen: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [open, setOpen] = useState(true);
     return (
       <YStack height={360} maxWidth={480}>
@@ -126,6 +128,7 @@ export const DialogOpen: Story = {
  * step position, body, and the step dots beneath. */
 export const StepOverlayOpen: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [stepIndex, setStepIndex] = useState(0);
     return (
       <YStack maxWidth={430}>
