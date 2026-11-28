@@ -1,0 +1,1 @@
+{"compilerOptions":{"declaration":false,"declarationMap":false,"noEmit":true,"rootDir":".","sourceMap":false},"exclude":["node_modules"],"extends":"./tsconfig.json","include":["src/**/*.test.ts","src/**/*.test.tsx","test/**/*",".storybook/**/*","eslintRules/*.test.ts","eslintRules/*.d.mts","eslint.config.ts"]}

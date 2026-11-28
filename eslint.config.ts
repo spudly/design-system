@@ -46,6 +46,34 @@ export default [
   ...base,
   ...react,
   {
+    // #906 (burn-down T1 of #902): files the root tsconfig excludes
+    // (tests) or never included (test/, .storybook/, eslintRules
+    // tests, this config) are not found by the shared config's
+    // project service, which turned every one into a lint parsing
+    // error. Point the parser at tsconfig.eslint.json — a noEmit
+    // program that covers exactly those files — for them instead
+    // (the Eciperay pattern). The remaining lint debt in these files
+    // is tranches T2–T5 (#907–#910), not parsing coverage.
+    files: [
+      "src/**/*.test.ts",
+      "src/**/*.test.tsx",
+      "test/**/*.ts",
+      "test/**/*.tsx",
+      ".storybook/**/*.ts",
+      ".storybook/**/*.tsx",
+      "eslintRules/*.test.ts",
+      "eslintRules/*.d.mts",
+      "eslint.config.ts",
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ["./tsconfig.eslint.json"],
+        projectService: false,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
     // Node tooling (the visual-regression runner and helpers): these
     // run under Node, not in the library runtime, so Node globals
     // apply and console is their interface — the shared base's
