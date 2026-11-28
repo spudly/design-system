@@ -144,7 +144,8 @@ test("each icon carries its glyph's data (official Feather, except the custom Me
 
 test("no icon carries another icon's glyph (#246)", async () => {
   const literals = ICONS.filter(([, literal]) => literal).map(
-    ([name, literal]): [string, string] => [name, literal as string],
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the filter above keeps only entries with a literal
+    ([name, literal]): [string, string] => [name, literal!],
   );
   for (const [name] of ICONS) {
     const data = await dataOf(name);
@@ -227,7 +228,7 @@ test("the icons module is internal — no ./icons subpath export (#246, #298)", 
     "the package root is the only export — pages only (#298)",
   );
   assert.ok(
-    pkg.dependencies["react-native-svg"] || pkg.peerDependencies["react-native-svg"],
+    pkg.dependencies["react-native-svg"] ?? pkg.peerDependencies["react-native-svg"],
     "react-native-svg is not declared as a dependency or peer",
   );
 });

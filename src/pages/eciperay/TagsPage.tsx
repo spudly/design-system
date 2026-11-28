@@ -385,7 +385,7 @@ export function TagsPage({
                           Edit
                         </Button>
                       ) : null}
-                      {tag.canDelete !== false ? (
+                      {tag.canDelete === false ? null : (
                         <Button
                           ghost
                           size="sm"
@@ -397,7 +397,7 @@ export function TagsPage({
                         >
                           Delete
                         </Button>
-                      ) : null}
+                      )}
                     </TrailingActionsRow>
                   </Card>
                 ),

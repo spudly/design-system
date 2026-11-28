@@ -15,8 +15,10 @@ import { view } from "./.rnstorybook/storybook.requires";
 // and the UI behaves exactly as before.
 const StorybookUIRoot = view.getStorybookUI({
   enableWebsockets: process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === "true",
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- an empty-string env var must fall back to the default host; ?? would keep "".
   host: process.env.EXPO_PUBLIC_STORYBOOK_WEBSOCKET_HOST || "localhost",
-  port: parseInt(process.env.EXPO_PUBLIC_STORYBOOK_WEBSOCKET_PORT || "7007", 10),
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- an empty-string env var must fall back to the default port; ?? would keep "".
+  port: Number.parseInt(process.env.EXPO_PUBLIC_STORYBOOK_WEBSOCKET_PORT || "7007", 10),
   secured: process.env.EXPO_PUBLIC_STORYBOOK_WEBSOCKET_SECURED === "true",
   onDeviceUI: process.env.EXPO_PUBLIC_STORYBOOK_DISABLE_UI !== "true",
   shouldPersistSelection: true,
@@ -26,5 +28,7 @@ const StorybookUIRoot = view.getStorybookUI({
   },
 });
 
-export { view };
+
 export default StorybookUIRoot;
+
+export {view} from "./.rnstorybook/storybook.requires";

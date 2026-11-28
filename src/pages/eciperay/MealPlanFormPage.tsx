@@ -316,7 +316,7 @@ export function MealPlanFormPage({
             searchResults={searchResults.map((entry) => ({
               id: entry.key,
               label: entryLabel(entry),
-              ...(entry.servings !== undefined ? { detail: `${entry.servings} servings` } : {}),
+              ...(entry.servings === undefined ? {} : { detail: `${entry.servings} servings` }),
             }))}
             isSearching={isSearching}
             searchError={searchError}

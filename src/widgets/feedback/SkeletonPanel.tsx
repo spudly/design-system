@@ -1,6 +1,5 @@
 import { Col } from "../layout/Col.js";
 import type { ColProps } from "../layout/Col.js";
-import { tokens } from "../../tokens/index.js";
 
 export type SkeletonPanelProps = Omit<ColProps, "width" | "gap" | "p">;
 

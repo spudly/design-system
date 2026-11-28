@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import { Col } from "../layout/Col.js";
-import { tokens } from "../../tokens/index.js";
 
 export type StackedButtonRowProps = {
   children: ReactNode;

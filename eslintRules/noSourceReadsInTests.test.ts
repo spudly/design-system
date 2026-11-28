@@ -38,7 +38,7 @@ test("direct source reads are flagged", () => {
   assert.deepEqual(messageIds(`readFileSync(join(root, "src", "pages", "index.ts"), "utf8");`), [
     "sourceRead",
   ]);
-  assert.deepEqual(messageIds("readFileSync(join(here, `${name}.tsx`), \"utf8\");"), ["sourceRead"]);
+  assert.deepEqual(messageIds(`readFileSync(join(here, \`\${name}.tsx\`), "utf8");`), ["sourceRead"]);
   assert.deepEqual(messageIds(`fs.readFileSync("src/views/index.ts", "utf8");`), ["sourceRead"]);
   assert.deepEqual(messageIds(`existsSync("src/widgets/Retired.tsx");`), ["sourceRead"]);
 });

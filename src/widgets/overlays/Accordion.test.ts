@@ -131,7 +131,7 @@ test("the section header is keyboard-operable on web and at least 44px tall", ()
 test("the section's CollapsibleIcon sits to the left of the title (#458)", () => {
   const iconAt = section.indexOf("<CollapsibleIcon");
   const titleAt = section.indexOf('<Text variant="subheading"');
-  assert.ok(iconAt >= 0 && titleAt >= 0, "header must render both the icon and the title");
+  assert.ok(iconAt !== -1 && titleAt !== -1, "header must render both the icon and the title");
   assert.ok(iconAt < titleAt, "the icon must precede the title in the header row");
 });
 

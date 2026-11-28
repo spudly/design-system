@@ -59,6 +59,7 @@ const STEPS = [
  * treatments side by side. */
 export const Disclosure: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [isOpen, setOpen] = useState(true);
     return (
       <YStack maxWidth={430} gap={20}>
@@ -93,6 +94,7 @@ export const Disclosure: Story = {
  * body, and actions as a user meets them mid-task. */
 export const DialogOpen: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [open, setOpen] = useState(true);
     return (
       <YStack height={360} maxWidth={480}>
@@ -103,10 +105,10 @@ export const DialogOpen: Story = {
           description="This cannot be undone."
           actions={
             <>
-              <Button variant="secondary" size="sm" onPress={() => setOpen(false)}>
+              <Button variant="secondary" size="sm" onPress={() => { setOpen(false); }}>
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" onPress={() => setOpen(false)}>
+              <Button variant="primary" size="sm" onPress={() => { setOpen(false); }}>
                 Delete
               </Button>
             </>
@@ -116,7 +118,7 @@ export const DialogOpen: Story = {
             “Creamy Tuscan Garlic Chicken” will be removed from your library.
           </Text>
         </Dialog>
-        {!open ? <Text variant="hint">Dialog closed — reload the story to reopen.</Text> : null}
+        {open ? null : <Text variant="hint">Dialog closed — reload the story to reopen.</Text>}
       </YStack>
     );
   },
@@ -126,6 +128,7 @@ export const DialogOpen: Story = {
  * step position, body, and the step dots beneath. */
 export const StepOverlayOpen: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [stepIndex, setStepIndex] = useState(0);
     return (
       <YStack maxWidth={430}>
@@ -153,7 +156,7 @@ export const StepOverlayOpen: Story = {
                 variant="secondary"
                 size="sm"
                 disabled={stepIndex === 0}
-                onPress={() => setStepIndex((current) => Math.max(0, current - 1))}
+                onPress={() => { setStepIndex((current) => Math.max(0, current - 1)); }}
               >
                 Back
               </Button>
@@ -161,7 +164,7 @@ export const StepOverlayOpen: Story = {
                 variant="primary"
                 size="sm"
                 disabled={stepIndex === STEPS.length - 1}
-                onPress={() => setStepIndex((current) => Math.min(STEPS.length - 1, current + 1))}
+                onPress={() => { setStepIndex((current) => Math.min(STEPS.length - 1, current + 1)); }}
               >
                 Next
               </Button>

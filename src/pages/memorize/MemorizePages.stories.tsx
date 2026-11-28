@@ -92,8 +92,11 @@ export const PassageView: Story = {
 function MemorizationSessionDemo() {
   const words = passageFixture.drillWords;
   const [revealed, setRevealed] = useState<boolean[]>([true, false, false]);
-  const reveal = (index: number) =>
-    setRevealed((rows) => rows.map((row, i) => (i === index ? true : row)));
+  const reveal = (index: number) => { setRevealed((rows) => rows.map((row, i) => (i === index ? true : row))); };
+  /* eslint-disable @typescript-eslint/no-non-null-assertion -- the drill fixture and the initial revealed state are fixed at three entries, so indices 0-2 always exist */
+  const word0 = words[0]!; const word1 = words[1]!; const word2 = words[2]!;
+  const revealed0 = revealed[0]!; const revealed1 = revealed[1]!; const revealed2 = revealed[2]!;
+  /* eslint-enable @typescript-eslint/no-non-null-assertion -- end of the fixed-size index block above */
   return (
     <PageFrame>
       <Text variant="heading">{passageFixture.reference}</Text>
@@ -105,25 +108,25 @@ function MemorizationSessionDemo() {
       <Text variant="verse">
         The LORD is my shepherd; I shall not{" "}
         <BlankWord
-          word={words[0]!}
-          revealed={revealed[0]!}
-          onReveal={() => reveal(0)}
+          word={word0}
+          revealed={revealed0}
+          onReveal={() => { reveal(0); }}
           index={0}
           total={words.length}
         />
         . He makes me lie down in green{" "}
         <BlankWord
-          word={words[1]!}
-          revealed={revealed[1]!}
-          onReveal={() => reveal(1)}
+          word={word1}
+          revealed={revealed1}
+          onReveal={() => { reveal(1); }}
           index={1}
           total={words.length}
         />
         . He leads me beside still{" "}
         <BlankWord
-          word={words[2]!}
-          revealed={revealed[2]!}
-          onReveal={() => reveal(2)}
+          word={word2}
+          revealed={revealed2}
+          onReveal={() => { reveal(2); }}
           index={2}
           total={words.length}
         />

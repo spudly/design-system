@@ -98,7 +98,7 @@ export function verticalScrollers(html: string): string[] {
     }
     if (classScrollers.size > 0) {
       const classes = /class="([^"]*)"/.exec(tag)?.[1];
-      if (classes && classes.split(/\s+/).some((name) => classScrollers.has(name))) {
+      if (classes?.split(/\s+/).some((name) => classScrollers.has(name))) {
         found.push(tag.slice(0, 160));
       }
     }

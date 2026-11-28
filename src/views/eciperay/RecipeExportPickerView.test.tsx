@@ -27,9 +27,11 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 async function renderPicker(props: Record<string, unknown>): Promise<string> {
   const { createElement: h } = await import("react");
   const { renderToString } = await import("react-dom/server");
+  // eslint-disable-next-line design-system/no-page-styling -- test harness imports TamaguiProvider directly to render the view under test; tests ship no page code
   const { TamaguiProvider }: Record<string, any> = await import("tamagui");
   const distRuntime = await loadInternalDist();
   const { createTamaguiConfig, baseTheme, RecipeExportPickerView } = distRuntime;
@@ -49,7 +51,7 @@ async function renderPicker(props: Record<string, unknown>): Promise<string> {
 }
 function buttonAttrs(html: string, label: string): string {
   const idx = html.indexOf(label);
-  assert.ok(idx >= 0, `the "${label}" button renders`);
+  assert.ok(idx !== -1, `the "${label}" button renders`);
   const start = html.lastIndexOf("<button", idx);
   const end = html.indexOf(">", start);
   return html.slice(start, end);

@@ -38,14 +38,15 @@ const here = dirname(fileURLToPath(import.meta.url));
 // renderItem — they never render the FlatList itself.
 const reactNativeStubUrl =
   "data:text/javascript,export%20function%20FlatList()%7Breturn%20null%3B%7D%0Aexport%20function%20View()%7Breturn%20null%3B%7D%0A";
+// eslint-disable-next-line @typescript-eslint/no-deprecated -- node:module register() loads external/data-URL loader hooks before test imports; registerHooks() cannot register hook modules by URL
 register(
-  "data:text/javascript," +
+  `data:text/javascript,${ 
     encodeURIComponent(
       `export async function resolve(specifier, context, nextResolve) {\n` +
         `  if (specifier === "react-native") return { shortCircuit: true, url: ${JSON.stringify(reactNativeStubUrl)} };\n` +
         `  return nextResolve(specifier, context);\n` +
         `}`,
-    ),
+    )}`,
 );
 
 async function loadPage() {
@@ -207,9 +208,9 @@ test("the rendered tree has no loading state or render-slot content", async () =
   const tree = MyVersesPage(baseProps());
   const types: string[] = [];
   const walk = (node: any): void => {
-    if (node == null || typeof node !== "object") return;
+    if ((node === null || node === undefined) || typeof node !== "object") return;
     if (Array.isArray(node)) {
-      node.forEach(walk);
+      for (const child of node) walk(child);
       return;
     }
     if (typeof node.type === "function") types.push(node.type.name);

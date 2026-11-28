@@ -51,7 +51,7 @@ function screenChildren(tree: any): any[] {
 
 function textOf(element: any): string {
   const children = element.props.children;
-  return (Array.isArray(children) ? children : [children]).map((c) => String(c)).join("");
+  return (Array.isArray(children) ? children : [children]).map(String).join("");
 }
 
 const WORDS = [
@@ -209,12 +209,12 @@ test("the rendered tree has no demo inventions, loading state, or text entry", a
   const types: string[] = [];
   const labels: string[] = [];
   const walk = (node: any): void => {
-    if (node == null || typeof node !== "object") {
+    if ((node === null || node === undefined) || typeof node !== "object") {
       if (typeof node === "string") labels.push(node);
       return;
     }
     if (Array.isArray(node)) {
-      node.forEach(walk);
+      for (const child of node) walk(child);
       return;
     }
     if (typeof node.type === "function") types.push(node.type.name);

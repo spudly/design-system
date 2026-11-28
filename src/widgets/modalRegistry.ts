@@ -107,7 +107,7 @@ export function registerModalLayer(token: symbol, parentToken: symbol | null): M
 
 export function unregisterModalLayer(layer: ModalLayer): void {
   const index = modalLayers.indexOf(layer);
-  if (index >= 0) {
+  if (index !== -1) {
     modalLayers.splice(index, 1);
   }
 }
@@ -161,8 +161,9 @@ export function isAboveModalLayer(a: ModalLayer, b: ModalLayer): boolean {
   const pathB = presentationPath(b);
   const shared = Math.min(pathA.length, pathB.length);
   for (let i = 0; i < shared; i++) {
-    const stampA = pathA[i]!;
-    const stampB = pathB[i]!;
+    const stampA = pathA[i];
+    const stampB = pathB[i];
+    if (stampA === undefined || stampB === undefined) break;
     if (stampA !== stampB) {
       return stampA > stampB;
     }

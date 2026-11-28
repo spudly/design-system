@@ -42,6 +42,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 test("the views ship in the built surface; the list stays internal, the row is public (#671)", async () => {
   const distRuntime = await loadInternalDist();
   assert.equal(typeof distRuntime.RecipeInstructionListView, "function");
@@ -78,6 +79,7 @@ const rows = [
 async function renderList(props: Record<string, unknown>): Promise<string> {
   const { createElement: h } = await import("react");
   const { renderToString } = await import("react-dom/server");
+  // eslint-disable-next-line design-system/no-page-styling -- test harness imports TamaguiProvider directly to render the view under test; tests ship no page code
   const { TamaguiProvider }: Record<string, any> = await import("tamagui");
   const distRuntime = await loadInternalDist();
   const { createTamaguiConfig, baseTheme, RecipeInstructionListView } = distRuntime;

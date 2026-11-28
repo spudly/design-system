@@ -6,6 +6,7 @@ import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../../..");
 function codeOf(rel: string) {
@@ -146,7 +147,6 @@ function loadRuntime() {
 }
 async function renderToHtml(element: any) {
   const {
-    React,
     renderToString,
     TamaguiProvider,
     createTamaguiConfig,
@@ -563,7 +563,6 @@ describe("autocompletePickerReview", () => {
   }
   async function renderToHtml(element: any) {
     const {
-      React,
       renderToString,
       TamaguiProvider,
       createTamaguiConfig,

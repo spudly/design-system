@@ -47,12 +47,12 @@ test("on web the column is full-width, capped, and centered", () => {
 });
 
 test("the column owns no padding (#628: no new padding token)", () => {
-  assert.ok(!/padding/.test(column), "PageContentColumn must not set any padding");
+  assert.ok(!column.includes('padding'), "PageContentColumn must not set any padding");
 });
 
 test("on native the column is a plain full-width pass-through stack", () => {
   const nativeBranch = column.indexOf("if (!isWeb)");
-  assert.ok(nativeBranch >= 0, "PageContentColumn handles native explicitly");
+  assert.ok(nativeBranch !== -1, "PageContentColumn handles native explicitly");
   const nativeBlock = column.slice(nativeBranch, column.indexOf("return (", nativeBranch));
   assert.match(nativeBlock, /<Col width="100%">\{children\}<\/Col>/);
   assert.ok(!nativeBlock.includes("maxWidth"), "the native stack carries no maxWidth");
@@ -74,7 +74,7 @@ test("FullBleed breaks out with calc(50% - 50vw) margins on web", () => {
 
 test("FullBleed is a pass-through on native", () => {
   const fullBleedAt = column.indexOf("export function FullBleed");
-  assert.ok(fullBleedAt >= 0, "FullBleed is defined");
+  assert.ok(fullBleedAt !== -1, "FullBleed is defined");
   const fullBleedBlock = column.slice(fullBleedAt);
   assert.match(fullBleedBlock, /if \(!isWeb\) \{\s*return <Col>\{children\}<\/Col>;/);
 });

@@ -20,6 +20,7 @@ import { createStoryLinkOpenURL } from "./storyLinks";
 let captureFullPageNative:
   typeof import("./modules/dsvr-capture/src/index").captureFullPage | null = null;
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- defensive load of an optionally-linked native module: require() in try/catch is the mechanism; a static import would crash JS-only runtimes.
   captureFullPageNative = require("./modules/dsvr-capture/src/index").captureFullPage;
 } catch {
   captureFullPageNative = null;
@@ -111,6 +112,7 @@ function logStoryLink(url: string) {
   const path = parsed.queryParams?.path;
   const isBrowse = parsed.hostname === "browse" || parsed.path === "browse";
   if (isBrowse && typeof path === "string") {
+    // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
     console.log(`DS LINK ${path}`);
   }
 }
@@ -149,11 +151,14 @@ function useStoryIndexLog() {
       const stories = Object.values(entries).filter((e) => e.type === "story");
       if (stories.length === 0) return;
       logged = true;
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       console.log(`DSVR INDEX_BEGIN ${stories.length}`);
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       for (const story of stories) console.log(`DSVR INDEX_ITEM ${story.id}`);
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       console.log("DSVR INDEX_END");
     }, 500);
-    return () => clearInterval(timer);
+    return () => { clearInterval(timer); };
   }, []);
 }
 
@@ -210,10 +215,11 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
     const fire = () => {
       if (fired) return;
       fired = true;
+      // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
       console.log(`DSVR READY ${nonce} ${storyId}`);
     };
     const handler = (payload?: { storyId?: string }) => {
-      if (!payload || payload.storyId === undefined || payload.storyId === storyId) {
+      if (payload?.storyId === undefined || payload.storyId === storyId) {
         // Let the rendered frame actually paint before signalling.
         setTimeout(fire, 250);
       }
@@ -247,12 +253,14 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
         }
         const r = await captureFullPageNative(`dsvr-appcap-${nonce}.png`);
         if (!cancelled) {
+          // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
           console.log(
             `DSVR APPCAP ${nonce} ${storyId} path=${r.path} ipath=${r.internalPath} w=${r.width} h=${r.height} content=${r.contentHeight} viewport=${r.viewportHeight} root=${r.rootHeight} mode=${r.mode} scrolls=${r.scrollViews} chain=${r.chainDepth} ms=${r.drawMs} settle=${r.settleDraws}`,
           );
         }
       } catch (error) {
         if (!cancelled) {
+          // eslint-disable-next-line no-console -- VR capture harness signals over the console — the capture driver reads this channel
           console.log(
             `DSVR APPCAP_ERROR ${nonce} ${storyId} ${error instanceof Error ? error.message : String(error)}`,
           );
@@ -260,12 +268,12 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
       }
     };
     const handler = (payload?: { storyId?: string }) => {
-      if (!payload || payload.storyId === undefined || payload.storyId === storyId) {
-        setTimeout(run, 650);
+      if (payload?.storyId === undefined || payload.storyId === storyId) {
+        setTimeout(() => { void run(); }, 650);
       }
     };
     view._channel.on(STORY_RENDERED, handler);
-    const fallback = setTimeout(run, 6000);
+    const fallback = setTimeout(() => { void run(); }, 6000);
     return () => {
       cancelled = true;
       view._channel.off(STORY_RENDERED, handler);
@@ -286,6 +294,9 @@ export default function App() {
   // per weight: a single variable registration left the medium
   // weight to Android's numeric resolution, which rendered it
   // nondeterministically (#326).
+  // Expo useFonts asset registration: Metro requires static require()
+  // calls for font assets — there is no import form for .ttf modules.
+  /* eslint-disable @typescript-eslint/no-require-imports -- Expo useFonts asset registration: Metro requires static require() calls for font assets; there is no import form for .ttf modules. */
   const [fontsLoaded, fontError] = useFonts({
     UiSans: require("./assets/fonts/UiSans.ttf"),
     "UiSans-Medium": require("./assets/fonts/UiSans-Medium.ttf"),
@@ -293,6 +304,7 @@ export default function App() {
     "UiSans-Bold": require("./assets/fonts/UiSans-Bold.ttf"),
     Alegreya: require("./assets/fonts/Alegreya.ttf"),
   });
+  /* eslint-enable @typescript-eslint/no-require-imports -- end of the useFonts asset-require block above. */
   const capture = useCaptureTarget();
   useStoryIndexLog();
 
@@ -301,14 +313,13 @@ export default function App() {
     LogBox.ignoreAllLogs(capture !== null);
   }, [capture]);
 
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean readiness: fontsLoaded=false must fall through to the fontError check; ?? would keep false.
   const ready = fontsLoaded || fontError != null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        {!ready ? (
-          <View style={{ flex: 1 }} />
-        ) : capture ? (
+        {ready ? capture ? (
           <CaptureRoot
             storyId={capture.storyId}
             theme={capture.theme ?? ""}
@@ -317,6 +328,8 @@ export default function App() {
           />
         ) : (
           <StorybookUIRoot />
+        ) : (
+          <View style={{ flex: 1 }} />
         )}
       </SafeAreaProvider>
     </GestureHandlerRootView>

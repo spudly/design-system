@@ -205,16 +205,16 @@ export function FeedbackPreferenceView({
             </Col>
           ) : hasConsent ? (
             <Row middle wrap gap="s">
-              {consent !== true ? (
+              {consent === true ? null : (
                 <Button ghost size="sm" onPress={onAcceptConsent}>
                   {acceptLongLabel}
                 </Button>
-              ) : null}
-              {consent !== false ? (
+              )}
+              {consent === false ? null : (
                 <Button ghost size="sm" onPress={onDeclineConsent}>
                   {declineLongLabel}
                 </Button>
-              ) : null}
+              )}
               {consent !== null && onWithdrawConsent ? (
                 <Button ghost size="sm" onPress={onWithdrawConsent}>
                   {withdrawLabel}

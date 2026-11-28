@@ -23,6 +23,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 function codeOf(rel: string) {
   const source = readFileSync(join(here, "../../..", rel), "utf8");
@@ -115,7 +116,7 @@ function loadRuntime() {
   return runtimePromise;
 }
 async function renderToHtml(element: any) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
+  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(

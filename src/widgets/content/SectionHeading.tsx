@@ -71,7 +71,7 @@ export function SectionHeading({ children, icon }: SectionHeadingProps) {
   // resolve: the primary ink is read from the active theme as a
   // concrete value (the BackLink glyph-ink pattern), falling
   // back to the base theme's primary step.
-  const primaryVariable = theme["primary"];
+  const primaryVariable = theme.primary;
   const glyphInk =
     typeof primaryVariable?.val === "string" ? primaryVariable.val : tokens.colors.primary.primary8;
   return (

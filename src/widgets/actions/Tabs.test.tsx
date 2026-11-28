@@ -6,6 +6,7 @@ import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 describe("tabsAriaControls", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const root = join(here, "../../..");
@@ -54,6 +55,7 @@ describe("tabsAriaControls", () => {
   }
   function assertNoDanglingAriaControls(html: string) {
     const ids = new Set([...html.matchAll(/ id="([^"]+)"/g)].map((match) => match[1]));
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the matchAll pattern
     const controls = [...html.matchAll(/ aria-controls="([^"]+)"/g)].map((match) => match[1]!);
     for (const target of controls) {
       assert.ok(ids.has(target), `aria-controls="${target}" resolves to a rendered element`);
@@ -120,8 +122,9 @@ describe("tabsIcon", () => {
   }
   const tabs = codeOf("src/widgets/actions/Tabs.tsx");
   function typeBlock(source: string, name: string): string {
-    const match = new RegExp(`type ${name} = \\{([\\s\\S]*?)\\n\\};`).exec(source);
+    const match = new RegExp(String.raw`type ${name} = \{([\s\S]*?)\n\};`).exec(source);
     assert.ok(match, `${name} type block found`);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the regex
     return match[1]!;
   }
   test("the button-variant item carries an icon name; the link item does not", () => {

@@ -19,16 +19,20 @@ type Story = StoryObj<typeof SecretRevealPanel>;
 export const Default: Story = {
   args: {
     secret: "ecp_9f2b7d4a1c8e5f6a3b9d2e7f1a4c8b",
-    onCopy: (s) => console.log("copied", s),
-    onDismiss: () => console.log("dismissed"),
+    // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+    onCopy: (s) => { console.log("copied", s); },
+    // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+    onDismiss: () => { console.log("dismissed"); },
   },
 };
 
 export const Loading: Story = {
   args: {
     secret: "storybook-fixture-value",
-    onCopy: (s) => console.log("copied", s),
-    onDismiss: () => console.log("dismissed"),
+    // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+    onCopy: (s) => { console.log("copied", s); },
+    // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+    onDismiss: () => { console.log("dismissed"); },
     loading: true,
   },
 };
@@ -39,8 +43,10 @@ export const LoadingOverlay: Story = {
     <YStack position="relative">
       <SecretRevealPanel
         secret="storybook-fixture-value"
-        onCopy={(s) => console.log("copied", s)}
-        onDismiss={() => console.log("dismissed")}
+        // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+        onCopy={(s) => { console.log("copied", s); }}
+        // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+        onDismiss={() => { console.log("dismissed"); }}
       />
       <YStack
         position="absolute"
@@ -53,8 +59,10 @@ export const LoadingOverlay: Story = {
       >
         <SecretRevealPanel
           secret="storybook-fixture-value"
-          onCopy={(s) => console.log("copied", s)}
-          onDismiss={() => console.log("dismissed")}
+          // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+          onCopy={(s) => { console.log("copied", s); }}
+          // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+          onDismiss={() => { console.log("dismissed"); }}
           loading
         />
       </YStack>
@@ -66,6 +74,7 @@ export const WithoutDismiss: Story = {
   args: {
     secret: "ecp_9f2b7d4a1c8e5f6a3b9d2e7f1a4c8b",
     title: "Personal access token",
-    onCopy: (s) => console.log("copied", s),
+    // eslint-disable-next-line no-console -- story action callback — the console is the Storybook demo output
+    onCopy: (s) => { console.log("copied", s); },
   },
 };

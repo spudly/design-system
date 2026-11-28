@@ -95,7 +95,7 @@ export function SecretRevealPanel({
             </Col>
           </SecretBox>
           <Row gap="s">
-            <Button variant="primary" size="sm" onPress={() => onCopy(secret)}>
+            <Button variant="primary" size="sm" onPress={() => { onCopy(secret); }}>
               {resolvedCopyLabel}
             </Button>
             {onDismiss ? (
@@ -126,7 +126,7 @@ export function SecretRevealPanel({
         </Text>
       </SecretBox>
       <Row gap="s">
-        <Button variant="primary" size="sm" onPress={() => onCopy(secret)}>
+        <Button variant="primary" size="sm" onPress={() => { onCopy(secret); }}>
           {resolvedCopyLabel}
         </Button>
         {onDismiss ? (

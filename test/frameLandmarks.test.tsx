@@ -54,6 +54,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "./internalDist.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")
@@ -198,6 +199,7 @@ function mainContentRange(html: string) {
   assert.ok(roleAt !== -1, "a main landmark renders");
   const openStart = html.lastIndexOf("<", roleAt);
   const openEnd = html.indexOf(">", roleAt);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the tag regex
   const tagName = /^<([a-zA-Z][\w-]*)/.exec(html.slice(openStart, openEnd))![1];
   const tagPattern = new RegExp(String.raw`</?${tagName}(?=[\s>])[^>]*>`, "g");
   tagPattern.lastIndex = openStart;

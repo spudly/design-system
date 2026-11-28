@@ -127,7 +127,7 @@ const ECIPERAY_CARD_E_PATH =
 /** The card's five binder holes (#861): paper circles down
  * the card's left edge, evenly spaced, measured from the
  * concept (centre x 55.6, radius 5.4). */
-const ECIPERAY_CARD_HOLE_CYS = [127.1, 146.0, 165.0, 184.0, 202.9];
+const ECIPERAY_CARD_HOLE_CYS = [127.1, 146, 165, 184, 202.9];
 
 /** The Memorize mark's Quiet Dawn colors — brand artwork, never theme-derived. */
 const MEMORIZE_MARK_BOOK = "#0f766e";
@@ -250,9 +250,10 @@ export type BrandMarkProps = {
  */
 export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
   switch (mark) {
-    case "eciperay":
+    case "eciperay": {
       return (
         <Svg width={size} height={size} viewBox="0 0 256 256" aria-hidden={true}>
+          {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry */}
           <Rect x={20} y={20} width={216} height={216} rx={48} fill={ECIPERAY_MARK_PAPER} />
           {/* The terracotta ray fan and sun disc, rising behind
               the recipe card — the card covers the disc's
@@ -260,6 +261,7 @@ export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
           <Path d={ECIPERAY_RAYS_PATH} fill={ECIPERAY_MARK_SUN} />
           <Circle cx={128.1} cy={114.8} r={50.6} fill={ECIPERAY_MARK_SUN} />
           {/* The sage recipe card. */}
+          {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry */}
           <Rect x={40.1} y={110.2} width={175.9} height={109.8} rx={11.2} fill={ECIPERAY_MARK_CARD} />
           {/* The card's paper binder holes and its cream E. */}
           {ECIPERAY_CARD_HOLE_CYS.map((cy) => (
@@ -268,7 +270,8 @@ export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
           <Path d={ECIPERAY_CARD_E_PATH} fill={ECIPERAY_MARK_PAPER} />
         </Svg>
       );
-    case "memorize":
+    }
+    case "memorize": {
       return (
         <Svg width={size} height={size} viewBox="0 0 256 256" aria-hidden={true}>
           {/* The golden ray fan and the central flame on its stem,
@@ -289,5 +292,6 @@ export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
           <Path d={MEMORIZE_PAGES_PATH} fill={MEMORIZE_MARK_BOOK} />
         </Svg>
       );
+    }
   }
 }

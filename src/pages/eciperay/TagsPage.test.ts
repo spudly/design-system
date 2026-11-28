@@ -25,9 +25,7 @@ describe("tagsPageCreateForm", () => {
     );
     assert.notEqual(createFormEnd, -1, "TagsPage must keep its loading branch boundary");
     const createForm = tagsPage.slice(0, createFormEnd);
-    const createRow = createForm.match(
-      /<TrailingActionsRow\s+leading=\{\s*<ColorPickerField[\s\S]*?<\/TrailingActionsRow>/,
-    );
+    const createRow = /<TrailingActionsRow\s+leading=\{\s*<ColorPickerField[\s\S]*?<\/TrailingActionsRow>/.exec(createForm);
     assert.ok(
       createRow,
       "TagsPage's create form must compose its ColorPickerField as the row's leading group (#219, #119)",

@@ -107,26 +107,30 @@ export type LegalDocumentLink = {
 
 function renderSpan(span: LegalDocumentSpan, key: number): ReactNode {
   switch (span.type) {
-    case "text":
+    case "text": {
       return span.text;
-    case "strong":
+    }
+    case "strong": {
       return (
         <Text key={key} fontWeight={tokens.typography.fontWeight.bold}>
           {span.text}
         </Text>
       );
-    case "code":
+    }
+    case "code": {
       return (
         <Text key={key} fontFamily={tokens.typography.fontFamily.mono}>
           {span.text}
         </Text>
       );
-    case "link":
+    }
+    case "link": {
       return (
         <TextLink key={key} href={span.href}>
           {span.label}
         </TextLink>
       );
+    }
   }
 }
 

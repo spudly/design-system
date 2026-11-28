@@ -809,11 +809,11 @@ describe("recipesPageUnified", () => {
     assert.match(code, /return `own-recipe-\$\{row\.item\.id\}`;/);
     assert.match(code, /return `discovery-recipe-\$\{row\.item\.id\}`;/);
     assert.ok(
-      !code.includes("return `own-${row.item.id}`;"),
+      !code.includes(`return \`own-\${row.item.id}\`;`),
       "bare own- recipe keys collide with own-heading/own-loading/own-error/own-empty",
     );
     assert.ok(
-      !code.includes("return `discovery-${row.item.id}`;"),
+      !code.includes(`return \`discovery-\${row.item.id}\`;`),
       "bare discovery- recipe keys collide with the discovery heading/state keys",
     );
   });

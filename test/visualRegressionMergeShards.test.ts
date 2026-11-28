@@ -38,7 +38,7 @@ function syntheticShards(specs: ShardSpec[]) {
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, bytes);
   };
-  specs.forEach((spec, i) => {
+  for (const [i, spec] of specs.entries()) {
     const dir = join(shardsDir, `dsvr-shard-${i}`);
     for (const [setName, files] of [
       ["dsvr-out", spec.standard ?? []],
@@ -61,7 +61,7 @@ function syntheticShards(specs: ShardSpec[]) {
       join(dir, "dsvr-shard-result.json"),
       JSON.stringify({ verdict: spec.verdict, missing: spec.missing ?? 0, diffs: spec.diffs ?? 0 }),
     );
-  });
+  }
   return {
     shardsDir,
     outDir: join(root, "out"),

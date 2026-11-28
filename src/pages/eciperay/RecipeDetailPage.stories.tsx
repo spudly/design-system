@@ -3,7 +3,6 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 
-import { Text } from "../../widgets/data/Text.js";
 import { tagColorNameForHex } from "../../themes/tagColors.js";
 import { recipeDetailFixture, eciperayFooterFixture } from "../shared/fixtures.js";
 import {

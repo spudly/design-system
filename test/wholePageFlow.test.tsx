@@ -10,13 +10,14 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { verticalScrollers } from "./wholePageFlow.js";
+
 test("verticalScrollers detects an inline-style scroller", () => {
   const html = `<div style="overflow-y: auto"><p>content</p></div>`;
   assert.equal(verticalScrollers(html).length, 1);
 });
 test("verticalScrollers detects a class-based scroller (negative control)", () => {
   const html =
-    `<style>.bounded { overflow-y: scroll; }</style>` + `<div class="bounded"><p>content</p></div>`;
+    `<style>.bounded { overflow-y: scroll; }</style><div class="bounded"><p>content</p></div>`;
   assert.equal(verticalScrollers(html).length, 1);
 });
 test("verticalScrollers reads the overflow shorthand's vertical value", () => {

@@ -64,12 +64,14 @@ const listStyle = { flex: 1 } as const;
 const separatorStyle = { height: tokens.spacing[2] } as const;
 
 function BoundedListSeparator() {
+  // eslint-disable-next-line design-system/no-page-styling -- FlatList separator views take layout only through the RN style prop; the value is a static token-derived constant defined beside the component
   return <View style={separatorStyle} />;
 }
 
 const separatorMdStyle = { height: tokens.spacing[3] } as const;
 
 function BoundedListSeparatorMd() {
+  // eslint-disable-next-line design-system/no-page-styling -- FlatList separator views take layout only through the RN style prop; the value is a static token-derived constant defined beside the component
   return <View style={separatorMdStyle} />;
 }
 
@@ -151,21 +153,22 @@ export function BoundedList<Item>({
 }: BoundedListProps<Item>) {
   return (
     <FlatList
+      // eslint-disable-next-line design-system/no-page-styling -- FlatList takes layout only through the RN style prop; the value is a static token-derived constant defined beside the component
       style={listStyle}
       data={data}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       ItemSeparatorComponent={separator === "none" ? undefined : separators[separator]}
       {...(contentInset === "page" ? { contentContainerStyle: pageContentStyle } : null)}
-      {...(ListHeaderComponent !== undefined ? { ListHeaderComponent } : null)}
-      {...(ListEmptyComponent !== undefined ? { ListEmptyComponent } : null)}
-      {...(ListFooterComponent !== undefined ? { ListFooterComponent } : null)}
-      {...(onEndReached !== undefined ? { onEndReached } : null)}
-      {...(onEndReachedThreshold !== undefined ? { onEndReachedThreshold } : null)}
-      {...(onScroll !== undefined ? { onScroll } : null)}
-      {...(onLayout !== undefined ? { onLayout } : null)}
-      {...(onContentSizeChange !== undefined ? { onContentSizeChange } : null)}
-      {...(keyboardShouldPersistTaps !== undefined ? { keyboardShouldPersistTaps } : null)}
+      {...(ListHeaderComponent === undefined ? null : { ListHeaderComponent })}
+      {...(ListEmptyComponent === undefined ? null : { ListEmptyComponent })}
+      {...(ListFooterComponent === undefined ? null : { ListFooterComponent })}
+      {...(onEndReached === undefined ? null : { onEndReached })}
+      {...(onEndReachedThreshold === undefined ? null : { onEndReachedThreshold })}
+      {...(onScroll === undefined ? null : { onScroll })}
+      {...(onLayout === undefined ? null : { onLayout })}
+      {...(onContentSizeChange === undefined ? null : { onContentSizeChange })}
+      {...(keyboardShouldPersistTaps === undefined ? null : { keyboardShouldPersistTaps })}
     />
   );
 }

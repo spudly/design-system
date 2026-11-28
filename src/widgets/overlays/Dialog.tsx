@@ -174,8 +174,9 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       const frame =
         content && typeof content.closest === "function" ? content.closest("dialog") : null;
       const insideOwnDialog = Boolean(
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean containment disjunction; ?? does not apply to booleans.
         (content && typeof content.contains === "function" && content.contains(activeElement)) ||
-        (frame && frame.contains(activeElement)),
+        (frame?.contains(activeElement)),
       );
       if (!insideOwnDialog) {
         // Retain the yielded-to control as the restore target: it
@@ -444,7 +445,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         layerRef.current = null;
       }
     };
-  }, [open, parentLayerToken]);
+  }, [open, layerToken, parentLayerToken]);
 
   // Focus containment for a dialog with nothing tabbable (#391):
   // the primitive's focus scope traps Tab between the dialog's
@@ -522,6 +523,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         return;
       }
       const content = contentRef.current as unknown as HTMLElement | null;
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- HTMLElement.querySelectorAll is the standard focusable-element query for focus containment; no replacement API exists
       if (!content || typeof content.querySelectorAll !== "function") {
         return;
       }
@@ -573,7 +575,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         focusedElement &&
         focusedElement !== document.body &&
         !content.contains(focusedElement) &&
-        !(frame && frame.contains(focusedElement)) &&
+        !(frame?.contains(focusedElement)) &&
         typeof focusedElement.closest === "function"
       ) {
         const foreignModal = focusedElement.closest('[role="dialog"][aria-modal="true"]');
@@ -589,7 +591,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
       if (frame) {
         const dsFrames = registeredModalFrames();
-        const covered = Array.from(document.querySelectorAll("dialog")).some((other) => {
+        const covered = [...document.querySelectorAll("dialog")].some((other) => {
           if (other === frame || frame.contains(other) || dsFrames.has(other)) {
             return false;
           }
@@ -626,7 +628,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       const candidates = content.querySelectorAll(
         'a[href], area[href], button, input, select, textarea, details, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
       );
-      const hasTabbable = Array.from(candidates).some((candidate) => {
+      const hasTabbable = [...candidates].some((candidate) => {
         // :disabled only — the disabled ATTRIBUTE has no effect
         // on elements that are not disableable (an <a href
         // disabled> or a <div tabindex="0" disabled> is still a
@@ -666,7 +668,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           // summary is the stop (counted on its own candidate
           // pass) and the details element is not (Copilot review
           // on PR #392, head fbf5aea).
-          const hasOwnSummary = Array.from(candidate.children).some(
+          const hasOwnSummary = [...candidate.children].some(
             (child) => child.tagName === "SUMMARY",
           );
           // An explicitly editable details is itself an editing
@@ -701,7 +703,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
             if (!(parent instanceof HTMLDetailsElement)) {
               return false;
             }
-            const firstSummary = Array.from(parent.children).find(
+            const firstSummary = [...parent.children].find(
               (child) => child.tagName === "SUMMARY",
             );
             if (firstSummary !== candidate) {
@@ -714,7 +716,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           if (!mapName) {
             return false;
           }
-          return Array.from(content.querySelectorAll("img[usemap]")).some((image) => {
+          return [...content.querySelectorAll("img[usemap]")].some((image) => {
             if (image.getAttribute("usemap") !== `#${mapName}`) {
               return false;
             }
@@ -752,11 +754,11 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       const activeElement = document.activeElement as HTMLElement | null;
       const inside = Boolean(
         activeElement &&
-        (content.contains(activeElement) || (frame && frame.contains(activeElement))),
+        (content.contains(activeElement) || (frame?.contains(activeElement))),
       );
       if (!inside) {
         const wrapper = frame
-          ? (frame.querySelector('[tabindex="-1"]') as HTMLElement | null)
+          ? frame.querySelector<HTMLElement>('[tabindex="-1"]')
           : null;
         const landing = wrapper ?? content;
         if (typeof landing.focus === "function") {

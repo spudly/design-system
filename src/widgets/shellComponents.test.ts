@@ -61,7 +61,7 @@ test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () 
   ]) {
     assert.match(
       toolbar,
-      new RegExp(String.raw`"${owned}"`),
+      new RegExp(`"${owned}"`),
       `ToolbarProps must omit the bar-owned ${owned}`,
     );
   }

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/filename-case -- the directory name "dsvr-capture" is the Expo module's registered name (its package.json name and native module lookup); renaming the directory would break native module resolution. */
 import { requireNativeModule } from "expo-modules-core";
 
 /** Geometry of one app-side full-content capture, as measured and
@@ -6,7 +7,7 @@ import { requireNativeModule } from "expo-modules-core";
  * (height - (rootHeight - viewportHeight)) must equal
  * contentHeight — the content region of the frame is exactly the
  * measured content, nothing clipped, nothing invented. */
-export interface FullPageCaptureResult {
+export type FullPageCaptureResult = {
   /** App-specific external files path (adb-readable), "" if none. */
   path: string;
   /** Internal files path (needs a rooted shell to read). */
@@ -43,7 +44,7 @@ export interface FullPageCaptureResult {
   drawMs: number;
 }
 
-interface DsvrCaptureNativeModule {
+type DsvrCaptureNativeModule = {
   captureFullPage(fileName: string): Promise<FullPageCaptureResult>;
 }
 

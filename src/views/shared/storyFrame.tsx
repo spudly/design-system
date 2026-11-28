@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+// eslint-disable-next-line design-system/no-page-styling -- story-only frame harness, not a shipped page; sizes story canvases with tamagui View directly
 import { View } from "tamagui";
 
 import { tokens } from "../../tokens/index.js";

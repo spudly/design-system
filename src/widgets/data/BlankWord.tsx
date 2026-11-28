@@ -84,8 +84,8 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
       display={{ web: "inline-flex" }}
       alignSelf="flex-start"
       onPress={onReveal}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      onFocus={() => { setFocused(true); }}
+      onBlur={() => { setFocused(false); }}
       // No fill and no chrome: the blank line below is the affordance.
       // The ghost treatment already gives the transparent fill
       // (#480: Button no longer accepts a backgroundColor prop).

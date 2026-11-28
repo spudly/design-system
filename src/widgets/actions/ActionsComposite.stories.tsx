@@ -58,6 +58,7 @@ const LINK_TABS = [
  * pinned bottom action bar — every actions widget in situ. */
 export const ScreenChrome: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [tab, setTab] = useState("overview");
     return (
       <View

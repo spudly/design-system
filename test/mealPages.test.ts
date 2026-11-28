@@ -158,11 +158,11 @@ test("MealFormPage servings-to-eat controls render alongside servings-to-cook (#
     assert.ok(page.includes(prop), `MealFormPage must take ${prop}`);
   }
   assert.ok(
-    page.includes("label={`Servings to cook · ${recipe.label}`}"),
+    page.includes(`label={\`Servings to cook · \${recipe.label}\`}`),
     "the existing stepper is renamed to the #363 servings-to-cook label",
   );
   assert.ok(
-    page.includes("label={`Servings to eat · ${recipe.label}`}"),
+    page.includes(`label={\`Servings to eat · \${recipe.label}\`}`),
     "a second stepper carries the #363 servings-to-eat label",
   );
   assert.ok(
@@ -189,11 +189,11 @@ test("MealPlanFormPage servings-to-eat controls render alongside servings-to-coo
     assert.ok(page.includes(prop), `MealPlanFormPage must take ${prop}`);
   }
   assert.ok(
-    page.includes("label={`Servings to cook · ${option.title}`}"),
+    page.includes(`label={\`Servings to cook · \${option.title}\`}`),
     "the existing stepper is renamed to the #363 servings-to-cook label",
   );
   assert.ok(
-    page.includes("label={`Servings to eat · ${option.title}`}"),
+    page.includes(`label={\`Servings to eat · \${option.title}\`}`),
     "a second stepper carries the #363 servings-to-eat label",
   );
   assert.ok(
@@ -218,7 +218,7 @@ test("MealFormPage ingredient servings-to-eat round-trips blank and divergent va
   const page = pageSource("MealFormPage");
   assert.ok(page.includes("servingsToEat: string"), "the ingredient type carries servingsToEat");
   assert.ok(
-    page.includes("label={`${entryLabel} — Servings to eat`}"),
+    page.includes(`label={\`\${entryLabel} — Servings to eat\`}`),
     "each entry renders a servings-to-eat field beside its servings field",
   );
   assert.ok(
@@ -412,7 +412,7 @@ test("MealFormPage direct ingredients are controlled entries with an opt-in sect
     "the editable section renders only when both its add and edit handlers are present",
   );
   assert.ok(
-    page.includes("accessibilityLabel={`Remove ${entryLabel}`}"),
+    page.includes(`accessibilityLabel={\`Remove \${entryLabel}\`}`),
     "each entry's remove control carries an accessible name",
   );
   assert.ok(

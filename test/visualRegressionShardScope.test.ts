@@ -76,7 +76,7 @@ test("splitScope shards are disjoint and union exactly to the input scope", () =
 
 test("splitScope balances shards to within one capture (round-robin)", () => {
   const sizes = [0, 1, 2, 3].map((i) => splitScope(decision(37, 0), i, 4).standard.length);
-  assert.ok(Math.max(...sizes) - Math.min(...sizes) <= 1, `unbalanced shards: ${sizes}`);
+  assert.ok(Math.max(...sizes) - Math.min(...sizes) <= 1, `unbalanced shards: ${sizes.join(', ')}`);
   // Round-robin spreads a sorted family across shards instead of
   // handing shard 0 the whole first chunk.
   assert.deepEqual(splitScope(decision(8, 0), 0, 4).standard, ["story-000", "story-004"]);
@@ -107,5 +107,5 @@ test("splitScope rejects invalid shard coordinates and malformed decisions", () 
   assert.throws(() => splitScope(d, 0, 0));
   assert.throws(() => splitScope(d, 4, 4));
   assert.throws(() => splitScope(d, -1, 4));
-  assert.throws(() => splitScope({ mode: "full", reasons: [] } as never, 0, 2));
+  assert.throws(() => splitScope({ mode: "full", reasons: [] }, 0, 2));
 });

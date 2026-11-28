@@ -3,7 +3,6 @@ import type { ReactElement, ReactNode } from "react";
 
 import { Row } from "../layout/Row.js";
 import type { RowProps } from "../layout/Row.js";
-import { tokens } from "../../tokens/index.js";
 
 export type ButtonRowProps = Omit<RowProps, "gap" | "top" | "wrap"> & {
   /**
@@ -106,7 +105,7 @@ export function ButtonRow({ children, equal = false, ...rest }: ButtonRowProps) 
   // so collect the explicit keys first and skip any that collide.
   const explicitKeys = new Set(
     items.flatMap((item) =>
-      isValidElement(item) && (item as ReactElement).key != null
+      isValidElement(item) && (item as ReactElement).key !== null && (item as ReactElement).key !== undefined
         ? [String((item as ReactElement).key)]
         : [],
     ),

@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
-import { tokens } from "../../tokens/index.js";
 
 import { Text } from "./Text.js";
 

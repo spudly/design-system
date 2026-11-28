@@ -351,9 +351,9 @@ test("SearchField glyph is capped in its own fixed box; the row keeps minHeight"
   // #746: the glyph box is a function component rendering Row —
   // its fixed height and clipping are pinned on the Row props.
   const glyphBox = stripped.slice(stripped.indexOf("function GlyphBox"));
-  assert.ok(/height=\{44\}/.test(glyphBox), "GlyphBox must render its Row at height 44");
+  assert.ok(glyphBox.includes('height={44}'), "GlyphBox must render its Row at height 44");
   assert.ok(
-    /overflow="hidden"/.test(glyphBox),
+    glyphBox.includes('overflow="hidden"'),
     'GlyphBox must render overflow "hidden" so an exploding glyph clips inside its own box',
   );
   const row = styledBlock(stripped, "SearchField");
@@ -381,12 +381,12 @@ test("SearchField search icon is drawn shapes, not a text glyph, so it centers b
   // rendering a fixed 24px box. If someone swaps it back to a font
   // glyph, this fails loudly rather than passing vacuously.
   assert.ok(
-    /function SearchGlyph\(\)/.test(stripped),
+    stripped.includes('function SearchGlyph()'),
     "SearchField must define the SearchGlyph drawn-icon component (design-system#45)",
   );
   const glyphFn = stripped.slice(stripped.indexOf("function SearchGlyph()"));
   assert.ok(
-    /width=\{24\}/.test(glyphFn) && /height=\{24\}/.test(glyphFn),
+    glyphFn.includes('width={24}') && glyphFn.includes('height={24}'),
     "SearchGlyph's box must be fixed at 24x24 so StyledGlyphBox's flex centering centers the icon itself (design-system#45)",
   );
 });
@@ -401,7 +401,7 @@ test("CheckboxField box clips its glyph with hidden overflow", () => {
   const stripped = stripComments(file.text);
   const block = stripped.slice(stripped.indexOf("function CheckboxBox"));
   assert.ok(
-    /overflow="hidden"/.test(block),
+    block.includes('overflow="hidden"'),
     'CheckboxBox must render overflow "hidden" so its glyph cannot paint or measure outside the 24px box',
   );
 });

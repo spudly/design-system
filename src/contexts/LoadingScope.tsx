@@ -36,5 +36,6 @@ export function LoadingScope({ active = false, children }: LoadingScopeProps) {
  */
 export function useLoadingScope(loadingProp?: boolean): boolean {
   const scopedLoading = useContext(LoadingScopeContext);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean scope: an explicit false prop must fall through to the context value; ?? would keep false.
   return loadingProp || scopedLoading;
 }

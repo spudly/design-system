@@ -147,7 +147,20 @@ export function CardRow({
   const textContent = <RowTextContent title={title} subtitle={subtitle} />;
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="m">
-      {href !== undefined ? (
+      {href === undefined ? (
+        <Col
+          grow
+          minWidth={0}
+          gap="xs"
+          {...platformAccessibilityProps({ accessibilityRole: "button" })}
+          onPress={onPress}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          cursor="web:pointer"
+        >
+          {textContent}
+        </Col>
+      ) : (
         isWeb ? (
           <Anchor
             flex={1}
@@ -170,19 +183,6 @@ export function CardRow({
             />
           </Col>
         )
-      ) : (
-        <Col
-          grow
-          minWidth={0}
-          gap="xs"
-          {...platformAccessibilityProps({ accessibilityRole: "button" })}
-          onPress={onPress}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          cursor="web:pointer"
-        >
-          {textContent}
-        </Col>
       )}
       {onActionPress && actionLabel ? (
         <Row middle>

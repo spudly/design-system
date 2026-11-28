@@ -242,7 +242,7 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
  * AutocompletePicker after a selection unmounts the focused
  * result row — can do so through the input's own `focus()`.
  */
-export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function SearchField(
+export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>((
   {
     value,
     onChangeText,
@@ -259,7 +259,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
     ...rest
   }: SearchFieldProps,
   ref,
-) {
+) => {
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
@@ -302,7 +302,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
                 center
                 minWidth={44}
                 minHeight={44}
-                onPress={disabled ? undefined : () => onChangeText("")}
+                onPress={disabled ? undefined : () => { onChangeText(""); }}
                 {...platformAccessibilityProps({
                   accessibilityRole: "button",
                   accessibilityLabel: "Clear search",

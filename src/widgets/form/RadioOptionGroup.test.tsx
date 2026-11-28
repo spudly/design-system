@@ -14,11 +14,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+
 const here = dirname(fileURLToPath(import.meta.url));
-function codeOf(rel: string) {{
+function codeOf(rel: string) {
   const source = readFileSync(join(here, "../../..", rel), "utf8");
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-}}
+}
 
 const code = codeOf("src/widgets/form/RadioOptionGroup.tsx");
 const stories = codeOf("src/widgets/form/RadioOptionGroup.stories.tsx");

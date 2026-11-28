@@ -202,7 +202,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           disabled={disabled}
           label="Tag color"
           colors={TAG_COLORS}
-          {...(tagColor !== undefined ? { value: tagColor } : {})}
+          {...(tagColor === undefined ? {} : { value: tagColor })}
           onChange={setTagColor}
           {...(errors ? { error: "Pick a color for this tag." } : {})}
         />

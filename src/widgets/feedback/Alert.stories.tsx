@@ -69,7 +69,7 @@ function DismissDemo({
         message={message}
         severity={severity}
         dismissible={dismissible}
-        onDismiss={() => setDismissals((n) => n + 1)}
+        onDismiss={() => { setDismissals((n) => n + 1); }}
       />
       {dismissals > 0 ? (
         <Text variant="hint">

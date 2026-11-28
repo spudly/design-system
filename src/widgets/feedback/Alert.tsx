@@ -111,7 +111,7 @@ export function Alert({
   // info ramp's text is a theme token ($primaryEmphasis), which SVG
   // cannot resolve, so it is read from the active theme (the
   // SectionHeading glyph-ink pattern).
-  const primaryEmphasisVariable = theme["primaryEmphasis"];
+  const primaryEmphasisVariable = theme.primaryEmphasis;
   const iconInk =
     severity === "info" && typeof primaryEmphasisVariable?.val === "string"
       ? primaryEmphasisVariable.val

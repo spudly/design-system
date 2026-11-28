@@ -51,6 +51,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 const here = dirname(fileURLToPath(import.meta.url));
 
 test("AppShellPage is exported from the built pages barrel", async () => {
@@ -112,6 +113,7 @@ function loadRuntime() {
     const reactModule = await import("react");
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
+    // eslint-disable-next-line design-system/no-page-styling -- test harness imports TamaguiProvider directly to render the page under test; tests ship no page code
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const shellModule: Record<string, any> =
@@ -354,6 +356,7 @@ test("SSR: footer data renders the one BigFooter band", async () => {
 test("SSR: a pending surface shows the loading state; a failed one stays in the slot", async () => {
   const { AppShellPage } = await loadRuntime();
   function PendingContent(): never {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- throwing a promise is the React Suspense protocol this fixture simulates
     throw new Promise(() => { /* noop */ });
   }
   function FailingContent(): never {

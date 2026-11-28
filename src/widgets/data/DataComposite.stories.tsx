@@ -105,13 +105,13 @@ function MarkableDemo() {
     <Col>
       <MarkableRow
         label="1 1/2 lb chicken thighs"
-        isMarked={marked["chicken"] ?? false}
-        onPress={() => toggle("chicken")}
+        isMarked={marked.chicken ?? false}
+        onPress={() => { toggle("chicken"); }}
       />
       <MarkableRow
         label="2 cups jasmine rice"
-        isMarked={marked["rice"] ?? false}
-        onPress={() => toggle("rice")}
+        isMarked={marked.rice ?? false}
+        onPress={() => { toggle("rice"); }}
       />
     </Col>
   );
@@ -178,6 +178,7 @@ export const BadgesAndStats: Story = {
  * ratings card, and the nutrition panel in one detail column. */
 export const StructuredContent: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [viewer, setViewer] = useState<number | null>(4);
     return (
       <YStack maxWidth={430} gap={16}>

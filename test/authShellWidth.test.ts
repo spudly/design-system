@@ -57,8 +57,8 @@ test("the auth outer layer stays full-width, paints the surface, and centers its
     screenContainer.indexOf("<Col\n"),
     screenContainer.indexOf("style={composedStyle}"),
   );
-  assert.ok(!/maxWidth/.test(outerCol), "the surface-painting outer layer must not be capped");
-  assert.ok(!/alignSelf/.test(outerCol), "centering must not rely on alignSelf");
+  assert.ok(!outerCol.includes('maxWidth'), "the surface-painting outer layer must not be capped");
+  assert.ok(!outerCol.includes('alignSelf'), "centering must not rely on alignSelf");
 });
 
 test("the auth content column is capped at 480px and rendered only for the auth variant (#265)", () => {

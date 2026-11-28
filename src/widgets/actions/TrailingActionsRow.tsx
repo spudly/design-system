@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import { Row } from "../layout/Row.js";
-import { tokens } from "../../tokens/index.js";
 
 export type TrailingActionsRowProps = {
   /** The row's leading group: the field or content the actions

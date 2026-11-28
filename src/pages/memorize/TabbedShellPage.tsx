@@ -279,7 +279,7 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
         variant="link"
         tabs={props.tabs.map((tab) => ({ value: tab.id, label: tab.label, href: tab.href }))}
         value={activeTabId ?? ""}
-        {...(tabsLabel !== undefined ? { label: tabsLabel } : null)}
+        {...(tabsLabel === undefined ? null : { label: tabsLabel })}
       />
     );
     content = props.children;
@@ -292,18 +292,18 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
           return {
             value: tab.id,
             label: tab.label,
-            ...(icon !== undefined ? { icon } : null),
+            ...(icon === undefined ? null : { icon }),
           };
         })}
         value={activeTabId ?? ""}
         onValueChange={props.onTabSelect}
-        {...(tabsLabel !== undefined ? { label: tabsLabel } : null)}
+        {...(tabsLabel === undefined ? null : { label: tabsLabel })}
       />
     );
     const override = props.children;
     const activeTab = props.tabs.find((tab) => tab.id === activeTabId);
-    content = override !== undefined ? override : activeTab?.content;
-    surfaceKey = override !== undefined ? "override" : (activeTabId ?? "override");
+    content = override === undefined ? activeTab?.content : override;
+    surfaceKey = override === undefined ? (activeTabId ?? "override") : "override";
   }
 
   return (
@@ -319,14 +319,14 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
             ) : null}
           </Row>
         ) : null}
-        {content !== undefined ? (
+        {content === undefined ? null : (
           <LazySlot
             key={contentKey ?? surfaceKey}
-            {...(onReload !== undefined ? { onReload } : null)}
+            {...(onReload === undefined ? null : { onReload })}
           >
             {content}
           </LazySlot>
-        ) : null}
+        )}
         {installBanner ? <InstallBannerView {...installBanner} /> : null}
         {consentBanner ? <ConsentBannerView {...consentBanner} /> : null}
       </ScreenContainer>

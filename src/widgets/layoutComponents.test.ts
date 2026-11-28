@@ -214,7 +214,7 @@ test("Button's grow keeps a content-sized basis in both forms (no wrapping-row c
     "both Button forms must spread the content-basis grow shape, displaced by a caller-passed flex and capped at the row's width — a zero basis (flex: 1) collapses a growing button in a wrapping row on native (PR #314's Start Cooking)",
   );
   assert.ok(
-    !/\{\.\.\.\(grow \? \{ flex: 1 \}/.test(buttonCode),
+    !buttonCode.includes('{...(grow ? { flex: 1 }'),
     "Button's grow must never spread flex: 1 (zero basis — the wrapping-row collapse)",
   );
 });

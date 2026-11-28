@@ -96,7 +96,7 @@ test("ProgressBar renders its track from $progressTrack", () => {
     "utf8",
   );
   assert.ok(
-    /backgroundColor: "\$progressTrack"/.test(src),
+    src.includes('backgroundColor: "$progressTrack"'),
     "ProgressBar's track must use the $progressTrack role (#94)",
   );
 });

@@ -1140,15 +1140,13 @@ function HistoryPanel({
   return (
     <Col gap="l" p="l">
       <SectionHeading>Cook History</SectionHeading>
-      {form !== null && form !== undefined ? (
-        form
-      ) : history.onLogCookPress ? (
+      {form ?? (history.onLogCookPress ? (
         <ButtonRow>
           <Button variant="primary" size="sm" onPress={history.onLogCookPress}>
             Log a cook
           </Button>
         </ButtonRow>
-      ) : null}
+      ) : null)}
       {history.cookLogs.length === 0 ? (
         <Text variant="hint">{COOK_LOG_EMPTY_MESSAGE}</Text>
       ) : (
@@ -1250,12 +1248,12 @@ function CtaBar({
 function OverviewSection({ overview }: { overview: RecipeDetailPageGuestOverviewProps }) {
   return (
     <RecipeOverviewPanel
-      {...(overview.imageUrl !== undefined ? { imageUrl: overview.imageUrl } : {})}
+      {...(overview.imageUrl === undefined ? {} : { imageUrl: overview.imageUrl })}
       title={overview.title}
-      {...(overview.description !== undefined ? { description: overview.description } : {})}
+      {...(overview.description === undefined ? {} : { description: overview.description })}
       servingsLabel={overview.servingsLabel}
-      {...(overview.prepTimeLabel !== undefined ? { prepTimeLabel: overview.prepTimeLabel } : {})}
-      {...(overview.cookTimeLabel !== undefined ? { cookTimeLabel: overview.cookTimeLabel } : {})}
+      {...(overview.prepTimeLabel === undefined ? {} : { prepTimeLabel: overview.prepTimeLabel })}
+      {...(overview.cookTimeLabel === undefined ? {} : { cookTimeLabel: overview.cookTimeLabel })}
       tags={overview.tags}
     />
   );

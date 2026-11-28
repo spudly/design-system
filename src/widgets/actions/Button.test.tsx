@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import "../../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../../test/internalDist.js";
+
 describe("buttonGhostProp", () => {
   const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 
@@ -111,7 +112,7 @@ describe("buttonGhostProp", () => {
     const srcFiles = readdirSync(join(root, "src"), {
       recursive: true,
     })
-      .map((entry) => String(entry))
+      .map(String)
       .filter(
         (entry) =>
           (entry.endsWith(".ts") || entry.endsWith(".tsx")) &&
@@ -186,7 +187,7 @@ describe("buttonIcon", () => {
       "Button must not import per-icon components directly — glyphs resolve only through the registry",
     );
     assert.ok(
-      !/ComponentType<IconComponentProps>/.test(button),
+      !button.includes('ComponentType<IconComponentProps>'),
       "the slot no longer takes a caller-supplied icon component",
     );
   });

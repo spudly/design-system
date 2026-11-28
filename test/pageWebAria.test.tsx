@@ -82,6 +82,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "./internalDist.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")
@@ -94,7 +95,7 @@ function sourceFiles(dir: string): string[] {
   }).flatMap((entry) => {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) return sourceFiles(path);
-    return /\.tsx$/.test(entry.name) && !entry.name.endsWith(".test.tsx") ? [path] : [];
+    return entry.name.endsWith(".tsx") && !entry.name.endsWith(".test.tsx") ? [path] : [];
   });
 }
 

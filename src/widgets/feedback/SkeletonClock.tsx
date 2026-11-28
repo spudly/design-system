@@ -140,10 +140,10 @@ function useWebPrefersReducedMotion(): boolean {
       return;
     }
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduced(query.matches);
+    const onChange = () => { setReduced(query.matches); };
     onChange();
     query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
+    return () => { query.removeEventListener("change", onChange); };
   }, []);
   return reduced;
 }
@@ -240,11 +240,9 @@ export function SkeletonClock({ children, frozen = false }: SkeletonClockProps) 
     () => false,
   );
   const storeRef = useRef<SkeletonClockStore | null>(null);
-  if (storeRef.current === null) {
-    storeRef.current = createSkeletonClockStore(
-      frozen || webPrefersReducedMotion() || isDefaultSkeletonClockFrozen(),
-    );
-  }
+  storeRef.current ??= createSkeletonClockStore(
+    frozen || webPrefersReducedMotion() || isDefaultSkeletonClockFrozen(),
+  );
   useEffect(() => {
     storeRef.current?.setFrozen(frozen || webReducedMotion || defaultFrozen);
   }, [frozen, webReducedMotion, defaultFrozen]);

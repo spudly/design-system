@@ -3,7 +3,6 @@ import { useId, useRef } from "react";
 import { XStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 
-import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";
@@ -24,6 +23,7 @@ import { SearchField } from "./SearchField.js";
  * $textMuted border (≥3:1, WCAG 1.4.11, as in SearchField) and
  * the focus-within ring — so the composite reads as one field.
  */
+// eslint-disable-next-line design-system/no-direct-stacks -- the field frame is a single-purpose bordered container carrying the SearchField container's own border/focus-within treatment (#805, see the doc comment above); it is a frame, not a layout stack composing children with spacing.
 const StyledFieldFrame = styled(XStack, {
   name: "AutocompletePickerFieldFrame",
 
@@ -233,13 +233,14 @@ export function AutocompletePicker({
   // matches / the count of results on offer. A failed search
   // (searchError set, no results) announces the error, never
   // the no-results message (#393).
-  const statusMessage = !hasSearchText
-    ? null
-    : isSearching
+  const statusMessage = hasSearchText
+    ? isSearching
       ? voice.autocompletePicker.searchingLabel
       : visibleResults.length === 0
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- an empty-string searchError must fall back to the no-results message; ?? would keep "".
         ? searchError || noResultsMessage
-        : voice.autocompletePicker.resultsAvailableLabel(visibleResults.length);
+        : voice.autocompletePicker.resultsAvailableLabel(visibleResults.length)
+    : null;
 
   // Both the select and remove paths unmount the control the
   // user just activated (the result row is filtered out as
@@ -343,7 +344,7 @@ export function AutocompletePicker({
               <ListItem
                 key={result.id}
                 title={result.label}
-                {...(result.detail !== undefined ? { subtitle: result.detail } : {})}
+                {...(result.detail === undefined ? {} : { subtitle: result.detail })}
                 isDisabled={disabled}
                 onPress={() => {
                   handleSelectResult(result.id);

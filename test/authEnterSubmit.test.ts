@@ -69,7 +69,7 @@ for (const { name, fields } of AUTH_FORMS) {
     // and loading state into it, and the shared tail's button
     // carries the wiring.
     assert.match(
-      source.replace(/\s+/g, " "),
+      source.replaceAll(/\s+/g, " "),
       /<AuthFormSubmit error=\{error\} loading=\{loading\} onSubmit=\{onSubmit\} submitLabel=\{submitLabel\} \/>/,
       `${name} renders the shared AuthFormSubmit tail with its error, loading, submit intent, and label`,
     );

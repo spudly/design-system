@@ -61,7 +61,7 @@ function assertAlertError(html: string, errorText: string, context: string) {
 }
 
 test("SSR: TextField renders its error through an Alert wired by describedby (#804)", async () => {
-  const { React, TextField } = await loadRuntime();
+  const { TextField } = await loadRuntime();
   const html = await renderToHtml(
     <TextField
       id="name"
@@ -81,7 +81,7 @@ test("SSR: TextField renders its error through an Alert wired by describedby (#8
 });
 
 test("SSR: SearchField gains the same Alert error treatment (#804)", async () => {
-  const { React, SearchField } = await loadRuntime();
+  const { SearchField } = await loadRuntime();
   const html = await renderToHtml(
     <SearchField
       id="search"
@@ -100,7 +100,7 @@ test("SSR: SearchField gains the same Alert error treatment (#804)", async () =>
 });
 
 test("SSR: Switch gains the same Alert error treatment (#804)", async () => {
-  const { React, Switch } = await loadRuntime();
+  const { Switch } = await loadRuntime();
   const html = await renderToHtml(
     <Switch
       id="notify"
@@ -119,7 +119,7 @@ test("SSR: Switch gains the same Alert error treatment (#804)", async () => {
 });
 
 test("SSR: NumberStepper gains the same Alert error treatment (#804)", async () => {
-  const { React, NumberStepper } = await loadRuntime();
+  const { NumberStepper } = await loadRuntime();
   const html = await renderToHtml(
     <NumberStepper
       id="servings"
@@ -137,7 +137,7 @@ test("SSR: NumberStepper gains the same Alert error treatment (#804)", async () 
 });
 
 test("SSR: StarRatingInput gains the same Alert error treatment (#804)", async () => {
-  const { React, StarRatingInput } = await loadRuntime();
+  const { StarRatingInput } = await loadRuntime();
   const html = await renderToHtml(
     <StarRatingInput id="rating" label="Rating" value={0} onChange={() => null} error="Rate it." />,
   );
@@ -149,7 +149,7 @@ test("SSR: StarRatingInput gains the same Alert error treatment (#804)", async (
 });
 
 test("SSR: CheckboxSelectList gains the same Alert error treatment (#804)", async () => {
-  const { React, CheckboxSelectList } = await loadRuntime();
+  const { CheckboxSelectList } = await loadRuntime();
   const html = await renderToHtml(
     <CheckboxSelectList
       id="tags"
@@ -167,7 +167,7 @@ test("SSR: CheckboxSelectList gains the same Alert error treatment (#804)", asyn
 });
 
 test("SSR: PresetValueSelector gains the same Alert error treatment (#804)", async () => {
-  const { React, PresetValueSelector } = await loadRuntime();
+  const { PresetValueSelector } = await loadRuntime();
   const html = await renderToHtml(
     <PresetValueSelector
       id="scale"
@@ -188,7 +188,7 @@ test("SSR: PresetValueSelector gains the same Alert error treatment (#804)", asy
 });
 
 test("SSR: AutocompletePicker's validation error renders through an Alert (#804)", async () => {
-  const { React, AutocompletePicker } = await loadRuntime();
+  const { AutocompletePicker } = await loadRuntime();
   const html = await renderToHtml(
     <AutocompletePicker
       id="picker"
@@ -209,7 +209,7 @@ test("SSR: AutocompletePicker's validation error renders through an Alert (#804)
 });
 
 test("SSR: no error UI renders when error is unset (#804)", async () => {
-  const { React, SearchField, Switch } = await loadRuntime();
+  const { SearchField, Switch } = await loadRuntime();
   const html = await renderToHtml(
     <>
       <SearchField label="Search" value="" onChangeText={() => null} />

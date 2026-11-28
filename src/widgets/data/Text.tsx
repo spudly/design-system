@@ -194,7 +194,7 @@ export function Text({
     accessibilityLabel,
     accessibilityLabelledBy,
     accessibilityLiveRegion,
-    accessibilityRole: accessibilityRole ?? (headingLevel !== undefined ? "header" : undefined),
+    accessibilityRole: accessibilityRole ?? (headingLevel === undefined ? undefined : "header"),
     accessibilityState,
     accessibilityValue,
     "aria-level":

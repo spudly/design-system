@@ -36,7 +36,7 @@ function loadRuntime() {
 }
 
 async function renderRow(props: Record<string, any>) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, LabelRow } =
+  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, LabelRow } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
@@ -61,11 +61,11 @@ function renderedSeparation(html: string) {
   const divs = html.match(/<div[^>]*>/g) ?? [];
   const spacerTag = divs.find((tag) => tag.includes("aria-hidden"));
   assert.ok(spacerTag, `expected a rendered spacer element in: ${html.slice(-600)}`);
-  const classMatch = spacerTag.match(/class="([^"]*)"/);
+  const classMatch = /class="([^"]*)"/.exec(spacerTag);
   assert.ok(classMatch, "the spacer element carries classes");
   for (const className of classMatch[1].split(/\s+/)) {
     for (const block of declarationBlocks(html, className)) {
-      const height = block.match(/height:([\d.]+px)/);
+      const height = /height:([\d.]+px)/.exec(block);
       if (height) return height[1];
     }
   }

@@ -51,26 +51,33 @@ export type IconElement =
 
 function renderElement(element: IconElement, index: number) {
   switch (element.kind) {
-    case "path":
+    case "path": {
       return <Path key={index} d={element.d} />;
-    case "polyline":
+    }
+    case "polyline": {
       return <Polyline key={index} points={element.points} />;
-    case "line":
+    }
+    case "line": {
       return <Line key={index} x1={element.x1} y1={element.y1} x2={element.x2} y2={element.y2} />;
-    case "circle":
+    }
+    case "circle": {
       return <Circle key={index} cx={element.cx} cy={element.cy} r={element.r} />;
-    case "rect":
+    }
+    case "rect": {
       return (
         <Rect
           key={index}
+          // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
           x={element.x}
+          // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
           y={element.y}
           width={element.width}
           height={element.height}
-          {...(element.rx !== undefined ? { rx: element.rx } : {})}
-          {...(element.ry !== undefined ? { ry: element.ry } : {})}
+          {...(element.rx === undefined ? {} : { rx: element.rx })}
+          {...(element.ry === undefined ? {} : { ry: element.ry })}
         />
       );
+    }
   }
 }
 

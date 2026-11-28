@@ -247,7 +247,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
                     <BlankWord
                       word={word.text}
                       revealed={word.blank.revealed}
-                      onReveal={() => onBlankReveal(i)}
+                      onReveal={() => { onBlankReveal(i); }}
                       index={ordinal}
                       total={blankCount}
                     />{" "}

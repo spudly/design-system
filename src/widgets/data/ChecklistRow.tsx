@@ -50,7 +50,7 @@ export type ChecklistRowProps = {
  * $primary outline in both states, $primary check glyph when checked.
  */
 export function ChecklistRow({ label, metadata, checked, onCheckedChange }: ChecklistRowProps) {
-  const toggle = () => onCheckedChange(!checked);
+  const toggle = () => { onCheckedChange(!checked); };
 
   return (
     <Row top gap="m" minHeight={44} py="xs">

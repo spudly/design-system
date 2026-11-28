@@ -48,6 +48,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { loadInternalDist } from "./internalDist.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")
@@ -213,10 +214,10 @@ const noop = () => null;
 // source pins (CodeRabbit finding on PR #283: source text alone
 // does not prove the post-fix rendered decoration).
 function anchorDecoration(html: string) {
-  const tag = html.match(/<a[^>]*class="([^"]*)"/);
+  const tag = /<a[^>]*class="([^"]*)"/.exec(html);
   assert.ok(tag, `expected an anchor with classes in: ${html.slice(-400)}`);
   for (const cls of tag[1].split(/\s+/)) {
-    const rule = html.match(new RegExp(String.raw`\.${cls}\{[^}]*text-decoration-line:([a-z]+)`));
+    const rule = new RegExp(String.raw`\.${cls}\{[^}]*text-decoration-line:([a-z]+)`).exec(html);
     if (rule) return rule[1];
   }
   return null;

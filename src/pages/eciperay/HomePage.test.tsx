@@ -127,8 +127,10 @@ test("the shared row renders no log-cook control when the host omits the callbac
 let runtimePromise: Promise<Record<string, any>> | undefined;
 function loadRuntime() {
   runtimePromise ??= (async () => {
-    const React = (await import("react")).default;
+    const reactModule = await import("react");
+    const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
+    // eslint-disable-next-line design-system/no-page-styling -- test harness imports TamaguiProvider directly to render the page under test; tests ship no page code
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const voiceModule: Record<string, any> = await import("../../../dist/voice/index.js");

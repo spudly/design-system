@@ -45,14 +45,9 @@ import { fileURLToPath } from "node:url";
 import { loadInternalDist } from "../../../test/internalDist.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../../..", "src", "widgets");
 
 function strip(source: string) {
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-}
-
-function code(file: string) {
-  return strip(readFileSync(join(componentsDir, file), "utf8"));
 }
 
 const page = strip(

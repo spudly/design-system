@@ -17,4 +17,5 @@
  */
 import { register } from "node:module";
 
+// eslint-disable-next-line @typescript-eslint/no-deprecated -- node:module register() loads external/data-URL loader hooks before test imports; registerHooks() cannot register hook modules by URL
 register("./svgStub.hooks.ts", import.meta.url);

@@ -621,5 +621,6 @@ export type StorybookThemeName =
 type AppConfig = ReturnType<typeof createTamaguiConfig>;
 
 declare module "tamagui" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/consistent-type-definitions -- declaration merging requires the interface form here; the type-alias conversion breaks Tamagui's own TamaguiCustomConfig interface (TS2300).
   interface TamaguiCustomConfig extends AppConfig {}
 }

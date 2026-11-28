@@ -61,13 +61,13 @@ function jobBlock(name: string) {
  * folded scalars match as one string. Fails loudly when absent. */
 function jobCondition(name: string) {
   const block = jobBlock(name);
-  const match = block.match(/\n {4}if:(?: >-\n((?: {6}.*\n?)+)| (.*))/);
+  const match = /\n {4}if:(?: >-\n((?: {6}.*\n?)+)| (.*))/.exec(block);
   assert.ok(match, `job "${name}" has no if: condition`);
   return (match[1] ?? match[2]).replaceAll(/\s+/g, " ").trim();
 }
 
 test("the pull_request trigger includes the labeled activity type", () => {
-  const trigger = workflow.match(/\n {2}pull_request:\n {4}types: \[([^\]]*)\]/);
+  const trigger = /\n {2}pull_request:\n {4}types: \[([^\]]*)\]/.exec(workflow);
   assert.ok(trigger, "pull_request trigger must declare an explicit types list");
   const types = trigger[1].split(",").map((t) => t.trim());
   assert.deepEqual(types, ["opened", "synchronize", "reopened", "labeled"]);
@@ -165,7 +165,7 @@ test("phase 2: the plan job owns bot-head detection and the scope computation", 
 });
 
 test("label-triggered runs get their own per-label concurrency group", () => {
-  const group = workflow.match(/\n {2}group: android-storybook-vr-(.*)/);
+  const group = /\n {2}group: android-storybook-vr-(.*)/.exec(workflow);
   assert.ok(group, "concurrency group not found in android-storybook.yml");
   assert.match(
     group[1],

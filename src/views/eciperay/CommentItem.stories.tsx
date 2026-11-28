@@ -74,7 +74,9 @@ export const LoadingOverlay: Story = {
 
 export const OwnComment: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editing, setEditing] = useState(false);
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [draft, setDraft] = useState("Doubled the garlic — excellent.");
     return (
       <CommentItem

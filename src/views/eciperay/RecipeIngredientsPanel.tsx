@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- single cohesive panel component (ingredient groups, scaling, and render in one definition); splitting it would scatter one panel across files (#902 T4) */
+// eslint-disable-next-line design-system/no-page-styling -- panel uses tamagui View/isWeb only for fixed-width skeleton slots alongside widget Row/Col; no semantic page styling
 import { View, isWeb } from "tamagui";
 
 import { Row } from "../../widgets/layout/Row.js";
@@ -203,6 +204,7 @@ export function RecipeIngredientsPanel({
               </Row>
             </Row>
             <Row middle gap="s">
+              {/* eslint-disable-next-line design-system/no-page-styling -- one-off skeleton alignment offset; no widget prop expresses paddingInlineEnd for this slot */}
               <Row style={{ paddingInlineEnd: 4 }}>
                 <View width={36}>
                   <TextSkeleton size="sm" lines={1} />
@@ -253,6 +255,7 @@ export function RecipeIngredientsPanel({
                 <TextSkeleton size="md" lines={1} />
               </Col>
               {ingredient.isOptional ? (
+                // eslint-disable-next-line design-system/no-page-styling -- one-off skeleton alignment offset; no widget prop expresses paddingInlineStart for this slot
                 <Col style={{ paddingInlineStart: 8 }}>
                   <View width={44}>
                     <TextSkeleton size="xs" lines={1} />

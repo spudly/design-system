@@ -107,6 +107,7 @@ test("no page story keeps a flat Pages/<Page> title (#70)", () => {
     assert.ok(
       title === "Pages/Eciperay" ||
         title === "Pages/Memorize" ||
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- boolean title-match disjunction; ?? does not apply to booleans.
         title?.startsWith("Pages/Eciperay/") ||
         title?.startsWith("Pages/Memorize/"),
       `${file} declares "${title}" — page stories live only under Pages/Eciperay or Pages/Memorize (#70)`,

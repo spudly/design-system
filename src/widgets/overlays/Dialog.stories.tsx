@@ -24,7 +24,7 @@ function DialogDemo() {
   const [open, setOpen] = useState(false);
   return (
     <YStack>
-      <Button onPress={() => setOpen(true)}>Delete recipe</Button>
+      <Button onPress={() => { setOpen(true); }}>Delete recipe</Button>
       <Dialog
         open={open}
         onOpenChange={setOpen}
@@ -32,10 +32,10 @@ function DialogDemo() {
         description="This cannot be undone."
         actions={
           <>
-            <Button variant="secondary" size="sm" onPress={() => setOpen(false)}>
+            <Button variant="secondary" size="sm" onPress={() => { setOpen(false); }}>
               Cancel
             </Button>
-            <Button variant="primary" size="sm" onPress={() => setOpen(false)}>
+            <Button variant="primary" size="sm" onPress={() => { setOpen(false); }}>
               Delete
             </Button>
           </>
@@ -55,10 +55,11 @@ export const Interactive: Story = {
 
 export const WithoutActions: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [open, setOpen] = useState(false);
     return (
       <YStack>
-        <Button onPress={() => setOpen(true)}>About</Button>
+        <Button onPress={() => { setOpen(true); }}>About</Button>
         <Dialog open={open} onOpenChange={setOpen} title="About this app">
           <Text variant="body">Version 1.0.0</Text>
         </Dialog>
@@ -99,10 +100,10 @@ function NestedDialogsDemo() {
           description="Opened in the same commit as its parent."
           actions={
             <>
-              <Button variant="secondary" size="sm" onPress={() => setChildOpen(false)}>
+              <Button variant="secondary" size="sm" onPress={() => { setChildOpen(false); }}>
                 Keep draft
               </Button>
-              <Button variant="primary" size="sm" onPress={() => setChildOpen(false)}>
+              <Button variant="primary" size="sm" onPress={() => { setChildOpen(false); }}>
                 Discard
               </Button>
             </>

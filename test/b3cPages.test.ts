@@ -20,7 +20,6 @@ import test from "node:test";
  */
 
 const page = (name: string) => readFileSync(`src/pages/eciperay/${name}.tsx`, "utf8");
-const component = (name: string) => readFileSync(`src/widgets/${name}.tsx`, "utf8");
 const view = (name: string) => readFileSync(`src/views/eciperay/${name}.tsx`, "utf8");
 
 const B3C_PAGES = [

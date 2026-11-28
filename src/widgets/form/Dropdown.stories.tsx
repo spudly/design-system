@@ -38,7 +38,7 @@ function MenuRow({
   destructive?: boolean;
   onAction: (label: string) => void;
 }) {
-  const Icon = icon !== undefined ? iconsByName[icon] : undefined;
+  const Icon = icon === undefined ? undefined : iconsByName[icon];
   const close = useDropdownClose();
   const activate = () => {
     onAction(label);
@@ -181,7 +181,7 @@ function ControlledMenu() {
         </YStack>
       </Dropdown>
       <Text variant="hint">Menu is {open ? "open" : "closed"}</Text>
-      <Button variant="secondary" size="sm" onPress={() => setOpen(true)}>
+      <Button variant="secondary" size="sm" onPress={() => { setOpen(true); }}>
         Open from outside
       </Button>
     </YStack>

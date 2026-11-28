@@ -74,7 +74,7 @@ test("the graded rules render in the label's order (#722)", () => {
   const caloriesAt = code.indexOf("{facts.caloriesLabel}");
   const mediumAt = code.indexOf("<LabelBar height={MEDIUM_BAR_HEIGHT} />", caloriesAt);
   const footnoteAt = code.indexOf("voice.nutritionPanel.dailyValueFootnote");
-  assert.ok(thickAt > -1 && thickAt < caloriesAt, "the very thick bar sits under the serving block, above Calories");
+  assert.ok(thickAt !== -1 && thickAt < caloriesAt, "the very thick bar sits under the serving block, above Calories");
   assert.ok(mediumAt > caloriesAt, "a medium bar follows the calories block");
   assert.ok(footnoteAt > mediumAt, "the %DV footnote renders inside the panel, after a medium bar");
   assert.match(code, /voice\.nutritionPanel\.dailyValueHeaderLabel/, "the % Daily Value column header renders");

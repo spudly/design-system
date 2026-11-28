@@ -31,12 +31,16 @@ type Story = StoryObj<typeof TagsPage>;
  */
 export const WithTags: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [tags, setTags] = useState<TagsPageTag[]>([
       ...tagsFixture.tags,
       { id: "tag-preset", name: "Preset", color: "gray", canEdit: false, canDelete: false },
     ]);
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editingTagId, setEditingTagId] = useState<string | null>(null);
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editName, setEditName] = useState(tagsFixture.tags[0]?.name ?? "");
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editColor, setEditColor] = useState<TagColorName>(
       tagsFixture.tags[0]?.color ?? "indigo",
     );
@@ -86,11 +90,15 @@ export const WithTags: Story = {
  */
 export const Editing: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [tags, setTags] = useState<TagsPageTag[]>(tagsFixture.tags);
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editingTagId, setEditingTagId] = useState<string | null>(
       tagsFixture.tags[0]?.id ?? null,
     );
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editName, setEditName] = useState(tagsFixture.tags[0]?.name ?? "");
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editColor, setEditColor] = useState<TagColorName>(
       tagsFixture.tags[0]?.color ?? "indigo",
     );
@@ -147,10 +155,13 @@ export const Editing: Story = {
  */
 export const FailingSaves: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editingTagId, setEditingTagId] = useState<string | null>(
       tagsFixture.tags[0]?.id ?? null,
     );
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editName, setEditName] = useState(tagsFixture.tags[0]?.name ?? "");
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [editColor, setEditColor] = useState<TagColorName>(
       tagsFixture.tags[0]?.color ?? "indigo",
     );

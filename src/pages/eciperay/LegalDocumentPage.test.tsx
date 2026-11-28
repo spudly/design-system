@@ -38,6 +38,7 @@ import {
   loadLegalDocumentRuntime,
   renderLegalDocumentToHtml,
 } from "../../../test/legalDocumentSsr.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")

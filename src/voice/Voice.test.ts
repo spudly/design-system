@@ -65,7 +65,7 @@ test("VoiceProvider supplies exactly the voice object it is given", async () => 
   const html = renderToString(
     React.createElement(VoiceProvider, { voice: fixtureVoice }, React.createElement(Probe)),
   );
-  assert.match(html, new RegExp(fixtureVoice.common.cancelLabel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.match(html, new RegExp(fixtureVoice.common.cancelLabel.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)));
 });
 
 test("the pseudo-locale fixture transforms the fixture voice's slots", async () => {

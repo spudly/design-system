@@ -189,7 +189,7 @@ export function PresetValueSelector({
       };
       const relatedTarget = blurEvent.relatedTarget ?? blurEvent.nativeEvent?.relatedTarget;
       const groupElement = groupRef.current as unknown as HTMLElement | null;
-      if (relatedTarget != null && groupElement?.contains(relatedTarget as Node)) {
+      if (relatedTarget !== null && relatedTarget !== undefined && groupElement?.contains(relatedTarget as Node)) {
         setCustomEditing(false);
         return;
       }

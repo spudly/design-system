@@ -21,6 +21,7 @@ const SCALE_OPTIONS = [
 
 export const Default: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("1");
     return (
       <YStack maxWidth={430} padding="$4">
@@ -40,6 +41,7 @@ export const Default: Story = {
 
 export const CustomSelected: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("2.5");
     return (
       <YStack maxWidth={430} padding="$4">
@@ -59,6 +61,7 @@ export const CustomSelected: Story = {
 
 export const Disabled: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("1");
     return (
       <YStack maxWidth={430} padding="$4">
@@ -79,6 +82,7 @@ export const Disabled: Story = {
 
 export const WithError: Story = {
   render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Storybook mounts a story's render function as a component, so hooks here run under component rules; the rule cannot recognize anonymous render functions
     const [value, setValue] = useState("1");
     return (
       <YStack maxWidth={430} padding="$4">

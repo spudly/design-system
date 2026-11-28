@@ -86,25 +86,26 @@ describe("switchThumb", () => {
   function resolvedThumbOffset(html: string): number {
     const txClass = thumbClass(html, "_tx-");
     const rules = [
-      ...html.matchAll(new RegExp(`\\.${txClass.replace("-", "\\-")}\\{--t-x:(-?\\d+)px\\}`, "g")),
+      ...html.matchAll(new RegExp(String.raw`\.${txClass.replace("-", String.raw`\-`)}\{--t-x:(-?\d+)px\}`, "g")),
     ];
     assert.ok(rules.length > 0, `rendered CSS must define --t-x for ${txClass}`);
-    return Number(rules[rules.length - 1][1]);
+    return Number(rules.at(-1)[1]);
   }
 
   function resolvedThumbAlignSelf(html: string): string {
     const asClass = thumbClass(html, "_as-");
     const rules = [
       ...html.matchAll(
-        new RegExp(`\\.${asClass.replace("-", "\\-")}\\{align-self:([a-z-]+)\\}`, "g"),
+        new RegExp(String.raw`\.${asClass.replace("-", String.raw`\-`)}\{align-self:([a-z-]+)\}`, "g"),
       ),
     ];
     assert.ok(rules.length > 0, `rendered CSS must define align-self for ${asClass}`);
-    return rules[rules.length - 1][1];
+    return rules.at(-1)[1];
   }
 
   async function renderSwitch(checked: boolean): Promise<string> {
-    const React = (await import("react")).default;
+    const reactModule = await import("react");
+    const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();

@@ -55,14 +55,15 @@ const here = dirname(fileURLToPath(import.meta.url));
 // never render the FlatList itself.
 const reactNativeStubUrl =
   "data:text/javascript,export%20function%20FlatList()%7Breturn%20null%3B%7D%0Aexport%20function%20View()%7Breturn%20null%3B%7D%0A";
+// eslint-disable-next-line @typescript-eslint/no-deprecated -- node:module register() loads external/data-URL loader hooks before test imports; registerHooks() cannot register hook modules by URL
 register(
-  "data:text/javascript," +
+  `data:text/javascript,${ 
     encodeURIComponent(
       `export async function resolve(specifier, context, nextResolve) {\n` +
         `  if (specifier === "react-native") return { shortCircuit: true, url: ${JSON.stringify(reactNativeStubUrl)} };\n` +
         `  return nextResolve(specifier, context);\n` +
         `}`,
-    ),
+    )}`,
 );
 
 let runtimePromise: Promise<Record<string, any>> | undefined;

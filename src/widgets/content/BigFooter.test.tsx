@@ -4,6 +4,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 function readCode(rel: string): string {
   return readFileSync(join(root, rel), "utf8")
@@ -34,14 +35,14 @@ test("BigFooter renders all sections from the one footer data object", () => {
   ]) {
     assert.ok(!bigFooter.includes(baked), `BigFooter must not hardcode ${baked}`);
   }
-  assert.ok(!/onPress/.test(bigFooter), "footer navigation is links, never press callbacks");
+  assert.ok(!bigFooter.includes('onPress'), "footer navigation is links, never press callbacks");
 });
 test("store and social entries are real links with accessible names", () => {
   // Store links (#466): a real anchor wrapping the store's
   // official badge, named by the label — never a plain Button.
   assert.match(bigFooter, /<StyledBigFooterStoreAnchor/);
   assert.match(bigFooter, /store: BigFooterStore;/);
-  assert.ok(!/<Button/.test(bigFooter), "store links must not render as Buttons (#466)");
+  assert.ok(!bigFooter.includes('<Button'), "store links must not render as Buttons (#466)");
   // Social entries: an anchor carrying the href, named by the label.
   assert.match(bigFooter, /accessibilityRole: "link",\s*accessibilityLabel: link\.label/);
   assert.match(bigFooter, /href=\{link\.href\}/);
@@ -79,7 +80,7 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   assert.match(bigFooter, /minHeight=\{\{ default: "100%", web: "100dvh" \}\}/);
   assert.match(bigFooter, /<Col minHeight=\{\{ default: "100%", web: "100dvh" \}\} gap="xl">/);
   assert.ok(
-    !/<Col minHeight="100dvh"/.test(bigFooter),
+    !bigFooter.includes('<Col minHeight="100dvh"'),
     "the shell must not pass a raw 100dvh minHeight to native",
   );
   // The content region is the positioned, growing wrapper around
@@ -92,7 +93,7 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
     bigFooter,
     /<PageContentColumn>\s*\{headerNode\}\s*\{children\}\s*<\/PageContentColumn>/,
   );
-  assert.ok(!/flexBasis="auto"/.test(bigFooter), "the bounded content region is gone (#547)");
+  assert.ok(!bigFooter.includes('flexBasis="auto"'), "the bounded content region is gone (#547)");
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
 test("BigFooter is internal — not exported from the components barrel or the package (#298)", () => {
@@ -104,7 +105,7 @@ test("BigFooter is internal — not exported from the components barrel or the p
   const pagesBarrel = readCode("src/pages/index.ts");
   assert.match(pagesBarrel, /type BigFooterData/, "the footer data types are the pages contract");
   assert.ok(
-    !/export \{ BigFooter,/.test(pagesBarrel),
+    !pagesBarrel.includes('export { BigFooter,'),
     "the component itself is not a package export",
   );
   assert.ok(
@@ -163,7 +164,7 @@ test("every page component renders BigFooter through the shell from a footer pro
       `${entry} does not render BigFooter/BigFooterShell — every page renders the footer (#410)`,
     );
     assert.ok(
-      /footer\?: BigFooterData/.test(code),
+      code.includes('footer?: BigFooterData'),
       `${entry} takes no footer?: BigFooterData prop`,
     );
     assert.ok(
@@ -181,7 +182,7 @@ test("the shell reserves viewport height only when a footer is supplied", () => 
   // by its own test below.) The no-footer branch must come
   // before (and stay clear of) the sticky viewport shell.
   const noFooterBranch = bigFooter.indexOf("if (!footer)");
-  assert.ok(noFooterBranch >= 0, "BigFooterShell handles the no-footer case explicitly");
+  assert.ok(noFooterBranch !== -1, "BigFooterShell handles the no-footer case explicitly");
   assert.ok(
     noFooterBranch <
       bigFooter.indexOf('minHeight={{ default: "100%", web: "100dvh" }}', noFooterBranch),
@@ -205,7 +206,7 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // exactly like one with a footer (the footerless SignUpPage
   // stall CodeRabbit flagged on PR #556).
   const nativeBranch = bigFooter.indexOf("if (!isWeb)");
-  assert.ok(nativeBranch >= 0, "BigFooterShell handles native explicitly");
+  assert.ok(nativeBranch !== -1, "BigFooterShell handles native explicitly");
   assert.ok(
     nativeBranch < bigFooter.indexOf("if (!footer)"),
     "the native branch precedes the web footer branch — native scrolling ignores footer data",
@@ -528,7 +529,6 @@ test("SSR: BigFooter renders brand, columns, store and social links as anchors",
 });
 test("SSR: an exported page renders its footer from the footer prop", async () => {
   const {
-    React,
     renderToString,
     TamaguiProvider,
     createTamaguiConfig,
@@ -574,13 +574,13 @@ describe("bigFooterBrandWordmark", () => {
   const footer = readCode("src/widgets/content/BigFooter.tsx");
   test("BigFooterBrand carries no logo slot — brand identity is data only (#688)", () => {
     assert.match(footer, /export type BigFooterBrand = \{/);
-    assert.ok(!/logo\?:/.test(footer), "the brand type must not carry a logo slot (#688)");
+    assert.ok(!footer.includes('logo?:'), "the brand type must not carry a logo slot (#688)");
     assert.ok(
-      !/brand\.logo/.test(footer),
+      !footer.includes('brand.logo'),
       "the footer must not render a host-supplied logo (#688)",
     );
     assert.ok(
-      !/BIG_FOOTER_BRAND_LOGO_HEIGHT/.test(footer),
+      !footer.includes('BIG_FOOTER_BRAND_LOGO_HEIGHT'),
       "the DS-owned logo box height is gone with the slot (#688)",
     );
   });
@@ -659,10 +659,10 @@ describe("bigFooterPrimary", () => {
     // which each theme sets to its button (primary) color.
     assert.match(footer, /backgroundColor="\$footerBackground"/);
     assert.ok(
-      !/backgroundColor="\$surface"/.test(footer),
+      !footer.includes('backgroundColor="$surface"'),
       "the band must not keep the surface fill",
     );
-    assert.ok(!/borderTopWidth/.test(footer), "the solid primary band carries no divider line");
+    assert.ok(!footer.includes('borderTopWidth'), "the solid primary band carries no divider line");
   });
   test("the brand wordmark and social links ink in $onPrimary (#465)", () => {
     const styledBlocks = footer.match(/color: "\$onPrimary"/g) ?? [];
@@ -671,7 +671,7 @@ describe("bigFooterPrimary", () => {
       2,
       "brand anchor + social anchor styled frames use $onPrimary",
     );
-    assert.ok(!/color: "\$primary"/.test(footer), "no frame inks in $primary on the primary fill");
+    assert.ok(!footer.includes('color: "$primary"'), "no frame inks in $primary on the primary fill");
   });
   test("column titles and column links ink in $onPrimary (#465)", () => {
     assert.match(footer, /<Text variant="label" color="\$onPrimary">/);
@@ -692,7 +692,7 @@ describe("bigFooterPrimary", () => {
     // #465 kept store links as secondary Buttons on the primary
     // band; #466 superseded that: each store link is now a real
     // anchor wrapping its store's official badge artwork.
-    assert.ok(!/<Button/.test(footer), "store links must not render as Buttons (#466)");
+    assert.ok(!footer.includes('<Button'), "store links must not render as Buttons (#466)");
     assert.match(footer, /<StyledBigFooterStoreAnchor/);
     assert.match(footer, /STORE_BADGES/);
   });
@@ -708,17 +708,17 @@ describe("bigFooterSideColumn", () => {
   test("the side column renders after the link columns, inside the same row (#467)", () => {
     const columnsAt = footer.indexOf("columns.map((column)");
     const sideAt = footer.indexOf('testID="big-footer-side-column"');
-    assert.ok(columnsAt >= 0, "link columns render");
+    assert.ok(columnsAt !== -1, "link columns render");
     assert.ok(sideAt > columnsAt, "side column follows the link-columns region");
     const brandAt = footer.indexOf("<StyledBigFooterBrandAnchor");
-    assert.ok(brandAt >= 0 && brandAt < columnsAt, "brand wordmark stays above the row");
+    assert.ok(brandAt !== -1 && brandAt < columnsAt, "brand wordmark stays above the row");
   });
   test("store links sit above socials in the side column, socials pinned to its bottom (#467)", () => {
     const sideAt = footer.indexOf('testID="big-footer-side-column"');
     const sideBlock = footer.slice(sideAt);
     const storeAt = sideBlock.indexOf("<StyledBigFooterStoreAnchor");
     const socialAt = sideBlock.indexOf("<StyledBigFooterSocialAnchor");
-    assert.ok(storeAt >= 0, "store links render inside the side column");
+    assert.ok(storeAt !== -1, "store links render inside the side column");
     assert.ok(socialAt > storeAt, "social row renders below the store links");
     const tagStart = footer.lastIndexOf("<Col", sideAt);
     const openingTag = footer.slice(tagStart, footer.indexOf(">", sideAt));
@@ -791,7 +791,7 @@ describe("bigFooterStoreBadges", () => {
     assert.match(footer, /<StyledBigFooterStoreAnchor/);
     assert.match(footer, /accessibilityRole: "link",\s*accessibilityLabel: link\.label/);
     assert.match(footer, /href=\{link\.href\}/);
-    assert.ok(!/<Button/.test(footer), "no plain text Button renders a store link (#466)");
+    assert.ok(!footer.includes('<Button'), "no plain text Button renders a store link (#466)");
     assert.match(footer, /storeLinks\.length > 0 \? \(/);
   });
   let runtimePromise: Promise<Record<string, any>> | undefined;
@@ -893,7 +893,7 @@ test("the shell renders the full AppTopBar from header data (#857) and the foote
   assert.match(bigFooter, /<AppTopBar/);
   assert.match(bigFooter, /backgroundColor="\$footerBackground"/);
   assert.ok(
-    !/backgroundColor="\$primary"/.test(bigFooter),
+    !bigFooter.includes('backgroundColor="$primary"'),
     "BigFooter consumes the footerBackground semantic token, not the raw primary token (#857)",
   );
 });

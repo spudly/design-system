@@ -146,8 +146,8 @@ test("the CLI rejects an omitted --capture-total instead of reading it as 0", ()
       ],
       { stdio: "pipe" },
     );
-  } catch (e) {
-    error = e;
+  } catch (error_) {
+    error = error_;
   }
   assert.ok(error, "CLI must fail without --capture-total");
   assert.equal(error.status, 1);
@@ -169,8 +169,8 @@ test("the CLI rejects a --capture-total flag with no operand", () => {
       ],
       { stdio: "pipe" },
     );
-  } catch (e) {
-    error = e;
+  } catch (error_) {
+    error = error_;
   }
   assert.ok(error, "CLI must fail when --capture-total has no operand");
   assert.equal(error.status, 1);

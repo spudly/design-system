@@ -35,18 +35,18 @@ const imageDef = text.slice(
 
 test("the initials fallback has a 1px border (#461)", () => {
   assert.ok(
-    /borderWidth=\{1\}/.test(fallbackDef),
+    fallbackDef.includes('borderWidth={1}'),
     "Avatar Fallback must set borderWidth 1 so non-image avatars render a 1px border (#461)",
   );
 });
 
 test("the fallback border matches the initials text color (#461)", () => {
   assert.ok(
-    /borderColor="\$primaryEmphasis"/.test(fallbackDef),
+    fallbackDef.includes('borderColor="$primaryEmphasis"'),
     'Avatar Fallback must set borderColor "$primaryEmphasis" so the border matches the initials text color (#461)',
   );
   assert.ok(
-    /color: "\$primaryEmphasis"/.test(text),
+    text.includes('color: "$primaryEmphasis"'),
     "Avatar initials must render in $primaryEmphasis, the token the border matches (#461)",
   );
 });

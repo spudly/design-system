@@ -131,6 +131,7 @@ export const IconTabs: Story = {
 
 /** A child that suspends the way a pending lazy chunk does. */
 function PendingContent(): never {
+  // eslint-disable-next-line @typescript-eslint/only-throw-error -- throwing a promise is the React Suspense protocol this fixture simulates
   throw new Promise(() => { /* noop */ });
 }
 

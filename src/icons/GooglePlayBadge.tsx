@@ -39,13 +39,16 @@ export function GooglePlayBadge() {
       viewBox="0 0 155 46"
       aria-hidden={true}
     >
+      {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry */}
       <Rect x={0.5} y={0.5} width={154} height={45} rx={6} fill="#000000" stroke="#ffffff" />
       <Path d="M17 12 L26 23 L17 34 Z" fill="#00d2ff" />
       <Path d="M17 12 L36 20.5 L26 23 Z" fill="#00f076" />
       <Path d="M26 23 L36 20.5 L36 25.5 Z" fill="#ffce00" />
       <Path d="M17 34 L26 23 L36 25.5 Z" fill="#ff3a44" />
       <Text
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
         x={45}
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
         y={19}
         fill="#ffffff"
         fontSize={7.5}
@@ -55,7 +58,9 @@ export function GooglePlayBadge() {
         GET IT ON
       </Text>
       <Text
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
         x={45}
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
         y={35}
         fill="#ffffff"
         fontSize={15}
