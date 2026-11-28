@@ -37,7 +37,8 @@
         "prettier",
         "react-native-web",
         "storybook",
-        "tsx"
+        "tsx",
+        "typescript7"
       ],
       "ignoreBinaries": [
         "changeset",
