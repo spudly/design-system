@@ -20,6 +20,7 @@ import { createStoryLinkOpenURL } from "./storyLinks";
 let captureFullPageNative:
   typeof import("./modules/dsvr-capture/src/index").captureFullPage | null = null;
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- defensive load of an optionally-linked native module: require() in try/catch is the mechanism; a static import would crash JS-only runtimes.
   captureFullPageNative = require("./modules/dsvr-capture/src/index").captureFullPage;
 } catch {
   captureFullPageNative = null;
@@ -286,6 +287,9 @@ export default function App() {
   // per weight: a single variable registration left the medium
   // weight to Android's numeric resolution, which rendered it
   // nondeterministically (#326).
+  // Expo useFonts asset registration: Metro requires static require()
+  // calls for font assets — there is no import form for .ttf modules.
+  /* eslint-disable @typescript-eslint/no-require-imports -- Expo useFonts asset registration: Metro requires static require() calls for font assets; there is no import form for .ttf modules. */
   const [fontsLoaded, fontError] = useFonts({
     UiSans: require("./assets/fonts/UiSans.ttf"),
     "UiSans-Medium": require("./assets/fonts/UiSans-Medium.ttf"),
@@ -293,6 +297,7 @@ export default function App() {
     "UiSans-Bold": require("./assets/fonts/UiSans-Bold.ttf"),
     Alegreya: require("./assets/fonts/Alegreya.ttf"),
   });
+  /* eslint-enable @typescript-eslint/no-require-imports -- end of the useFonts asset-require block above. */
   const capture = useCaptureTarget();
   useStoryIndexLog();
 
