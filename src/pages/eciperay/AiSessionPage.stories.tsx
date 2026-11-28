@@ -19,14 +19,14 @@ export default meta;
 type Story = StoryObj<typeof AiSessionPage>;
 
 const noopHandlers = {
-  onPromptChange: () => {},
-  onFollowUpChange: () => {},
-  onStart: () => {},
-  onSendMessage: () => {},
-  onApprovePlan: () => {},
-  onFinalize: () => {},
-  onCancel: () => {},
-  onEmptyCancel: () => {},
+  onPromptChange: () => { /* noop */ },
+  onFollowUpChange: () => { /* noop */ },
+  onStart: () => { /* noop */ },
+  onSendMessage: () => { /* noop */ },
+  onApprovePlan: () => { /* noop */ },
+  onFinalize: () => { /* noop */ },
+  onCancel: () => { /* noop */ },
+  onEmptyCancel: () => { /* noop */ },
 };
 
 export const Start: Story = {

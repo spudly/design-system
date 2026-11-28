@@ -35,7 +35,7 @@ function TagsDemo({ withAction = false }: { withAction?: boolean }) {
         label="Tags"
         action={
           withAction ? (
-            <RevertAction label="Weeknight, Kid-approved" onPress={() => {}} />
+            <RevertAction label="Weeknight, Kid-approved" onPress={() => { /* noop */ }} />
           ) : undefined
         }
       >

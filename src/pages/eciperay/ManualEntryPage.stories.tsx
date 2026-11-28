@@ -47,9 +47,9 @@ function useFormProps(): RecipeFormPageProps {
     tagOptions: fixture.tagOptions,
     tagIds,
     onTagIdsChange: setTagIds,
-    onGenerateDescription: () => {},
+    onGenerateDescription: () => { /* noop */ },
     submitLabel: "Create Recipe",
-    onSubmit: () => {},
+    onSubmit: () => { /* noop */ },
   };
 }
 

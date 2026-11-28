@@ -34,8 +34,8 @@ function Hub({ initialTab }: { initialTab: MealsHubPageTab }) {
       loading={false}
       createMealHref="/meals/new"
       createPlanHref="/meal-plans/new"
-      onDeleteMeal={() => {}}
-      onDeletePlan={() => {}}
+      onDeleteMeal={() => { /* noop */ }}
+      onDeletePlan={() => { /* noop */ }}
     />
   );
 }
@@ -72,14 +72,14 @@ export const PlansTabLongListNarrow: Story = {
     <MealsHubPage
       footer={eciperayFooterFixture}
       activeTab="plans"
-      onSelectTab={() => {}}
+      onSelectTab={() => { /* noop */ }}
       meals={mealsHubFixture.meals}
       plans={LONG_PLANS}
       loading={false}
       createMealHref="/meals/new"
       createPlanHref="/meal-plans/new"
-      onDeleteMeal={() => {}}
-      onDeletePlan={() => {}}
+      onDeleteMeal={() => { /* noop */ }}
+      onDeletePlan={() => { /* noop */ }}
     />
   ),
 };
@@ -90,14 +90,14 @@ export const PlansTabLongListNarrowLoading: Story = {
     <MealsHubPage
       footer={eciperayFooterFixture}
       activeTab="plans"
-      onSelectTab={() => {}}
+      onSelectTab={() => { /* noop */ }}
       meals={mealsHubFixture.meals}
       plans={LONG_PLANS}
       loading
       createMealHref="/meals/new"
       createPlanHref="/meal-plans/new"
-      onDeleteMeal={() => {}}
-      onDeletePlan={() => {}}
+      onDeleteMeal={() => { /* noop */ }}
+      onDeletePlan={() => { /* noop */ }}
     />
   ),
 };
@@ -108,14 +108,14 @@ export const Empty: Story = {
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
-        onSelectTab={() => {}}
+        onSelectTab={() => { /* noop */ }}
         meals={[]}
         plans={[]}
         loading={false}
         createMealHref="/meals/new"
         createPlanHref="/meal-plans/new"
-        onDeleteMeal={() => {}}
-        onDeletePlan={() => {}}
+        onDeleteMeal={() => { /* noop */ }}
+        onDeletePlan={() => { /* noop */ }}
       />
     </>
   ),
@@ -127,14 +127,14 @@ export const Loading: Story = {
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
-        onSelectTab={() => {}}
+        onSelectTab={() => { /* noop */ }}
         meals={[]}
         plans={[]}
         loading
         createMealHref="/meals/new"
         createPlanHref="/meal-plans/new"
-        onDeleteMeal={() => {}}
-        onDeletePlan={() => {}}
+        onDeleteMeal={() => { /* noop */ }}
+        onDeletePlan={() => { /* noop */ }}
       />
     </>
   ),
@@ -147,14 +147,14 @@ export const LoadingOverlay: Story = {
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
-        onSelectTab={() => {}}
+        onSelectTab={() => { /* noop */ }}
         meals={mealsHubFixture.meals}
         plans={mealsHubFixture.plans}
         loading={false}
         createMealHref="/meals/new"
         createPlanHref="/meal-plans/new"
-        onDeleteMeal={() => {}}
-        onDeletePlan={() => {}}
+        onDeleteMeal={() => { /* noop */ }}
+        onDeletePlan={() => { /* noop */ }}
       />
       <View
         position="absolute"
@@ -168,14 +168,14 @@ export const LoadingOverlay: Story = {
         <MealsHubPage
           footer={eciperayFooterFixture}
           activeTab="meals"
-          onSelectTab={() => {}}
+          onSelectTab={() => { /* noop */ }}
           meals={mealsHubFixture.meals}
           plans={mealsHubFixture.plans}
           loading
           createMealHref="/meals/new"
           createPlanHref="/meal-plans/new"
-          onDeleteMeal={() => {}}
-          onDeletePlan={() => {}}
+          onDeleteMeal={() => { /* noop */ }}
+          onDeletePlan={() => { /* noop */ }}
         />
       </View>
     </View>

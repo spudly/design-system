@@ -65,7 +65,7 @@ test("the shell is BigFooterShell in content scroll mode around the plain Screen
     title: "Memorize",
     tabs: sentinelTabs(React),
     activeTabId: "verses",
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
     footer,
   });
   assert.equal(tree.type, BigFooterShell, "the page renders through the footer shell (#410)");
@@ -133,7 +133,7 @@ const sentinelTabs = (React: any) => [
 ];
 test("the slot renders only the active tab's content, keyed by the active surface", async () => {
   const { React, TabbedShellPage, distViews } = await loadRuntime();
-  const onTabSelect = () => {};
+  const onTabSelect = () => { /* noop */ };
   const tree = TabbedShellPage({
     title: "Memorize",
     tabsLabel: "Memorize sections",
@@ -181,7 +181,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     title: "Memorize",
     tabs: sentinelTabs(React),
     activeTabId: null,
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
     children: override,
   });
   const [, tabBar, , slot] = tree.props.children.props.children;
@@ -192,7 +192,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     title: "Memorize",
     tabs: sentinelTabs(React),
     activeTabId: "verses",
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
     contentKey: "verse-42",
   });
   assert.equal(
@@ -209,7 +209,7 @@ test("SSR: title, tab bar, and the active surface render; the inactive surface d
       tabsLabel="Memorize sections"
       tabs={sentinelTabs(React)}
       activeTabId="verses"
-      onTabSelect={() => {}}
+      onTabSelect={() => { /* noop */ }}
     />,
   );
   assert.match(html, /Memorize/, "the app title renders");
@@ -220,7 +220,7 @@ test("SSR: title, tab bar, and the active surface render; the inactive surface d
 test("SSR: a pending surface shows the loading state; a failed one the boundary fallback", async () => {
   const { TabbedShellPage } = await loadRuntime();
   function PendingContent(): never {
-    throw new Promise(() => {});
+    throw new Promise(() => { /* noop */ });
   }
   function FailingContent(): never {
     throw new Error("Failed to fetch dynamically imported module");
@@ -236,7 +236,7 @@ test("SSR: a pending surface shows the loading state; a failed one the boundary 
         },
       ]}
       activeTabId="search"
-      onTabSelect={() => {}}
+      onTabSelect={() => { /* noop */ }}
     />,
   );
   assert.match(
@@ -256,8 +256,8 @@ test("SSR: a pending surface shows the loading state; a failed one the boundary 
         },
       ]}
       activeTabId="search"
-      onTabSelect={() => {}}
-      onReload={() => {}}
+      onTabSelect={() => { /* noop */ }}
+      onReload={() => { /* noop */ }}
     />,
   );
   // renderToString never paints a class boundary's fallback
@@ -308,7 +308,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     title: "Memorize",
     tabs: sentinelTabs(React),
     activeTabId: "verses",
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
   });
   assert.equal(
     bare.props.children.props.children[2],
@@ -323,7 +323,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     title: "Memorize",
     tabs: sentinelTabs(React),
     activeTabId: "verses",
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
     notice: {
       message: "Your verses could not be refreshed.",
       action: { label: "Try again", onPress },
@@ -351,10 +351,10 @@ test("SSR: a notice renders its message and action above the content; content st
       title="Memorize"
       tabs={sentinelTabs(React)}
       activeTabId="verses"
-      onTabSelect={() => {}}
+      onTabSelect={() => { /* noop */ }}
       notice={{
         message: "Your verses could not be refreshed.",
-        action: { label: "Try again", onPress: () => {} },
+        action: { label: "Try again", onPress: () => { /* noop */ } },
       }}
     />,
   );
@@ -369,7 +369,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
     title: "Memorize",
     tabs: sentinelTabs(React),
     activeTabId: "verses",
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
   });
   const bareChildren = bare.props.children.props.children;
   assert.equal(bareChildren[4], null, "no install banner data — no install banner renders");
@@ -384,7 +384,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
     onAccept: () => {
       accepts += 1;
     },
-    onDecline: () => {},
+    onDecline: () => { /* noop */ },
   };
   const installBanner = {
     message: "Get the app for the best experience.",
@@ -397,7 +397,7 @@ test("banners (#879): absent by default; when present the shell renders the bann
     title: "Memorize",
     tabs: sentinelTabs(React),
     activeTabId: "verses",
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
     consentBanner,
     installBanner,
   });

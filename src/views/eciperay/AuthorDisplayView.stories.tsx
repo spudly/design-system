@@ -14,8 +14,8 @@ export default meta;
 type Story = StoryObj<typeof AuthorDisplayView>;
 
 const actions = {
-  onChange: () => {},
-  onSave: () => {},
+  onChange: () => { /* noop */ },
+  onSave: () => { /* noop */ },
 };
 
 export const Named: Story = {

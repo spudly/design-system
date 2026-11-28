@@ -36,18 +36,18 @@ export const Default: Story = {
 };
 
 export const Loading: Story = {
-  args: { items: [], selectedIds: [], onToggle: () => {}, loading: true },
+  args: { items: [], selectedIds: [], onToggle: () => { /* noop */ }, loading: true },
 };
 
 export const Empty: Story = {
-  args: { items: [], selectedIds: [], onToggle: () => {} },
+  args: { items: [], selectedIds: [], onToggle: () => { /* noop */ } },
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
     <YStack position="relative" maxWidth={430}>
-      <CheckboxSelectList items={ITEMS} selectedIds={["a"]} onToggle={() => {}} />
+      <CheckboxSelectList items={ITEMS} selectedIds={["a"]} onToggle={() => { /* noop */ }} />
       <YStack
         position="absolute"
         top={0}
@@ -57,7 +57,7 @@ export const LoadingOverlay: Story = {
         opacity={0.45}
         pointerEvents="none"
       >
-        <CheckboxSelectList items={ITEMS} selectedIds={["a"]} onToggle={() => {}} loading />
+        <CheckboxSelectList items={ITEMS} selectedIds={["a"]} onToggle={() => { /* noop */ }} loading />
       </YStack>
     </YStack>
   ),

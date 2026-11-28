@@ -19,12 +19,12 @@ export const Form: Story = {
       <FeedbackPage
         footer={eciperayFooterFixture}
         message="The shopping list didn't keep my checks after I closed the app."
-        onMessageChange={() => {}}
+        onMessageChange={() => { /* noop */ }}
         replyEmail="cook@example.com"
-        onReplyEmailChange={() => {}}
+        onReplyEmailChange={() => { /* noop */ }}
         isBug
-        onIsBugChange={() => {}}
-        onSubmit={() => {}}
+        onIsBugChange={() => { /* noop */ }}
+        onSubmit={() => { /* noop */ }}
       />
     </>
   ),
@@ -36,14 +36,14 @@ export const Submitted: Story = {
       <FeedbackPage
         footer={eciperayFooterFixture}
         message=""
-        onMessageChange={() => {}}
+        onMessageChange={() => { /* noop */ }}
         replyEmail=""
-        onReplyEmailChange={() => {}}
+        onReplyEmailChange={() => { /* noop */ }}
         isBug={false}
-        onIsBugChange={() => {}}
+        onIsBugChange={() => { /* noop */ }}
         submitted
-        onSubmit={() => {}}
-        onResetPress={() => {}}
+        onSubmit={() => { /* noop */ }}
+        onResetPress={() => { /* noop */ }}
       />
     </>
   ),
@@ -55,13 +55,13 @@ export const FormWithCancel: Story = {
       <FeedbackPage
         footer={eciperayFooterFixture}
         message="The shopping list didn't keep my checks after I closed the app."
-        onMessageChange={() => {}}
+        onMessageChange={() => { /* noop */ }}
         replyEmail="cook@example.com"
-        onReplyEmailChange={() => {}}
+        onReplyEmailChange={() => { /* noop */ }}
         isBug
-        onIsBugChange={() => {}}
-        onSubmit={() => {}}
-        onCancel={() => {}}
+        onIsBugChange={() => { /* noop */ }}
+        onSubmit={() => { /* noop */ }}
+        onCancel={() => { /* noop */ }}
       />
     </>
   ),

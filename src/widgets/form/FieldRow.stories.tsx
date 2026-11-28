@@ -18,7 +18,7 @@ export const Default: Story = {
   render: () => (
     <YStack maxWidth={430}>
       <FieldRow>
-        <SearchField grow value="" onChangeText={() => {}} placeholder="e.g. Ether 12:27" />
+        <SearchField grow value="" onChangeText={() => { /* noop */ }} placeholder="e.g. Ether 12:27" />
         <Button>Search</Button>
       </FieldRow>
     </YStack>
@@ -32,7 +32,7 @@ export const SmallAction: Story = {
         <SearchField
           grow
           value=""
-          onChangeText={() => {}}
+          onChangeText={() => { /* noop */ }}
           placeholder="Search recipes…"
           aria-label="Search recipes"
         />

@@ -339,7 +339,7 @@ test("banners (#879): absent by default; when present the page renders the banne
     onAccept: () => {
       accepts += 1;
     },
-    onDecline: () => {},
+    onDecline: () => { /* noop */ },
   };
   const installBanner = {
     message: "Get the app for the best experience.",

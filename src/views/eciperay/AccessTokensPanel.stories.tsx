@@ -21,11 +21,11 @@ export const WithTokens: Story = {
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName="Kitchen tablet"
-        onTokenNameChange={() => {}}
-        onCreate={() => {}}
+        onTokenNameChange={() => { /* noop */ }}
+        onCreate={() => { /* noop */ }}
         createdSecret={null}
-        onDismissSecret={() => {}}
-        onRevoke={() => {}}
+        onDismissSecret={() => { /* noop */ }}
+        onRevoke={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -38,11 +38,11 @@ export const Loading: Story = {
         tokens={accessTokensFixture.tokens}
         loading
         tokenName=""
-        onTokenNameChange={() => {}}
-        onCreate={() => {}}
+        onTokenNameChange={() => { /* noop */ }}
+        onCreate={() => { /* noop */ }}
         createdSecret={null}
-        onDismissSecret={() => {}}
-        onRevoke={() => {}}
+        onDismissSecret={() => { /* noop */ }}
+        onRevoke={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -56,11 +56,11 @@ export const LoadingOverlay: Story = {
         <AccessTokensPanel
           tokens={accessTokensFixture.tokens}
           tokenName="Kitchen tablet"
-          onTokenNameChange={() => {}}
-          onCreate={() => {}}
+          onTokenNameChange={() => { /* noop */ }}
+          onCreate={() => { /* noop */ }}
           createdSecret={null}
-          onDismissSecret={() => {}}
-          onRevoke={() => {}}
+          onDismissSecret={() => { /* noop */ }}
+          onRevoke={() => { /* noop */ }}
         />
         <YStack
           position="absolute"
@@ -75,11 +75,11 @@ export const LoadingOverlay: Story = {
             tokens={accessTokensFixture.tokens}
             loading
             tokenName="Kitchen tablet"
-            onTokenNameChange={() => {}}
-            onCreate={() => {}}
+            onTokenNameChange={() => { /* noop */ }}
+            onCreate={() => { /* noop */ }}
             createdSecret={null}
-            onDismissSecret={() => {}}
-            onRevoke={() => {}}
+            onDismissSecret={() => { /* noop */ }}
+            onRevoke={() => { /* noop */ }}
           />
         </YStack>
       </YStack>
@@ -93,11 +93,11 @@ export const SecretJustCreated: Story = {
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName=""
-        onTokenNameChange={() => {}}
-        onCreate={() => {}}
+        onTokenNameChange={() => { /* noop */ }}
+        onCreate={() => { /* noop */ }}
         createdSecret={accessTokensFixture.createdSecret}
-        onDismissSecret={() => {}}
-        onRevoke={() => {}}
+        onDismissSecret={() => { /* noop */ }}
+        onRevoke={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -109,11 +109,11 @@ export const PlanNotice: Story = {
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens.slice(0, 1)}
         tokenName=""
-        onTokenNameChange={() => {}}
-        onCreate={() => {}}
+        onTokenNameChange={() => { /* noop */ }}
+        onCreate={() => { /* noop */ }}
         createdSecret={null}
-        onDismissSecret={() => {}}
-        onRevoke={() => {}}
+        onDismissSecret={() => { /* noop */ }}
+        onRevoke={() => { /* noop */ }}
         planNotice="API access tokens are a Power plan feature. Upgrade to create tokens."
       />
     </StoryFrame>

@@ -121,7 +121,7 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     onDayChange: (key, day) => {
       setDayByKey((current) => ({ ...current, [key]: day }));
     },
-    onSubmit: restOverrides.onSubmit ?? (() => {}),
+    onSubmit: restOverrides.onSubmit ?? (() => { /* noop */ }),
   };
 }
 
@@ -176,14 +176,14 @@ export const DetailsOnly: Story = {
     <MealPlanFormPage
       footer={eciperayFooterFixture}
       title="New plan"
-      onTitleChange={() => {}}
+      onTitleChange={() => { /* noop */ }}
       notes=""
-      onNotesChange={() => {}}
+      onNotesChange={() => { /* noop */ }}
       startsOn="2026-10-19"
-      onStartsOnChange={() => {}}
+      onStartsOnChange={() => { /* noop */ }}
       endsOn="2026-10-25"
-      onEndsOnChange={() => {}}
-      onSubmit={() => {}}
+      onEndsOnChange={() => { /* noop */ }}
+      onSubmit={() => { /* noop */ }}
     />
   ),
 };

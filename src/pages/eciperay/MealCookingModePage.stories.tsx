@@ -37,7 +37,7 @@ function Cooking({ initialStep }: { initialStep: number }) {
       onNext={() => {
         setStepIndex((current) => Math.min(steps.length - 1, current + 1));
       }}
-      onDone={() => {}}
+      onDone={() => { /* noop */ }}
     />
   );
 }
@@ -61,9 +61,9 @@ export const NoFooter: Story = {
       mealTitle={mealCookingFixture.mealTitle}
       steps={mealCookingFixture.steps}
       stepIndex={1}
-      onPrev={() => {}}
-      onNext={() => {}}
-      onDone={() => {}}
+      onPrev={() => { /* noop */ }}
+      onNext={() => { /* noop */ }}
+      onDone={() => { /* noop */ }}
     />
   ),
 };
@@ -99,7 +99,7 @@ export const LoadError: Story = {
       <MealCookingModePage
         state="error"
         mealTitle={mealCookingFixture.mealTitle}
-        onDone={() => {}}
+        onDone={() => { /* noop */ }}
       />
     </>
   ),
@@ -134,9 +134,9 @@ export const LongBody: Story = {
         mealTitle={mealCookingFixture.mealTitle}
         steps={LONG_BODY_STEPS}
         stepIndex={0}
-        onPrev={() => {}}
-        onNext={() => {}}
-        onDone={() => {}}
+        onPrev={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
+        onDone={() => { /* noop */ }}
       />
     </>
   ),

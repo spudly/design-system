@@ -33,9 +33,9 @@ export const WithIngredientsPanel: Story = {
             "1 tsp smoked paprika",
           ],
         }}
-        onPrev={() => {}}
-        onNext={() => {}}
-        onDone={() => {}}
+        onPrev={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
+        onDone={() => { /* noop */ }}
       />
     </>
   ),
@@ -62,9 +62,9 @@ export const NoFooter: Story = {
             "1 tsp smoked paprika",
           ],
         }}
-        onPrev={() => {}}
-        onNext={() => {}}
-        onDone={() => {}}
+        onPrev={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
+        onDone={() => { /* noop */ }}
       />
     </>
   ),
@@ -77,9 +77,9 @@ export const Loading: Story = {
         recipeTitle="Skillet Chicken"
         steps={[]}
         stepIndex={0}
-        onPrev={() => {}}
-        onNext={() => {}}
-        onDone={() => {}}
+        onPrev={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
+        onDone={() => { /* noop */ }}
         loading
       />
     </>
@@ -93,9 +93,9 @@ export const FirstStep: Story = {
         recipeTitle="Skillet Chicken"
         steps={steps}
         stepIndex={0}
-        onPrev={() => {}}
-        onNext={() => {}}
-        onDone={() => {}}
+        onPrev={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
+        onDone={() => { /* noop */ }}
       />
     </>
   ),
@@ -115,13 +115,13 @@ export const CookLogFormOpen: Story = {
         steps={steps}
         stepIndex={1}
         cookLogForm={{
-          onSubmit: () => {},
-          onSkip: () => {},
+          onSubmit: () => { /* noop */ },
+          onSkip: () => { /* noop */ },
           isPending: false,
         }}
-        onPrev={() => {}}
-        onNext={() => {}}
-        onDone={() => {}}
+        onPrev={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
+        onDone={() => { /* noop */ }}
       />
     </>
   ),
@@ -134,9 +134,9 @@ export const LastStep: Story = {
         recipeTitle="Skillet Chicken"
         steps={steps}
         stepIndex={2}
-        onPrev={() => {}}
-        onNext={() => {}}
-        onDone={() => {}}
+        onPrev={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
+        onDone={() => { /* noop */ }}
       />
     </>
   ),

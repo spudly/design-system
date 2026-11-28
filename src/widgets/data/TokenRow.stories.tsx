@@ -16,7 +16,7 @@ export const Default: Story = {
     name: "Claude Desktop",
     prefix: "eci_pat_8f3k",
     metaLabel: "Created Oct 2, 2026 · Last used Oct 20, 2026",
-    onRevoke: () => {},
+    onRevoke: () => { /* noop */ },
   },
 };
 
@@ -25,7 +25,7 @@ export const NeverUsed: Story = {
     name: "Backup script",
     prefix: "eci_pat_51qd",
     metaLabel: "Created Oct 12, 2026 · Never used",
-    onRevoke: () => {},
+    onRevoke: () => { /* noop */ },
   },
 };
 
@@ -35,7 +35,7 @@ export const Revoked: Story = {
     prefix: "eci_pat_9zx2",
     metaLabel: "Created Sep 1, 2026 · Last used Sep 30, 2026",
     revoked: true,
-    onRevoke: () => {},
+    onRevoke: () => { /* noop */ },
   },
 };
 
@@ -44,7 +44,7 @@ export const Loading: Story = {
     name: "Claude Desktop",
     prefix: "eci_pat_8f3k",
     metaLabel: "Created Oct 2, 2026 · Last used Oct 20, 2026",
-    onRevoke: () => {},
+    onRevoke: () => { /* noop */ },
     loading: true,
   },
 };
@@ -57,7 +57,7 @@ export const LoadingOverlay: Story = {
         name="Claude Desktop"
         prefix="eci_pat_8f3k"
         metaLabel="Created Oct 2, 2026 · Last used Oct 20, 2026"
-        onRevoke={() => {}}
+        onRevoke={() => { /* noop */ }}
       />
       <YStack
         position="absolute"
@@ -72,7 +72,7 @@ export const LoadingOverlay: Story = {
           name="Claude Desktop"
           prefix="eci_pat_8f3k"
           metaLabel="Created Oct 2, 2026 · Last used Oct 20, 2026"
-          onRevoke={() => {}}
+          onRevoke={() => { /* noop */ }}
           loading
         />
       </YStack>

@@ -56,7 +56,7 @@ function buttonAttrs(html: string, label: string): string {
 }
 const baseProps = {
   search: "",
-  onSearchChange: () => {},
+  onSearchChange: () => { /* noop */ },
   items: [
     {
       id: "a",
@@ -68,10 +68,10 @@ const baseProps = {
     },
   ],
   selectedIds: ["a"],
-  onToggle: () => {},
-  onSelectAll: () => {},
-  onClearSelection: () => {},
-  onExport: () => {},
+  onToggle: () => { /* noop */ },
+  onSelectAll: () => { /* noop */ },
+  onClearSelection: () => { /* noop */ },
+  onExport: () => { /* noop */ },
   exportLabel: "Export selected (1)",
 };
 test("error state: Select all is disabled, the selection can still be cleared, items stay hidden", async () => {

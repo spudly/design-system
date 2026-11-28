@@ -79,13 +79,13 @@ export function ConsentPreferencesPage({
             <Col gap="xxl">
               <TextSkeleton size="md" lines={3} />
               <ButtonRow>
-                <Button variant="primary" onPress={() => {}}>
+                <Button variant="primary" onPress={() => { /* noop */ }}>
                   {voice.consentPreferencesPage.acceptLabel}
                 </Button>
-                <Button variant="secondary" onPress={() => {}}>
+                <Button variant="secondary" onPress={() => { /* noop */ }}>
                   {voice.consentPreferencesPage.declineLabel}
                 </Button>
-                <Button variant="secondary" onPress={() => {}}>
+                <Button variant="secondary" onPress={() => { /* noop */ }}>
                   {voice.consentPreferencesPage.withdrawLabel}
                 </Button>
               </ButtonRow>

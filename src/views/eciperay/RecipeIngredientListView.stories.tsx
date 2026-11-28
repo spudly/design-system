@@ -60,7 +60,7 @@ function Harness({
                 variant="secondary"
                 size="sm"
                 accessibilityLabel={`Reorder ingredient ${index + 1}`}
-                onPress={() => {}}
+                onPress={() => { /* noop */ }}
               >
                 Drag
               </Button>

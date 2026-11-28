@@ -25,30 +25,30 @@ export const WithSections: Story = {
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
-        onSignOut={() => {}}
+        onSignOut={() => { /* noop */ }}
         tagsHref="/profile/tags"
         nutritionGoals={{
           goals: nutritionGoalsFixture,
-          onChange: () => {},
-          onSave: () => {},
+          onChange: () => { /* noop */ },
+          onSave: () => { /* noop */ },
         }}
         accessTokens={{
           tokens: accessTokensFixture.tokens,
           tokenName: "",
-          onTokenNameChange: () => {},
-          onCreate: () => {},
+          onTokenNameChange: () => { /* noop */ },
+          onCreate: () => { /* noop */ },
           createdSecret: null,
-          onDismissSecret: () => {},
-          onRevoke: () => {},
+          onDismissSecret: () => { /* noop */ },
+          onRevoke: () => { /* noop */ },
         }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
-          onShortcutEnabledChange: () => {},
+          onShortcutEnabledChange: () => { /* noop */ },
           consent: true,
           consentStatusText: "Analytics consent: Accepted",
-          onAcceptConsent: () => {},
-          onDeclineConsent: () => {},
-          onWithdrawConsent: () => {},
+          onAcceptConsent: () => { /* noop */ },
+          onDeclineConsent: () => { /* noop */ },
+          onWithdrawConsent: () => { /* noop */ },
           choicesHref: "/privacy/consent",
         }}
         legalLinks={[
@@ -69,17 +69,17 @@ export const Loading: Story = {
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
-        onSignOut={() => {}}
+        onSignOut={() => { /* noop */ }}
         loading
         subscription={{
           planLabel: "Plus plan",
           statusText: "Your Plus plan is active and renews on Dec 1, 2026.",
-          onManage: () => {},
+          onManage: () => { /* noop */ },
         }}
         authorDisplay={{
           settings: { displayName: "Jamie Cook", showOnPublicRecipes: true },
-          onChange: () => {},
-          onSave: () => {},
+          onChange: () => { /* noop */ },
+          onSave: () => { /* noop */ },
         }}
         familySharing={{
           grants: [
@@ -91,37 +91,37 @@ export const Loading: Story = {
             },
           ],
           email: "",
-          onEmailChange: () => {},
-          onAdd: () => {},
-          onRemove: () => {},
+          onEmailChange: () => { /* noop */ },
+          onAdd: () => { /* noop */ },
+          onRemove: () => { /* noop */ },
         }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
-          onShortcutEnabledChange: () => {},
+          onShortcutEnabledChange: () => { /* noop */ },
           consent: true,
           consentStatusText: "Analytics consent: Accepted",
-          onAcceptConsent: () => {},
-          onDeclineConsent: () => {},
-          onWithdrawConsent: () => {},
+          onAcceptConsent: () => { /* noop */ },
+          onDeclineConsent: () => { /* noop */ },
+          onWithdrawConsent: () => { /* noop */ },
           choicesHref: "/privacy/consent",
         }}
         accountData={{
-          onExportData: () => {},
-          onDeleteAccount: () => {},
+          onExportData: () => { /* noop */ },
+          onDeleteAccount: () => { /* noop */ },
         }}
         nutritionGoals={{
           goals: nutritionGoalsFixture,
-          onChange: () => {},
-          onSave: () => {},
+          onChange: () => { /* noop */ },
+          onSave: () => { /* noop */ },
         }}
         accessTokens={{
           tokens: accessTokensFixture.tokens,
           tokenName: "",
-          onTokenNameChange: () => {},
-          onCreate: () => {},
+          onTokenNameChange: () => { /* noop */ },
+          onCreate: () => { /* noop */ },
           createdSecret: null,
-          onDismissSecret: () => {},
-          onRevoke: () => {},
+          onDismissSecret: () => { /* noop */ },
+          onRevoke: () => { /* noop */ },
         }}
         legalLinks={[
           { label: "Terms of Service", href: "/terms" },
@@ -145,23 +145,23 @@ export const WithCoverageSections: Story = {
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
-        onSignOut={() => {}}
+        onSignOut={() => { /* noop */ }}
         subscription={{
           planLabel: "Plus plan",
           statusText: "Your Plus plan is active and renews on Dec 1, 2026.",
-          onManage: () => {},
+          onManage: () => { /* noop */ },
         }}
         showLess={{
           entries: [
             { sourceRecipeId: "recipe-1", title: "Spicy Tuna Casserole" },
             { sourceRecipeId: "recipe-2", title: "Liver and Onions" },
           ],
-          onUndo: () => {},
+          onUndo: () => { /* noop */ },
         }}
         authorDisplay={{
           settings: { displayName: "Jamie Cook", showOnPublicRecipes: true },
-          onChange: () => {},
-          onSave: () => {},
+          onChange: () => { /* noop */ },
+          onSave: () => { /* noop */ },
         }}
         familySharing={{
           grants: [
@@ -173,54 +173,54 @@ export const WithCoverageSections: Story = {
             },
           ],
           email: "",
-          onEmailChange: () => {},
-          onAdd: () => {},
-          onRemove: () => {},
+          onEmailChange: () => { /* noop */ },
+          onAdd: () => { /* noop */ },
+          onRemove: () => { /* noop */ },
         }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
-          onShortcutEnabledChange: () => {},
+          onShortcutEnabledChange: () => { /* noop */ },
           consent: true,
           consentStatusText: "Analytics consent: Accepted",
-          onAcceptConsent: () => {},
-          onDeclineConsent: () => {},
-          onWithdrawConsent: () => {},
+          onAcceptConsent: () => { /* noop */ },
+          onDeclineConsent: () => { /* noop */ },
+          onWithdrawConsent: () => { /* noop */ },
           choicesHref: "/privacy/consent",
         }}
         transfer={{
           exportPicker: {
             search: "",
-            onSearchChange: () => {},
+            onSearchChange: () => { /* noop */ },
             items: [
               { id: "r1", label: "Skillet Chicken" },
               { id: "r2", label: "First Soup" },
             ],
             selectedIds: ["r1"],
-            onToggle: () => {},
-            onSelectAll: () => {},
-            onClearSelection: () => {},
-            onExport: () => {},
+            onToggle: () => { /* noop */ },
+            onSelectAll: () => { /* noop */ },
+            onClearSelection: () => { /* noop */ },
+            onExport: () => { /* noop */ },
             exportLabel: "Export selected (1)",
           },
-          onImportPress: () => {},
+          onImportPress: () => { /* noop */ },
         }}
         accountData={{
-          onExportData: () => {},
-          onDeleteAccount: () => {},
+          onExportData: () => { /* noop */ },
+          onDeleteAccount: () => { /* noop */ },
         }}
         nutritionGoals={{
           goals: nutritionGoalsFixture,
-          onChange: () => {},
-          onSave: () => {},
+          onChange: () => { /* noop */ },
+          onSave: () => { /* noop */ },
         }}
         accessTokens={{
           tokens: accessTokensFixture.tokens,
           tokenName: "",
-          onTokenNameChange: () => {},
-          onCreate: () => {},
+          onTokenNameChange: () => { /* noop */ },
+          onCreate: () => { /* noop */ },
           createdSecret: null,
-          onDismissSecret: () => {},
-          onRevoke: () => {},
+          onDismissSecret: () => { /* noop */ },
+          onRevoke: () => { /* noop */ },
         }}
         legalLinks={[
           { label: "Terms of Service", href: "/terms" },

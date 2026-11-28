@@ -51,7 +51,7 @@ test("a rejected chunk flips the boundary into its failed state", () => {
   // any environment (see the no-action test below).
   const instance = new dist.ChunkErrorBoundary({
     children: "surface content",
-    onReload: () => {},
+    onReload: () => { /* noop */ },
   });
   assert.equal(instance.render(), "surface content", "children render untouched before a failure");
   instance.state = { failed: true };

@@ -49,6 +49,6 @@ export const WithIconAndCallbackAction: Story = {
     body: "Try a different word or reference.",
     icon: "help",
     actionLabel: "Clear search",
-    onAction: () => {},
+    onAction: () => { /* noop */ },
   },
 };

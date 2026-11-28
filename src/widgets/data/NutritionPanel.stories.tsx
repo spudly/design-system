@@ -46,7 +46,7 @@ export const Ready: Story = {
           state: "ready",
           facts: FULL_FACTS,
           disclaimer: DISCLAIMER,
-          onRefreshPress: () => {},
+          onRefreshPress: () => { /* noop */ },
         }}
       />
     </YStack>
@@ -70,7 +70,7 @@ export const LoadingOverlay: Story = {
           state: "ready",
           facts: FULL_FACTS,
           disclaimer: DISCLAIMER,
-          onRefreshPress: () => {},
+          onRefreshPress: () => { /* noop */ },
         }}
       />
       <YStack
@@ -87,7 +87,7 @@ export const LoadingOverlay: Story = {
             state: "ready",
             facts: FULL_FACTS,
             disclaimer: DISCLAIMER,
-            onRefreshPress: () => {},
+            onRefreshPress: () => { /* noop */ },
           }}
           loading
         />
@@ -99,7 +99,7 @@ export const LoadingOverlay: Story = {
 export const Unavailable: Story = {
   render: () => (
     <YStack maxWidth={430}>
-      <NutritionPanel nutrition={{ state: "unavailable", onEstimatePress: () => {} }} />
+      <NutritionPanel nutrition={{ state: "unavailable", onEstimatePress: () => { /* noop */ } }} />
     </YStack>
   ),
 };
@@ -108,7 +108,7 @@ export const UnavailableRefreshing: Story = {
   render: () => (
     <YStack maxWidth={430}>
       <NutritionPanel
-        nutrition={{ state: "unavailable", isRefreshing: true, onEstimatePress: () => {} }}
+        nutrition={{ state: "unavailable", isRefreshing: true, onEstimatePress: () => { /* noop */ } }}
       />
     </YStack>
   ),

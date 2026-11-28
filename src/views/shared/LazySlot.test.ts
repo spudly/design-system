@@ -81,7 +81,7 @@ test("the slot composes the internal boundary around a Suspense", () => {
 });
 
 test("a caller-supplied onReload is forwarded to the boundary", () => {
-  const onReload = () => {};
+  const onReload = () => { /* noop */ };
   const element = distViews.LazySlot({ children: "surface content", onReload });
   assert.equal(element.props.onReload, onReload);
 });

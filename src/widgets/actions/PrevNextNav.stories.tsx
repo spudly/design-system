@@ -17,26 +17,26 @@ export default meta;
 type Story = StoryObj<typeof PrevNextNav>;
 
 export const Both: Story = {
-  args: { onBack: () => {}, onNext: () => {} },
+  args: { onBack: () => { /* noop */ }, onNext: () => { /* noop */ } },
 };
 
 export const CustomLabels: Story = {
   args: {
-    onBack: () => {},
-    onNext: () => {},
+    onBack: () => { /* noop */ },
+    onNext: () => { /* noop */ },
     backLabel: "Previous step",
     nextLabel: "Start cooking",
   },
 };
 
 export const NextOnly: Story = {
-  args: { onNext: () => {}, nextLabel: "Continue" },
+  args: { onNext: () => { /* noop */ }, nextLabel: "Continue" },
 };
 
 export const NextDisabled: Story = {
-  args: { onBack: () => {}, onNext: () => {}, nextDisabled: true },
+  args: { onBack: () => { /* noop */ }, onNext: () => { /* noop */ }, nextDisabled: true },
 };
 
 export const BackDisabled: Story = {
-  args: { onBack: () => {}, onNext: () => {}, backDisabled: true },
+  args: { onBack: () => { /* noop */ }, onNext: () => { /* noop */ }, backDisabled: true },
 };

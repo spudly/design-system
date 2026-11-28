@@ -19,7 +19,7 @@ type Story = StoryObj<typeof TextLink>;
 export const Default: Story = {
   args: {
     children: "Forgot your password?",
-    onPress: () => {},
+    onPress: () => { /* noop */ },
   },
 };
 
@@ -28,9 +28,9 @@ export const InProse: Story = {
     <YStack maxWidth={420}>
       <Text variant="body">
         By continuing you agree to the{" "}
-        <TextLink onPress={() => {}}>Terms of Service</TextLink> and{" "}
-        <TextLink onPress={() => {}}>Privacy Policy</TextLink>. Questions?{" "}
-        <TextLink onPress={() => {}}>Contact support</TextLink>.
+        <TextLink onPress={() => { /* noop */ }}>Terms of Service</TextLink> and{" "}
+        <TextLink onPress={() => { /* noop */ }}>Privacy Policy</TextLink>. Questions?{" "}
+        <TextLink onPress={() => { /* noop */ }}>Contact support</TextLink>.
       </Text>
     </YStack>
   ),
@@ -41,7 +41,7 @@ export const InHintText: Story = {
     <YStack maxWidth={420}>
       <Text variant="hint">
         Tokens let scripts act on your behalf.{" "}
-        <TextLink onPress={() => {}} fontSize={14}>
+        <TextLink onPress={() => { /* noop */ }} fontSize={14}>
           Learn how tokens work
         </TextLink>
       </Text>

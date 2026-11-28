@@ -52,7 +52,7 @@ const instructionRows: RecipeInstructionRow[] = [
  * in the apps this node is the drag container's activator. */
 function dragHandle(label: string) {
   return (
-    <Button variant="secondary" size="sm" accessibilityLabel={label} onPress={() => {}}>
+    <Button variant="secondary" size="sm" accessibilityLabel={label} onPress={() => { /* noop */ }}>
       Drag
     </Button>
   );
@@ -97,7 +97,7 @@ function FormHarness({
   const [instructions, setInstructions] = useState<RecipeInstructionRow[]>(
     empty ? [] : instructionRows,
   );
-  const noop = () => {};
+  const noop = () => { /* noop */ };
   return (
     <RecipeFormPage
       footer={eciperayFooterFixture}

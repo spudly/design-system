@@ -24,7 +24,7 @@ export const Opening: Story = {
 export const Closed: Story = {
   render: () => (
     <>
-      <PayPage footer={eciperayFooterFixture} status="closed" onRetryPress={() => {}} />
+      <PayPage footer={eciperayFooterFixture} status="closed" onRetryPress={() => { /* noop */ }} />
     </>
   ),
 };
@@ -32,7 +32,7 @@ export const Closed: Story = {
 export const ErrorState: Story = {
   render: () => (
     <>
-      <PayPage footer={eciperayFooterFixture} status="error" onRetryPress={() => {}} />
+      <PayPage footer={eciperayFooterFixture} status="error" onRetryPress={() => { /* noop */ }} />
     </>
   ),
 };

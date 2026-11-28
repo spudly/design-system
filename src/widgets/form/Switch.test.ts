@@ -116,7 +116,7 @@ describe("switchThumb", () => {
         React.createElement(dist.Switch, {
           label: "Email notifications",
           checked,
-          onCheckedChange: () => {},
+          onCheckedChange: () => { /* noop */ },
         }),
       ),
     );

@@ -41,7 +41,7 @@ export const Default: Story = {
                 { value: "plans", label: "Plans" },
               ]}
               value="meals"
-              onValueChange={() => {}}
+              onValueChange={() => { /* noop */ }}
             />
           </Col>
         }

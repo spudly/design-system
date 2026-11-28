@@ -85,13 +85,13 @@ const RESULTS = [
 function baseProps(overrides: Record<string, any> = {}) {
   return {
     query: "weakness",
-    onQueryChange: (_v: string) => {},
-    onSearch: () => {},
+    onQueryChange: (_v: string) => { /* noop */ },
+    onSearch: () => { /* noop */ },
     isSearching: false,
     usingDemo: false,
     errorMessage: null,
     results: RESULTS,
-    onAddVerse: (_id: string) => {},
+    onAddVerse: (_id: string) => { /* noop */ },
     ...overrides,
   };
 }
@@ -148,7 +148,7 @@ test("the search row wires the field and the button to the one search callback",
   const onSearch = () => {
     searches += 1;
   };
-  const onQueryChange = (_v: string) => {};
+  const onQueryChange = (_v: string) => { /* noop */ };
   const tree = VerseSearchPage(baseProps({ onSearch, onQueryChange }));
   const [field, button] = screenChildren(tree)[2].props.children;
   assert.equal(field.type, SearchField, "the search row renders the DS SearchField");

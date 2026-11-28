@@ -545,9 +545,9 @@ test("SSR: an exported page renders its footer from the footer prop", async () =
         <SignInPage
           email=""
           password=""
-          onEmailChange={() => {}}
-          onPasswordChange={() => {}}
-          onSubmit={() => {}}
+          onEmailChange={() => { /* noop */ }}
+          onPasswordChange={() => { /* noop */ }}
+          onSubmit={() => { /* noop */ }}
           signUpHref="/signup"
           forgotPasswordHref="/forgot-password"
           footer={footerData}

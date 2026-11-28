@@ -23,7 +23,7 @@ export const Default: Story = {
           id="title"
           accessibilityLabel="Title"
           value="Tuscan chicken"
-          onChangeText={() => {}}
+          onChangeText={() => { /* noop */ }}
         />
       </LabeledField>
     </YStack>
@@ -36,14 +36,14 @@ export const WithAction: Story = {
       <LabeledField
         label="Title"
         fieldId="title"
-        action={<RevertAction label="Chicken, plain" onPress={() => {}} />}
+        action={<RevertAction label="Chicken, plain" onPress={() => { /* noop */ }} />}
       >
         <TextField
           id="title"
           accessibilityLabel="Title"
           changed
           value="Tuscan chicken"
-          onChangeText={() => {}}
+          onChangeText={() => { /* noop */ }}
         />
       </LabeledField>
     </YStack>
@@ -63,7 +63,7 @@ export const WithError: Story = {
           accessibilityLabel="Description"
           numberOfLines={3}
           value=""
-          onChangeText={() => {}}
+          onChangeText={() => { /* noop */ }}
         />
       </LabeledField>
     </YStack>

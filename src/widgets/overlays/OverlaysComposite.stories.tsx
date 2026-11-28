@@ -134,7 +134,7 @@ export const StepOverlayOpen: Story = {
             title="Beef tacos"
             stepLabel={`Step ${stepIndex + 1} of ${STEPS.length}`}
             body={STEPS[stepIndex] ?? ""}
-            onDone={() => {}}
+            onDone={() => { /* noop */ }}
           >
             <XStack gap={tokens.spacing[2]} justifyContent="center" paddingBlockEnd="$6">
               {STEPS.map((step, index) => (

@@ -241,7 +241,7 @@ function RecipesPageDemo({
               ...(onDiscoveryLoadMoreRetry ? { onDiscoveryLoadMoreRetry } : {}),
             })}
         isFetchingNextPage={isFetchingNextPage}
-        onLogCookPress={() => {}}
+        onLogCookPress={() => { /* noop */ }}
         {...(expandedRecipeId
           ? {
               // The expanded row's cook-log form as data (#687):
@@ -249,8 +249,8 @@ function RecipesPageDemo({
               // row, which also hides that row's log-cook control.
               cookLogForm: {
                 recipeId: expandedRecipeId,
-                onSubmit: () => {},
-                onSkip: () => {},
+                onSubmit: () => { /* noop */ },
+                onSkip: () => { /* noop */ },
                 isPending: false,
               },
             }
@@ -364,8 +364,8 @@ export const DiscoveryWithActions: Story = {
       discoveryRecipes={discoveryItems.map((item) => ({
         ...item,
         actions: [
-          { id: "hide", label: "Hide this recipe", onSelect: () => {} },
-          { id: "show-less", label: "Show less like this", onSelect: () => {} },
+          { id: "hide", label: "Hide this recipe", onSelect: () => { /* noop */ } },
+          { id: "show-less", label: "Show less like this", onSelect: () => { /* noop */ } },
         ],
       }))}
     />
@@ -392,7 +392,7 @@ export const DiscoveryLoadMoreError: Story = {
   render: () => (
     <RecipesPageDemo
       discoveryLoadMoreErrorMessage="We couldn't load more public recipes. Check your connection and try again."
-      onDiscoveryLoadMoreRetry={() => {}}
+      onDiscoveryLoadMoreRetry={() => { /* noop */ }}
     />
   ),
 };

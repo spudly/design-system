@@ -48,7 +48,7 @@ export const LoadingOverlay: Story = {
         body="Doubled the garlic — excellent. The kids asked for seconds."
         canEdit
         canDelete
-        onDelete={() => {}}
+        onDelete={() => { /* noop */ }}
       />
       <YStack
         position="absolute"
@@ -64,7 +64,7 @@ export const LoadingOverlay: Story = {
           body="Doubled the garlic — excellent. The kids asked for seconds."
           canEdit
           canDelete
-          onDelete={() => {}}
+          onDelete={() => { /* noop */ }}
           loading
         />
       </YStack>
@@ -94,7 +94,7 @@ export const OwnComment: Story = {
         onSaveEdit={() => {
           setEditing(false);
         }}
-        onDelete={() => {}}
+        onDelete={() => { /* noop */ }}
       />
     );
   },

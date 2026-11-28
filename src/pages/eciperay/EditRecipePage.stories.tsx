@@ -48,7 +48,7 @@ function useFormProps(): RecipeFormPageProps {
     tagIds,
     onTagIdsChange: setTagIds,
     submitLabel: "Save Changes",
-    onSubmit: () => {},
+    onSubmit: () => { /* noop */ },
   };
 }
 

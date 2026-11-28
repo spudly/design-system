@@ -26,13 +26,13 @@ export const Default: Story = {
               prefix="Meal · "
               title="Sunday Dinner leftovers"
               subtitle="Qty 1 · 3 recipes"
-              onPress={() => {}}
+              onPress={() => { /* noop */ }}
             />
             <ListItem
               prefix="Recipe · "
               title="Test Recipe"
               subtitle="Qty 1 · 4 servings · 520 cal"
-              onPress={() => {}}
+              onPress={() => { /* noop */ }}
             />
           </Col>
           <DetailRow label="Calories" value="1,850 cal" />

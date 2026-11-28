@@ -43,7 +43,7 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 /** Every messaging surface in one column: the banner row, alerts
  * in all severities, the changed-list banner, a toast card, and

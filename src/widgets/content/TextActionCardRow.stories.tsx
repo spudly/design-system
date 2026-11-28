@@ -22,7 +22,7 @@ export const Default: Story = {
     subtitle: "Beef tacos, elote, lime crema",
     href: "/meals/1",
     actionLabel: "Delete",
-    onActionPress: () => {},
+    onActionPress: () => { /* noop */ },
   },
 };
 
@@ -36,6 +36,6 @@ export const TitleOnly: Story = {
     title: "Soup Sunday",
     href: "/meals/2",
     actionLabel: "Delete",
-    onActionPress: () => {},
+    onActionPress: () => { /* noop */ },
   },
 };

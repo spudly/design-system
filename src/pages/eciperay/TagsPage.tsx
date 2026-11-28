@@ -305,7 +305,7 @@ export function TagsPage({
                   <Card key={key} variant="compact">
                     <TrailingActionsRow leading={<BoxSkeleton width={96} height={24} />}>
                       {onStartEdit ? (
-                        <Button ghost size="sm" accessibilityLabel="Edit tag" onPress={() => {}}>
+                        <Button ghost size="sm" accessibilityLabel="Edit tag" onPress={() => { /* noop */ }}>
                           Edit
                         </Button>
                       ) : null}
@@ -314,7 +314,7 @@ export function TagsPage({
                         size="sm"
                         variant="danger"
                         accessibilityLabel="Delete tag"
-                        onPress={() => {}}
+                        onPress={() => { /* noop */ }}
                       >
                         Delete
                       </Button>

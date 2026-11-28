@@ -19,7 +19,7 @@ export const WithDescription: Story = {
   args: {
     title: "Manual entry",
     description: "Type or paste a recipe by hand",
-    onPress: () => {},
+    onPress: () => { /* noop */ },
   },
   render: (args) => (
     <YStack maxWidth={480}>
@@ -29,7 +29,7 @@ export const WithDescription: Story = {
 };
 
 export const TitleOnly: Story = {
-  args: { title: "Import from URL", onPress: () => {} },
+  args: { title: "Import from URL", onPress: () => { /* noop */ } },
   render: (args) => (
     <YStack maxWidth={480}>
       <OptionCard {...args} />
@@ -56,17 +56,17 @@ export const Multiple: Story = {
       <OptionCard
         title="Manual entry"
         description="Type or paste a recipe by hand"
-        onPress={() => {}}
+        onPress={() => { /* noop */ }}
       />
       <OptionCard
         title="Import from URL"
         description="Pull a recipe from a website link"
-        onPress={() => {}}
+        onPress={() => { /* noop */ }}
       />
       <OptionCard
         title="Import from image"
         description="Extract a recipe from a photo"
-        onPress={() => {}}
+        onPress={() => { /* noop */ }}
       />
     </YStack>
   ),

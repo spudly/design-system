@@ -61,7 +61,7 @@ async function renderWithVoice(element: any): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 test("AccessTokensPanel renders its chrome from the voice object", async () => {
   const { h, AccessTokensPanel, fixtureVoice } = await loadRuntime();

@@ -56,7 +56,7 @@ async function renderWithVoice(element: any, voice: any): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 test("RecipeOverviewPanel renders its stat labels from the voice object", async () => {
   const { h, RecipeOverviewPanel, fixtureVoice } = await loadRuntime();

@@ -67,7 +67,7 @@ export const Default: Story = {
       <MyVersesPage
         footer={memorizeFooterFixture}
         verses={verseItems}
-        onRemoveVerse={() => {}}
+        onRemoveVerse={() => { /* noop */ }}
       />
     </>
   ),
@@ -79,7 +79,7 @@ export const Loading: Story = {
       <MyVersesPage
         footer={memorizeFooterFixture}
         verses={[]}
-        onRemoveVerse={() => {}}
+        onRemoveVerse={() => { /* noop */ }}
         loading
       />
     </>
@@ -92,7 +92,7 @@ export const Empty: Story = {
       <MyVersesPage
         footer={memorizeFooterFixture}
         verses={[]}
-        onRemoveVerse={() => {}}
+        onRemoveVerse={() => { /* noop */ }}
         searchHref="/search"
       />
     </>

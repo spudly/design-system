@@ -36,7 +36,7 @@ export const WithAction: Story = {
       <RouteErrorPage
         footer={eciperayFooterFixture}
         variant="error"
-        action={{ label: "Try again", onPress: () => {} }}
+        action={{ label: "Try again", onPress: () => { /* noop */ } }}
       />
     </>
   ),

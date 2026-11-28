@@ -19,7 +19,7 @@ const entries: ShowLessEntry[] = [
 ];
 
 const actions = {
-  onUndo: () => {},
+  onUndo: () => { /* noop */ },
 };
 
 export const WithEntries: Story = {

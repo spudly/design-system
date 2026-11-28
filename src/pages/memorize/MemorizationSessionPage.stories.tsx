@@ -54,7 +54,7 @@ function wordsWithBlanks(
   );
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 export const FirstRound: Story = {
   // Round 1 of 7 blanks nothing — the engine's first round

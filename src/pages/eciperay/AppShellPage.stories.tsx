@@ -66,8 +66,8 @@ const consentBannerFixture = {
   linkLabel: "privacy policy",
   linkHref: "/privacy",
   messageAfterLink: ".",
-  onAccept: () => {},
-  onDecline: () => {},
+  onAccept: () => { /* noop */ },
+  onDecline: () => { /* noop */ },
 };
 
 /** Install banner data (#879): the mobile-app prompt as the host passes it. */
@@ -77,7 +77,7 @@ const installBannerFixture = {
     { label: "Download on the App Store", href: "/get-the-app" },
     { label: "Get it on Google Play", href: "/get-the-app" },
   ],
-  onDismiss: () => {},
+  onDismiss: () => { /* noop */ },
 };
 
 /** The Eciperay shell as the app renders it: icon nav, Recipes current, account action, footer. */
@@ -89,7 +89,7 @@ export const Default: Story = {
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
         footer={eciperayFooterFixture}
       >
         <RecipesContent />
@@ -111,10 +111,10 @@ export const WithSearch: Story = {
           label: "Search recipes",
           placeholder: "Search recipes",
           value: "soup",
-          onValueChange: () => {},
-          onSubmit: () => {},
+          onValueChange: () => { /* noop */ },
+          onSubmit: () => { /* noop */ },
         }}
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
         footer={eciperayFooterFixture}
       >
         <RecipesContent />
@@ -170,7 +170,7 @@ export const NoFooter: Story = {
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="meals"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
       >
         <RecipesContent />
       </AppShellPage>
@@ -187,7 +187,7 @@ export const WithNotice: Story = {
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
         footer={eciperayFooterFixture}
         notice={{ message: "Your profile could not be loaded." }}
       >
@@ -206,11 +206,11 @@ export const WithNoticeAction: Story = {
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
         footer={eciperayFooterFixture}
         notice={{
           message: "Your profile could not be loaded.",
-          action: { label: "Try again", onPress: () => {} },
+          action: { label: "Try again", onPress: () => { /* noop */ } },
         }}
       >
         <RecipesContent />
@@ -228,7 +228,7 @@ export const WithConsentBanner: Story = {
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
         footer={eciperayFooterFixture}
         consentBanner={consentBannerFixture}
       >
@@ -247,7 +247,7 @@ export const WithInstallBanner: Story = {
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
         footer={eciperayFooterFixture}
         installBanner={installBannerFixture}
       >
@@ -266,7 +266,7 @@ export const WithBanners: Story = {
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
         footer={eciperayFooterFixture}
         consentBanner={consentBannerFixture}
         installBanner={installBannerFixture}
@@ -298,7 +298,7 @@ export const ChunkFailedContent: Story = {
         footer={eciperayFooterFixture}
         // A no-op reload in Storybook so the fallback stays on
         // screen for inspection instead of reloading the page.
-        onReload={() => {}}
+        onReload={() => { /* noop */ }}
       >
         <FailingContent />
       </AppShellPage>

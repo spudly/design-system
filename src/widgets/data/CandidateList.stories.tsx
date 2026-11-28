@@ -20,7 +20,7 @@ export const Default: Story = {
           { id: "v4", label: "v4 — Adds the slow-cooker variant" },
           { id: "v5", label: "v5 — Doubles the sauce" },
         ]}
-        onActivatePress={() => {}}
+        onActivatePress={() => { /* noop */ }}
       />
     </YStack>
   ),
@@ -33,7 +33,7 @@ export const Pending: Story = {
         title="Ready to activate"
         candidates={[{ id: "v4", label: "v4 — Adds the slow-cooker variant" }]}
         isActivationPending
-        onActivatePress={() => {}}
+        onActivatePress={() => { /* noop */ }}
       />
     </YStack>
   ),
@@ -59,7 +59,7 @@ export const Loading: Story = {
           { id: "v4", label: "v4 — Adds the slow-cooker variant" },
           { id: "v5", label: "v5 — Doubles the sauce" },
         ]}
-        onActivatePress={() => {}}
+        onActivatePress={() => { /* noop */ }}
         loading
       />
     </YStack>
@@ -76,7 +76,7 @@ export const LoadingOverlay: Story = {
           { id: "v4", label: "v4 — Adds the slow-cooker variant" },
           { id: "v5", label: "v5 — Doubles the sauce" },
         ]}
-        onActivatePress={() => {}}
+        onActivatePress={() => { /* noop */ }}
       />
       <YStack
         position="absolute"
@@ -94,7 +94,7 @@ export const LoadingOverlay: Story = {
             { id: "v4", label: "v4 — Adds the slow-cooker variant" },
             { id: "v5", label: "v5 — Doubles the sauce" },
           ]}
-          onActivatePress={() => {}}
+          onActivatePress={() => { /* noop */ }}
           loading
         />
       </YStack>

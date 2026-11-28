@@ -96,8 +96,8 @@ export const Loading: Story = {
   args: { title: "API access tokens", loading: true },
   render: (args) => (
     <SectionCard {...args} style={{ maxWidth: 480 }}>
-      <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
-      <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+      <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => { /* noop */ }} />
+      <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => { /* noop */ }} />
     </SectionCard>
   ),
 };
@@ -115,8 +115,8 @@ export const LoadingOverlay: Story = {
           </Button>
         }
       >
-        <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
-        <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+        <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => { /* noop */ }} />
+        <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => { /* noop */ }} />
       </SectionCard>
       <YStack
         position="absolute"
@@ -137,8 +137,8 @@ export const LoadingOverlay: Story = {
           }
           loading
         >
-          <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
-          <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+          <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => { /* noop */ }} />
+          <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => { /* noop */ }} />
         </SectionCard>
       </YStack>
     </YStack>

@@ -17,7 +17,7 @@ type Story = StoryObj<typeof AccountDataView>;
 export const Default: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <AccountDataView onExportData={() => {}} onDeleteAccount={() => {}} />
+      <AccountDataView onExportData={() => { /* noop */ }} onDeleteAccount={() => { /* noop */ }} />
     </StoryFrame>
   ),
 };
@@ -26,8 +26,8 @@ export const WithError: Story = {
   render: () => (
     <StoryFrame variant="panel">
       <AccountDataView
-        onExportData={() => {}}
-        onDeleteAccount={() => {}}
+        onExportData={() => { /* noop */ }}
+        onDeleteAccount={() => { /* noop */ }}
         error="We couldn't prepare your download. Try again."
       />
     </StoryFrame>
@@ -37,7 +37,7 @@ export const WithError: Story = {
 export const Loading: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <AccountDataView onExportData={() => {}} onDeleteAccount={() => {}} loading />
+      <AccountDataView onExportData={() => { /* noop */ }} onDeleteAccount={() => { /* noop */ }} loading />
     </StoryFrame>
   ),
 };
@@ -47,7 +47,7 @@ export const LoadingOverlay: Story = {
   render: () => (
     <StoryFrame variant="panel">
       <View position="relative">
-        <AccountDataView onExportData={() => {}} onDeleteAccount={() => {}} />
+        <AccountDataView onExportData={() => { /* noop */ }} onDeleteAccount={() => { /* noop */ }} />
         <View
           position="absolute"
           top={0}
@@ -58,8 +58,8 @@ export const LoadingOverlay: Story = {
           pointerEvents="none"
         >
           <AccountDataView
-            onExportData={() => {}}
-            onDeleteAccount={() => {}}
+            onExportData={() => { /* noop */ }}
+            onDeleteAccount={() => { /* noop */ }}
             loading
           />
         </View>

@@ -92,7 +92,7 @@ test("the top bar is one shared chrome: TabbedShellPage renders it too", async (
     title: "Memorize",
     tabs: [{ id: "verses", label: "My verses", content: <span>VERSES SURFACE</span> }],
     activeTabId: "verses",
-    onTabSelect: () => {},
+    onTabSelect: () => { /* noop */ },
   });
   const header = tree.props.children.props.children[0];
   assert.equal(
@@ -232,7 +232,7 @@ test("SSR: brand and nav render as real links; exactly the active item is curren
         {
           id: "sign-out",
           label: "Sign out",
-          onPress: () => {},
+          onPress: () => { /* noop */ },
         },
       ]}
     >
@@ -256,8 +256,8 @@ test("search data forwards from the page to the top bar; SSR renders the landmar
     label: "Search recipes",
     placeholder: "Search recipes",
     value: "soup",
-    onValueChange: () => {},
-    onSubmit: () => {},
+    onValueChange: () => { /* noop */ },
+    onSubmit: () => { /* noop */ },
   };
   const tree = AppShellPage({
     brand: {
@@ -354,7 +354,7 @@ test("SSR: footer data renders the one BigFooter band", async () => {
 test("SSR: a pending surface shows the loading state; a failed one stays in the slot", async () => {
   const { AppShellPage } = await loadRuntime();
   function PendingContent(): never {
-    throw new Promise(() => {});
+    throw new Promise(() => { /* noop */ });
   }
   function FailingContent(): never {
     throw new Error("Failed to fetch dynamically imported module");
@@ -385,7 +385,7 @@ test("SSR: a pending surface shows the loading state; a failed one stays in the 
       }}
       navItems={sentinelNav}
       activeItemId="recipes"
-      onReload={() => {}}
+      onReload={() => { /* noop */ }}
     >
       <FailingContent />
     </AppShellPage>,
@@ -460,7 +460,7 @@ test("SSR: a notice renders its message and action above the content; content st
       activeItemId="recipes"
       notice={{
         message: "Your profile could not be loaded.",
-        action: { label: "Try again", onPress: () => {} },
+        action: { label: "Try again", onPress: () => { /* noop */ } },
       }}
     >
       <span>PAGE SURFACE</span>
@@ -550,13 +550,13 @@ test("SSR: banners render their copy, the policy link, and the voice-default act
             linkLabel: "privacy policy",
             linkHref: "/privacy",
             messageAfterLink: ".",
-            onAccept: () => {},
-            onDecline: () => {},
+            onAccept: () => { /* noop */ },
+            onDecline: () => { /* noop */ },
           }}
           installBanner={{
             message: "Get the app for the best experience.",
             links: [{ label: "App Store", href: "https://apps.example.test/install" }],
-            onDismiss: () => {},
+            onDismiss: () => { /* noop */ },
           }}
         >
           <span>PAGE SURFACE</span>

@@ -114,10 +114,10 @@ export const WithActions: Story = {
   args: {
     message: "Install the mobile app for a faster cooking-mode experience.",
     dismissible: true,
-    onDismiss: () => {},
+    onDismiss: () => { /* noop */ },
     actions: [
-      { label: "Install", onPress: () => {} },
-      { label: "Learn more", onPress: () => {} },
+      { label: "Install", onPress: () => { /* noop */ } },
+      { label: "Learn more", onPress: () => { /* noop */ } },
     ],
   },
 };

@@ -78,8 +78,8 @@ const VERSES = [
 function baseProps(overrides: Record<string, any> = {}) {
   return {
     verses: VERSES,
-    onRememberedPress: (_id: string) => {},
-    onForgotPress: (_id: string) => {},
+    onRememberedPress: (_id: string) => { /* noop */ },
+    onForgotPress: (_id: string) => { /* noop */ },
     ...overrides,
   };
 }

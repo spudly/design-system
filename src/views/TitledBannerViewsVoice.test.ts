@@ -60,7 +60,7 @@ async function render(element: any, withVoice = true): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 test("ChangedListBanner renders its Revert action from the voice object", async () => {
   const { h, ChangedListBanner, fixtureVoice } = await loadRuntime();

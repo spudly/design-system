@@ -61,7 +61,7 @@ export const WithRichDescription: Story = {
         description={
           <>
             I understand this recipe may be viewed without signing in and I agree to the{" "}
-            <TextLink onPress={() => {}}>Privacy Policy</TextLink>.
+            <TextLink onPress={() => { /* noop */ }}>Privacy Policy</TextLink>.
           </>
         }
         checked={checked}
@@ -130,7 +130,7 @@ export const ListShapeChecked: Story = {
         separator
         strikeWhenChecked
         checked
-        onCheckedChange={() => {}}
+        onCheckedChange={() => { /* noop */ }}
       />
     </YStack>
   ),

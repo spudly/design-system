@@ -408,7 +408,7 @@ const editableDays: MealPlanDetailPageDay[] = weekDays.map((day, index) => ({
   entries: index === 0 ? editableEntries : day.entries,
 }));
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 export const Editable: Story = {
   render: () => (

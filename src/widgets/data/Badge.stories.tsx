@@ -78,7 +78,7 @@ export const AllTones: Story = {
 };
 
 export const Selected: Story = {
-  args: { selected: true, onPress: () => {}, children: "Weeknight" },
+  args: { selected: true, onPress: () => { /* noop */ }, children: "Weeknight" },
 };
 
 export const SelectableDisabled: Story = {

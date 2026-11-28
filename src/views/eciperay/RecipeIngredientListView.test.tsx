@@ -105,9 +105,9 @@ async function renderList(props: Record<string, unknown>): Promise<string> {
 }
 const baseProps = {
   rows,
-  onAdd: () => {},
-  onFieldChange: () => {},
-  onRemove: () => {},
+  onAdd: () => { /* noop */ },
+  onFieldChange: () => { /* noop */ },
+  onRemove: () => { /* noop */ },
 };
 test("populated list: label, add action, row values, handles, and remove actions render", async () => {
   const { createElement: h } = await import("react");

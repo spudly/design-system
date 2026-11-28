@@ -96,7 +96,7 @@ const FILTERS = [
     id: "ingredient",
     label: "Ingredient",
     value: "",
-    onChange: () => {},
+    onChange: () => { /* noop */ },
     placeholder: "e.g. chicken",
     defaultValue: "",
   },
@@ -105,7 +105,7 @@ const FILTERS = [
     id: "status",
     label: "Status",
     value: "all",
-    onChange: () => {},
+    onChange: () => { /* noop */ },
     options: [
       { value: "all", label: "All statuses" },
       { value: "perfected", label: "Perfected" },
@@ -118,7 +118,7 @@ test("the bar renders caller-supplied filter definitions, never a hardcoded list
   const html = await renderBar({
     searchPlaceholder: "Search the catalog…",
     search: "",
-    onSearchChange: () => {},
+    onSearchChange: () => { /* noop */ },
     filters: FILTERS,
     activeFilters: ["ingredient"],
   });
@@ -135,7 +135,7 @@ test("the open chooser offers only the filters not yet added, under caller label
   const html = await renderBar({
     searchPlaceholder: "Search the catalog…",
     search: "",
-    onSearchChange: () => {},
+    onSearchChange: () => { /* noop */ },
     filters: FILTERS,
     activeFilters: ["ingredient"],
     filterChooserOpen: true,

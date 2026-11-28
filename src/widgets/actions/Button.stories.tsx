@@ -36,7 +36,7 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 export const Primary: Story = {
   args: { variant: "primary", size: "md", children: "Save recipe" },

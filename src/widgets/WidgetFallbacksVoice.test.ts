@@ -65,7 +65,7 @@ async function renderWithVoice(element: any, voice: any): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 const pickerSentinels = {
   searchPlaceholder: "SENT search placeholder",

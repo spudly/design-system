@@ -47,10 +47,10 @@ export const WithTags: Story = {
           name="Baking"
           color="purple"
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => {}}
-          onColorChange={() => {}}
-          onCreate={() => {}}
-          onDelete={() => {}}
+          onNameChange={() => { /* noop */ }}
+          onColorChange={() => { /* noop */ }}
+          onCreate={() => { /* noop */ }}
+          onDelete={() => { /* noop */ }}
           editingTagId={editingTagId}
           editName={editName}
           editColor={editColor}
@@ -101,10 +101,10 @@ export const Editing: Story = {
           name=""
           color={tagsFixture.colorOptions[0] ?? "indigo"}
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => {}}
-          onColorChange={() => {}}
-          onCreate={() => {}}
-          onDelete={() => {}}
+          onNameChange={() => { /* noop */ }}
+          onColorChange={() => { /* noop */ }}
+          onCreate={() => { /* noop */ }}
+          onDelete={() => { /* noop */ }}
           editingTagId={editingTagId}
           editName={editName}
           editColor={editColor}
@@ -161,8 +161,8 @@ export const FailingSaves: Story = {
           name="Baking"
           color="purple"
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => {}}
-          onColorChange={() => {}}
+          onNameChange={() => { /* noop */ }}
+          onColorChange={() => { /* noop */ }}
           onCreate={() => false}
           onDelete={() => false}
           initialFailedOperation="create"
@@ -196,10 +196,10 @@ export const Loading: Story = {
         name=""
         color={tagsFixture.colorOptions[0] ?? "indigo"}
         colorOptions={tagsFixture.colorOptions}
-        onNameChange={() => {}}
-        onColorChange={() => {}}
-        onCreate={() => {}}
-        onDelete={() => {}}
+        onNameChange={() => { /* noop */ }}
+        onColorChange={() => { /* noop */ }}
+        onCreate={() => { /* noop */ }}
+        onDelete={() => { /* noop */ }}
       />
     </>
   ),
@@ -215,11 +215,11 @@ export const LoadingOverlay: Story = {
         name=""
         color={tagsFixture.colorOptions[0] ?? "indigo"}
         colorOptions={tagsFixture.colorOptions}
-        onNameChange={() => {}}
-        onColorChange={() => {}}
-        onCreate={() => {}}
-        onDelete={() => {}}
-        onStartEdit={() => {}}
+        onNameChange={() => { /* noop */ }}
+        onColorChange={() => { /* noop */ }}
+        onCreate={() => { /* noop */ }}
+        onDelete={() => { /* noop */ }}
+        onStartEdit={() => { /* noop */ }}
       />
       <View
         position="absolute"
@@ -237,11 +237,11 @@ export const LoadingOverlay: Story = {
           name=""
           color={tagsFixture.colorOptions[0] ?? "indigo"}
           colorOptions={tagsFixture.colorOptions}
-          onNameChange={() => {}}
-          onColorChange={() => {}}
-          onCreate={() => {}}
-          onDelete={() => {}}
-          onStartEdit={() => {}}
+          onNameChange={() => { /* noop */ }}
+          onColorChange={() => { /* noop */ }}
+          onCreate={() => { /* noop */ }}
+          onDelete={() => { /* noop */ }}
+          onStartEdit={() => { /* noop */ }}
         />
       </View>
     </View>

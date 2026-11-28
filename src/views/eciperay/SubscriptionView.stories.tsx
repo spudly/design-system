@@ -20,8 +20,8 @@ export const Active: Story = {
       <SubscriptionView
         planLabel="Plus plan"
         statusText="Your Plus plan is active and renews on Dec 1, 2026."
-        onManage={() => {}}
-        onRefresh={() => {}}
+        onManage={() => { /* noop */ }}
+        onRefresh={() => { /* noop */ }}
         portalUrl="https://example.com/portal"
       />
     </StoryFrame>
@@ -33,7 +33,7 @@ export const FreeUpsell: Story = {
     <StoryFrame variant="panel">
       <SubscriptionView
         upsellText="You're on the free plan. Upgrade to Plus for meal planning and nutrition goals."
-        onManage={() => {}}
+        onManage={() => { /* noop */ }}
         manageLabel="See Plus"
       />
     </StoryFrame>
@@ -56,8 +56,8 @@ export const LoadingOverlay: Story = {
         <SubscriptionView
           planLabel="Plus plan"
           statusText="Your Plus plan is active and renews on Dec 1, 2026."
-          onManage={() => {}}
-          onRefresh={() => {}}
+          onManage={() => { /* noop */ }}
+          onRefresh={() => { /* noop */ }}
           portalUrl="https://example.com/portal"
         />
         <YStack
@@ -72,8 +72,8 @@ export const LoadingOverlay: Story = {
           <SubscriptionView
             planLabel="Plus plan"
             statusText="Your Plus plan is active and renews on Dec 1, 2026."
-            onManage={() => {}}
-            onRefresh={() => {}}
+            onManage={() => { /* noop */ }}
+            onRefresh={() => { /* noop */ }}
             portalUrl="https://example.com/portal"
             loading
           />

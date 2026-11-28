@@ -29,9 +29,9 @@ const grants: FamilySharingGrant[] = [
 ];
 
 const actions = {
-  onEmailChange: () => {},
-  onAdd: () => {},
-  onRemove: () => {},
+  onEmailChange: () => { /* noop */ },
+  onAdd: () => { /* noop */ },
+  onRemove: () => { /* noop */ },
 };
 
 export const WithGrants: Story = {
