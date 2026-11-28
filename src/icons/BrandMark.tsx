@@ -253,6 +253,7 @@ export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
     case "eciperay": {
       return (
         <Svg width={size} height={size} viewBox="0 0 256 256" aria-hidden={true}>
+          {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry */}
           <Rect x={20} y={20} width={216} height={216} rx={48} fill={ECIPERAY_MARK_PAPER} />
           {/* The terracotta ray fan and sun disc, rising behind
               the recipe card — the card covers the disc's
@@ -260,6 +261,7 @@ export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
           <Path d={ECIPERAY_RAYS_PATH} fill={ECIPERAY_MARK_SUN} />
           <Circle cx={128.1} cy={114.8} r={50.6} fill={ECIPERAY_MARK_SUN} />
           {/* The sage recipe card. */}
+          {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry */}
           <Rect x={40.1} y={110.2} width={175.9} height={109.8} rx={11.2} fill={ECIPERAY_MARK_CARD} />
           {/* The card's paper binder holes and its cream E. */}
           {ECIPERAY_CARD_HOLE_CYS.map((cy) => (

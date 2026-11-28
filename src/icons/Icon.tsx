@@ -67,7 +67,9 @@ function renderElement(element: IconElement, index: number) {
       return (
         <Rect
           key={index}
+          // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
           x={element.x}
+          // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
           y={element.y}
           width={element.width}
           height={element.height}

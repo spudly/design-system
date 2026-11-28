@@ -92,6 +92,7 @@ export type CardProps = Omit<YStackProps, "variant" | "gap"> & {
  */
 export function Card({
   variant,
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- this is the deprecated elevated prop's own implementation, kept for existing consumers
   elevated = false,
   style,
   loading = false,

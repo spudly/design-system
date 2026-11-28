@@ -164,6 +164,7 @@ function activeShellNode(
     return null;
   }
   const node = shellRef.current as unknown as HTMLElement | null;
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- HTMLElement.querySelectorAll is the standard focusable-element query for focus containment; no replacement API exists
   if (!node || typeof node.querySelectorAll !== "function") {
     return null;
   }

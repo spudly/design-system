@@ -523,6 +523,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         return;
       }
       const content = contentRef.current as unknown as HTMLElement | null;
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- HTMLElement.querySelectorAll is the standard focusable-element query for focus containment; no replacement API exists
       if (!content || typeof content.querySelectorAll !== "function") {
         return;
       }

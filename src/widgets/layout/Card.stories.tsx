@@ -15,6 +15,7 @@ const meta: Meta<typeof Card> = {
       control: "select",
       options: ["default", "bordered", "muted", "elevated", "compact"],
     },
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- story intentionally covers the deprecated elevated prop kept for existing consumers, alongside the variant form
     elevated: { control: "boolean" },
   },
 };
@@ -33,6 +34,7 @@ export const Default: Story = {
 
 export const Elevated: Story = {
   render: (args) => (
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- story intentionally covers the deprecated elevated prop kept for existing consumers, alongside the variant form
     <Card {...args} elevated style={{ maxWidth: 360 }}>
       <Text variant="subheading">Creamy Tuscan Garlic Chicken</Text>
       <Text variant="hint">30 min · Medium · 4.8 stars</Text>

@@ -129,6 +129,7 @@ export const StacksAndCards: Story = {
           <Text variant="subheading">Muted card</Text>
           <Text variant="body">Recessed page-background fill.</Text>
         </Card>
+        {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- story intentionally covers the deprecated elevated prop kept for existing consumers, alongside the variant form */}
         <Card elevated>
           <Text variant="subheading">Elevated card</Text>
           <Text variant="body">Raised treatment.</Text>

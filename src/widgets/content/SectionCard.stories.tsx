@@ -16,6 +16,7 @@ const meta: Meta<typeof SectionCard> = {
       control: "select",
       options: ["default", "bordered", "muted", "elevated"],
     },
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- story intentionally covers the deprecated elevated prop kept for existing consumers, alongside the variant form
     elevated: { control: "boolean" },
   },
 };
@@ -53,6 +54,7 @@ export const WithAction: Story = {
 };
 
 export const Elevated: Story = {
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- story intentionally covers the deprecated elevated prop kept for existing consumers, alongside the variant form
   args: { title: "Nutrition goals", elevated: true },
   render: (args) => (
     <SectionCard {...args} style={{ maxWidth: 480 }}>

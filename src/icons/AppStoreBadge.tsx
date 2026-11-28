@@ -46,13 +46,17 @@ export function AppStoreBadge() {
       viewBox="0 0 120 40"
       aria-hidden={true}
     >
+      {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry */}
       <Rect x={0.5} y={0.5} width={119} height={39} rx={6} fill="#000000" stroke="#ffffff" />
       <Path d={APPLE_LOGO_PATH} transform="translate(13 8.5) scale(0.044)" fill="#ffffff" />
+      {/* eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry */}
       <Text x={36} y={16} fill="#ffffff" fontSize={8} fontFamily="Helvetica, Arial, sans-serif">
         Download on the
       </Text>
       <Text
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
         x={36}
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- react-native-svg geometry props position the element itself; the transform-prop replacement would change the rendered geometry
         y={31}
         fill="#ffffff"
         fontSize={15}
