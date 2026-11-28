@@ -64,12 +64,14 @@ const listStyle = { flex: 1 } as const;
 const separatorStyle = { height: tokens.spacing[2] } as const;
 
 function BoundedListSeparator() {
+  // eslint-disable-next-line design-system/no-page-styling -- FlatList separator views take layout only through the RN style prop; the value is a static token-derived constant defined beside the component
   return <View style={separatorStyle} />;
 }
 
 const separatorMdStyle = { height: tokens.spacing[3] } as const;
 
 function BoundedListSeparatorMd() {
+  // eslint-disable-next-line design-system/no-page-styling -- FlatList separator views take layout only through the RN style prop; the value is a static token-derived constant defined beside the component
   return <View style={separatorMdStyle} />;
 }
 
@@ -151,6 +153,7 @@ export function BoundedList<Item>({
 }: BoundedListProps<Item>) {
   return (
     <FlatList
+      // eslint-disable-next-line design-system/no-page-styling -- FlatList takes layout only through the RN style prop; the value is a static token-derived constant defined beside the component
       style={listStyle}
       data={data}
       keyExtractor={keyExtractor}

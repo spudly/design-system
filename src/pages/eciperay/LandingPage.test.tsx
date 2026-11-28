@@ -141,6 +141,7 @@ function loadRuntime() {
     const reactModule = await import("react");
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
+    // eslint-disable-next-line design-system/no-page-styling -- test harness imports TamaguiProvider directly to render the page under test; tests ship no page code
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const shellModule: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");

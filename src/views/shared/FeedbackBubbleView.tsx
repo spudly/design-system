@@ -56,6 +56,7 @@ export function FeedbackBubbleView({
       zIndex={50}
       right
       gap="m"
+      // eslint-disable-next-line design-system/no-page-styling -- floating-bubble anchor offsets (right/bottom) for the fixed overlay; no widget prop pair expresses both
       style={{ right: 16, bottom: 80 }}
     >
       {open ? (

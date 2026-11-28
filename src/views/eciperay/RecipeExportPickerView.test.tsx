@@ -31,6 +31,7 @@ import { loadInternalDist } from "../../../test/internalDist.js";
 async function renderPicker(props: Record<string, unknown>): Promise<string> {
   const { createElement: h } = await import("react");
   const { renderToString } = await import("react-dom/server");
+  // eslint-disable-next-line design-system/no-page-styling -- test harness imports TamaguiProvider directly to render the view under test; tests ship no page code
   const { TamaguiProvider }: Record<string, any> = await import("tamagui");
   const distRuntime = await loadInternalDist();
   const { createTamaguiConfig, baseTheme, RecipeExportPickerView } = distRuntime;
