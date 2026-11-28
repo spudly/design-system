@@ -144,6 +144,7 @@ test("each icon carries its glyph's data (official Feather, except the custom Me
 
 test("no icon carries another icon's glyph (#246)", async () => {
   const literals = ICONS.filter(([, literal]) => literal).map(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the filter above keeps only entries with a literal
     ([name, literal]): [string, string] => [name, literal!],
   );
   for (const [name] of ICONS) {

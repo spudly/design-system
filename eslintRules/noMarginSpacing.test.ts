@@ -200,6 +200,7 @@ test("eslint.config.ts wires the rule at error for components and pages, off for
     (block: any) => block.files?.includes("src/widgets/**/*.tsx") && block.rules,
   );
   assert.ok(componentsBlock, "a config block must target src/widgets/**/*.tsx");
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
   assert.equal(componentsBlock.rules!["design-system/no-margin-spacing"], "error");
   assert.ok(
     componentsBlock.plugins?.["design-system"],
@@ -209,12 +210,14 @@ test("eslint.config.ts wires the rule at error for components and pages, off for
     (block: any) => block.files?.includes("src/pages/**/*.tsx") && block.rules,
   );
   assert.ok(pagesBlock, "a config block must target src/pages/**/*.tsx");
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
   assert.equal(pagesBlock.rules!["design-system/no-margin-spacing"], "error");
   for (const storiesGlob of ["src/pages/**/*.stories.tsx", "src/widgets/**/*.stories.tsx"]) {
     const storiesBlock = config.find(
       (block: any) => block.files?.includes(storiesGlob) && block.rules,
     );
     assert.ok(storiesBlock, `a config block must target ${storiesGlob}`);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
     assert.equal(storiesBlock.rules!["design-system/no-margin-spacing"], "off");
   }
 });

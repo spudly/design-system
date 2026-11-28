@@ -55,7 +55,9 @@ function readJson(rel: string) {
 function exportNames(code: string): Set<string> {
   const names = new Set<string>();
   for (const match of code.matchAll(/export\s+(?:declare\s+)?(?:type\s+)?\{([^}]*)\}/g)) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the regex
     for (const part of match[1]!.split(",")) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the regex
       const name = part
         .trim()
         .replace(/^type\s+/, "")
@@ -68,6 +70,7 @@ function exportNames(code: string): Set<string> {
   for (const match of code.matchAll(
     /export\s+(?:declare\s+)?(?:const|let|var|function|class|type|interface)\s+([A-Za-z0-9_$]+)/g,
   )) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the regex
     names.add(match[1]!);
   }
   return names;
@@ -77,6 +80,7 @@ function exportNames(code: string): Set<string> {
 function exportSpecifiers(code: string): Set<string> {
   const specifiers = new Set<string>();
   for (const match of code.matchAll(/export\s+(?:type\s+)?(?:\{[^}]*\}|\*)\s+from\s+"([^"]+)"/g)) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the regex
     specifiers.add(match[1]!);
   }
   return specifiers;

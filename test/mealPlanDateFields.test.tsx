@@ -174,6 +174,7 @@ test("SSR: TextField type=date renders a real date input with its value (ecipera
       onChangeText={noop}
     />,
   );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the rendered fixture always renders this input first
   const input = inputTags(html)[0]!;
   assert.ok(input.includes('type="date"'), `expected type="date" in: ${input}`);
   assert.ok(
@@ -186,6 +187,7 @@ test("SSR: a plain TextField does not render type=date (eciperay#334)", async ()
   const html = await renderToHtml(
     <TextField label="Title" value="Plan" placeholder="Plan title" onChangeText={noop} />,
   );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the rendered fixture always renders this input first
   const input = inputTags(html)[0]!;
   assert.ok(!input.includes('type="date"'), `unexpected type="date" in: ${input}`);
 });

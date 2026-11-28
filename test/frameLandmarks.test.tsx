@@ -199,6 +199,7 @@ function mainContentRange(html: string) {
   assert.ok(roleAt !== -1, "a main landmark renders");
   const openStart = html.lastIndexOf("<", roleAt);
   const openEnd = html.indexOf(">", roleAt);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- capture group 1 is required by the tag regex
   const tagName = /^<([a-zA-Z][\w-]*)/.exec(html.slice(openStart, openEnd))![1];
   const tagPattern = new RegExp(String.raw`</?${tagName}(?=[\s>])[^>]*>`, "g");
   tagPattern.lastIndex = openStart;

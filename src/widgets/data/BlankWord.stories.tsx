@@ -42,20 +42,26 @@ export const Revealed: Story = {
 function InteractiveDrill() {
   const words = ["want", "pastures", "waters"];
   const [revealed, setRevealed] = useState<boolean[]>(words.map(() => false));
+  /* eslint-disable @typescript-eslint/no-non-null-assertion -- words is a three-entry literal and revealed is mapped from it, so indices 0-1 always exist */
+  const word0 = words[0]!;
+  const word1 = words[1]!;
+  const revealed0 = revealed[0]!;
+  const revealed1 = revealed[1]!;
+  /* eslint-enable @typescript-eslint/no-non-null-assertion -- end of the fixed-size index block above */
   return (
     <Text variant="verse">
       The LORD is my shepherd; I shall not{" "}
       <BlankWord
-        word={words[0]!}
-        revealed={revealed[0]!}
+        word={word0}
+        revealed={revealed0}
         onReveal={() => { setRevealed((r) => r.map((v, i) => (i === 0 ? true : v))); }}
         index={0}
         total={words.length}
       />{" "}
       He makes me lie down in green{" "}
       <BlankWord
-        word={words[1]!}
-        revealed={revealed[1]!}
+        word={word1}
+        revealed={revealed1}
         onReveal={() => { setRevealed((r) => r.map((v, i) => (i === 1 ? true : v))); }}
         index={1}
         total={words.length}

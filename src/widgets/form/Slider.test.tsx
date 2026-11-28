@@ -324,6 +324,7 @@ test("SSR: the track renders at the spacing[3] height, not the primitive's 6px",
     .split(/\s+/)
     .map((c) => rules.get(c.replace(/^_/, "")))
     .filter((r) => r && /(^|;)height:/.test(r))
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the map only runs over matched style strings
     .map((r) => /(?:^|;)height:([^;]+)/.exec(r!)?.[1]);
   assert.deepEqual(heights, ["12px"], `track height must be 12px, got ${JSON.stringify(heights)}`);
 });

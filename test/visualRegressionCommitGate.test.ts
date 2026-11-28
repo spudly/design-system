@@ -212,6 +212,7 @@ test("staging keeps baseline bytes for noise, capture bytes for real changes", (
     skipped: 1,
     skippedStrict: 1,
   });
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the run above always logs the per-run summary line last
   assert.match(logs.at(-1)!, /3 capture\(s\) gated: 2 staged/, "per-run summary line is logged");
   const stagedBytes = [
     ["t/noise.png", fx.base], // noise keeps baseline bytes

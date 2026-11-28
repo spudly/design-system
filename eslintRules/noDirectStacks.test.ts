@@ -108,6 +108,7 @@ test("eslint.config.ts wires the rule at error, with the recorded allowlist off"
       block.rules?.["design-system/no-direct-stacks"] !== undefined,
   );
   assert.ok(componentsBlock, "a config block must target src/widgets/**/*.tsx");
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
   assert.equal(componentsBlock.rules!["design-system/no-direct-stacks"], "error");
   assert.ok(
     componentsBlock.plugins?.["design-system"],
@@ -127,6 +128,7 @@ test("eslint.config.ts wires the rule at error, with the recorded allowlist off"
       (block: any) => block.files?.includes(allowlisted) && block.rules,
     );
     assert.ok(allowBlock, `a config block must allowlist ${allowlisted}`);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
     assert.equal(allowBlock.rules!["design-system/no-direct-stacks"], "off");
   }
 });

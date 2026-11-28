@@ -142,12 +142,14 @@ test("eslint.config.ts wires the rule at error for pages, off for stories", asyn
     (block) => block.files?.includes("src/pages/**/*.tsx") && block.rules,
   );
   assert.ok(pagesBlock, "a config block must target src/pages/**/*.tsx");
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
   assert.equal(pagesBlock.rules!["design-system/no-page-styling"], "error");
   assert.ok(pagesBlock.plugins?.["design-system"], "the design-system plugin must be registered");
   const storiesBlock = config.find(
     (block) => block.files?.includes("src/pages/**/*.stories.tsx") && block.rules,
   );
   assert.ok(storiesBlock, "a config block must target src/pages/**/*.stories.tsx");
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
   assert.equal(storiesBlock.rules!["design-system/no-page-styling"], "off");
 });
 
@@ -158,11 +160,13 @@ test("eslint.config.ts wires the rule at error for views, off for view stories (
     (block) => block.files?.includes("src/views/**/*.tsx") && block.rules?.["design-system/no-page-styling"],
   );
   assert.ok(viewsBlock, "a config block must target src/views/**/*.tsx with the rule");
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
   assert.equal(viewsBlock.rules!["design-system/no-page-styling"], "error");
   const storiesBlock = config.find(
     (block) => block.files?.includes("src/views/**/*.stories.tsx") && block.rules?.["design-system/no-page-styling"],
   );
   assert.ok(storiesBlock, "a config block must target src/views/**/*.stories.tsx");
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- assert.ok above guarantees this config block and its rules exist
   assert.equal(storiesBlock.rules!["design-system/no-page-styling"], "off");
 });
 

@@ -161,8 +161,9 @@ export function isAboveModalLayer(a: ModalLayer, b: ModalLayer): boolean {
   const pathB = presentationPath(b);
   const shared = Math.min(pathA.length, pathB.length);
   for (let i = 0; i < shared; i++) {
-    const stampA = pathA[i]!;
-    const stampB = pathB[i]!;
+    const stampA = pathA[i];
+    const stampB = pathB[i];
+    if (stampA === undefined || stampB === undefined) break;
     if (stampA !== stampB) {
       return stampA > stampB;
     }

@@ -50,6 +50,7 @@ function guardScript() {
   const end = lines.findIndex((line, idx) => idx > 0 && line.trim() === "NODE");
   assert.notEqual(end, -1, "merge-guard heredoc end not found in merge-guard.yml");
   const body = lines.slice(1, end);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- the heredoc body always has a non-blank line and /^\s*/ always matches
   const indent = /^\s*/.exec((body.find((line) => line.trim() !== "")!))![0];
   return body
     .map((line) => (line.startsWith(indent) ? line.slice(indent.length) : line))
