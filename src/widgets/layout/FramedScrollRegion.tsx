@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { ScrollView } from "tamagui";
-import { Col } from "./Col.js";
+
 import { tokens } from "../../tokens/index.js";
+
+import { Col } from "./Col.js";
 
 export type FramedScrollRegionProps = {
   /**

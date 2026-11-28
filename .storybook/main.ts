@@ -1,4 +1,5 @@
 import { join } from "node:path";
+
 import type { StorybookConfig } from "@storybook/react-vite";
 
 // Absolute path (Storybook runs from the repo root): the alias below

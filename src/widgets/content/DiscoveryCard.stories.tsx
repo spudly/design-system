@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, YStack } from "tamagui";
+
 import { DiscoveryCard } from "./DiscoveryCard.js";
 
 /**
@@ -58,8 +59,8 @@ export const WithActions: Story = {
     subtitle: "By Maria · ★ 4.5 · Satiety 60",
     href: "/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken",
     actions: [
-      { id: "hide", label: "Hide this recipe", onSelect: () => undefined },
-      { id: "show-less", label: "Show less like this", onSelect: () => undefined },
+      { id: "hide", label: "Hide this recipe", onSelect: () => {} },
+      { id: "show-less", label: "Show less like this", onSelect: () => {} },
     ],
   },
 };

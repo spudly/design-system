@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { storyImageSquare, storyImageWide } from "../../storyFixtures.js";
+
 import { Text } from "./Text.js";
 import { Thumbnail } from "./Thumbnail.js";
 

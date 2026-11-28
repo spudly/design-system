@@ -1,5 +1,6 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { useMemo, type ReactNode } from "react";
+
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { isWeb } from "../../widgets/platform.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { Button } from "../../widgets/actions/Button.js";

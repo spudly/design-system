@@ -21,11 +21,12 @@
  * script does both).
  */
 import "../test/registerSvgStub.js";
-import { loadInternalDist } from "../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { getConfig } from "tamagui";
+
+import { loadInternalDist } from "../test/internalDist.js";
 
 /** The installed global config, or undefined when none is installed. */
 function getConfigMaybe() {

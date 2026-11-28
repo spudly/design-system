@@ -1,5 +1,7 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { ImportImagePage } from "./ImportImagePage.js";
 
 const meta: Meta<typeof ImportImagePage> = {
@@ -16,8 +18,8 @@ export const Idle: Story = {
     <>
       <ImportImagePage
         footer={eciperayFooterFixture}
-        onPickCamera={() => undefined}
-        onPickLibrary={() => undefined}
+        onPickCamera={() => {}}
+        onPickLibrary={() => {}}
       />
     </>
   ),

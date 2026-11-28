@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { ProseColumn } from "./ProseColumn.js";
+
 import { Text } from "../data/Text.js";
+
+import { ProseColumn } from "./ProseColumn.js";
 import { Col } from "./Col.js";
 
 const meta: Meta<typeof ProseColumn> = {

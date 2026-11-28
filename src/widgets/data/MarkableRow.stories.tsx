@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { MarkableRow } from "./MarkableRow.js";
+
 import { Col } from "../layout/Col.js";
+
+import { MarkableRow } from "./MarkableRow.js";
 
 const meta: Meta<typeof MarkableRow> = {
   title: "Widgets/Data Display/MarkableRow",

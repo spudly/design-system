@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { ScrollShell } from "./ScrollShell.js";
+
 import { Text } from "../data/Text.js";
+
+import { ScrollShell } from "./ScrollShell.js";
 
 const meta: Meta<typeof ScrollShell> = {
   title: "Widgets/Layout & Structure/ScrollShell",

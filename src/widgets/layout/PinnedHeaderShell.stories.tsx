@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ScrollView, YStack } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
-import { PinnedHeaderShell } from "./PinnedHeaderShell.js";
 import { Tabs } from "../actions/Tabs.js";
 import { Text } from "../data/Text.js";
+
+import { PinnedHeaderShell } from "./PinnedHeaderShell.js";
 import { Col } from "./Col.js";
 
 const meta: Meta<typeof PinnedHeaderShell> = {

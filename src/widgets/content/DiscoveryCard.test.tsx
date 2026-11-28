@@ -18,6 +18,7 @@
  */
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
+
 import "../../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../../test/internalDist.js";
 
@@ -64,8 +65,8 @@ describe("discoveryCardActions", () => {
       <DiscoveryCard
         {...cardProps}
         actions={[
-          { id: "hide", label: "Hide this recipe", onSelect: () => undefined },
-          { id: "show-less", label: "Show less like this", onSelect: () => undefined },
+          { id: "hide", label: "Hide this recipe", onSelect: () => {} },
+          { id: "show-less", label: "Show less like this", onSelect: () => {} },
         ]}
       />,
     );
@@ -86,7 +87,7 @@ describe("discoveryCardActions", () => {
     const html = await renderToHtml(
       <DiscoveryCard
         {...cardProps}
-        actions={[{ id: "hide", label: "Hide this recipe", onSelect: () => undefined }]}
+        actions={[{ id: "hide", label: "Hide this recipe", onSelect: () => {} }]}
       />,
     );
     const anchorStart = html.indexOf("<a ");

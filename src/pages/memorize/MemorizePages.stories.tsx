@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
+
 import { BlankWord } from "../../widgets/data/BlankWord.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
@@ -74,8 +75,8 @@ export const PassageView: Story = {
       <PrevNextNav
         backLabel="Previous passage"
         nextLabel="Next passage"
-        onBack={() => undefined}
-        onNext={() => undefined}
+        onBack={() => {}}
+        onNext={() => {}}
       />
       <Button>Start memorization</Button>
     </PageFrame>

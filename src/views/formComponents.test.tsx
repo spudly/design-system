@@ -38,12 +38,13 @@
  *   this tranche does not read page source.
  */
 import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+
+import { loadInternalDist } from "../../test/internalDist.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = await loadInternalDist();
 // The Props type check reads the built dist type surface (a

@@ -1,14 +1,16 @@
 import { View } from "tamagui";
+import { useId } from "react";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
-import { CheckboxField } from "./CheckboxField.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
 import { useVoice } from "../../voice/index.js";
-import { useId } from "react";
+
+import { CheckboxField } from "./CheckboxField.js";
 import { FieldError } from "./FieldError.js";
 
 type CheckboxSelectItem = {

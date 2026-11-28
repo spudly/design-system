@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { addRecipeMenuFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { AddRecipeMenuPage } from "./AddRecipeMenuPage.js";
 
 const meta: Meta<typeof AddRecipeMenuPage> = {

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { AccordionSection } from "./AccordionSection.js";
+
 import { Text } from "../data/Text.js";
+
+import { AccordionSection } from "./AccordionSection.js";
 
 const meta: Meta<typeof AccordionSection> = {
   title: "Widgets/Overlays & Disclosure/AccordionSection",

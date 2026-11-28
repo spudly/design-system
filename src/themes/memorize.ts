@@ -1,5 +1,6 @@
-import { baseTheme } from "./base.js";
 import { tokens } from "../tokens/index.js";
+
+import { baseTheme } from "./base.js";
 import { quietDawnTagColors, quietDawnTagColorShades } from "./tagColors.js";
 
 /**

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { Button } from "./Button.js";
+
 import { Text } from "../data/Text.js";
+
+import { Button } from "./Button.js";
 
 const meta: Meta<typeof Button> = {
   title: "Widgets/Actions & Navigation/Button",

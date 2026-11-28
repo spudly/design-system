@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { mealFormFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import {
   MealFormPage,
   type MealFormPageIngredient,
@@ -134,7 +136,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
           },
         }
       : {}),
-    onSubmit: restOverrides.onSubmit ?? (() => undefined),
+    onSubmit: restOverrides.onSubmit ?? (() => {}),
   };
 }
 

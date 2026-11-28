@@ -1,11 +1,13 @@
 import { useState, type ReactNode } from "react";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { CollapsibleIcon } from "../../icons/CollapsibleIcon.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Collapsible } from "./Collapsible.js";
 import { Text } from "../data/Text.js";
+
+import { Collapsible } from "./Collapsible.js";
 
 export type AccordionSectionProps = {
   /** Section header label; also the header button's accessible name. */

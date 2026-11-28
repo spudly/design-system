@@ -1,5 +1,7 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { ConsentPreferencesPage } from "./ConsentPreferencesPage.js";
 
 const meta: Meta<typeof ConsentPreferencesPage> = {
@@ -12,9 +14,9 @@ export default meta;
 type Story = StoryObj<typeof ConsentPreferencesPage>;
 
 const actions = {
-  onAccept: () => undefined,
-  onDecline: () => undefined,
-  onWithdraw: () => undefined,
+  onAccept: () => {},
+  onDecline: () => {},
+  onWithdraw: () => {},
 };
 
 export const Accepted: Story = {

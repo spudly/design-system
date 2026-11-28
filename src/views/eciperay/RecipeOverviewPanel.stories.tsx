@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { RecipeOverviewPanel } from "./RecipeOverviewPanel.js";
 
 const meta: Meta<typeof RecipeOverviewPanel> = {

@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { isWeb } from "tamagui";
-import { Col } from "./Col.js";
+
 import { mainRoleProps } from "../accessibility.js";
+
+import { Col } from "./Col.js";
 
 export type MainLandmarkProps = {
   /** The page's primary content, rendered inside the landmark. */

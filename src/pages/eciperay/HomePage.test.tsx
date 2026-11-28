@@ -22,9 +22,10 @@
  * RecipesPage's own contract tests.
  */
 import "../../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "../../../test/internalDist.js";
 
 // Collect, in document order, every element in a tree whose
 // type is the given component.

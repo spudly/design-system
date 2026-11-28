@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { CreatedSecretPanel } from "./CreatedSecretPanel.js";
 
 const meta: Meta<typeof CreatedSecretPanel> = {
@@ -16,7 +17,7 @@ export const Default: Story = {
       secret="sk-example-secret-value"
       hint="Copy it now — it won't be shown again."
       doneLabel="Done"
-      onDismiss={() => undefined}
+      onDismiss={() => {}}
     />
   ),
 };

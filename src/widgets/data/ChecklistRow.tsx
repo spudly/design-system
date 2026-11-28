@@ -1,8 +1,10 @@
 import { Checkbox as TamaguiCheckbox, styled } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
+
 import { Text } from "./Text.js";
 
 const StyledCheckbox = styled(TamaguiCheckbox, {

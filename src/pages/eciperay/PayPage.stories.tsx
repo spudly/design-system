@@ -1,5 +1,7 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { PayPage } from "./PayPage.js";
 
 const meta: Meta<typeof PayPage> = {
@@ -22,7 +24,7 @@ export const Opening: Story = {
 export const Closed: Story = {
   render: () => (
     <>
-      <PayPage footer={eciperayFooterFixture} status="closed" onRetryPress={() => undefined} />
+      <PayPage footer={eciperayFooterFixture} status="closed" onRetryPress={() => {}} />
     </>
   ),
 };
@@ -30,7 +32,7 @@ export const Closed: Story = {
 export const ErrorState: Story = {
   render: () => (
     <>
-      <PayPage footer={eciperayFooterFixture} status="error" onRetryPress={() => undefined} />
+      <PayPage footer={eciperayFooterFixture} status="error" onRetryPress={() => {}} />
     </>
   ),
 };

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack } from "tamagui";
+
 import { tagColorNames } from "../../themes/tagColors.js";
+
 import { Badge } from "./Badge.js";
 
 const meta: Meta<typeof Badge> = {
@@ -76,7 +78,7 @@ export const AllTones: Story = {
 };
 
 export const Selected: Story = {
-  args: { selected: true, onPress: () => undefined, children: "Weeknight" },
+  args: { selected: true, onPress: () => {}, children: "Weeknight" },
 };
 
 export const SelectableDisabled: Story = {

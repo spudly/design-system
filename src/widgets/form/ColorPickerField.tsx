@@ -1,4 +1,5 @@
 import { useId } from "react";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import type { ColProps } from "../layout/Col.js";
@@ -6,9 +7,10 @@ import { tokens } from "../../tokens/index.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { useTagColorResolver } from "../tagColors.js";
-import { FieldError } from "./FieldError.js";
 import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
+
+import { FieldError } from "./FieldError.js";
 
 /**
  * One color swatch (#746, Option B): a 44px round Col whose

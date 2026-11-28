@@ -1,8 +1,10 @@
 import { isWeb } from "tamagui";
-import { Col } from "./Col.js";
-import type { ColProps } from "./Col.js";
+
 import type { LayoutSize } from "../layout.js";
 import { tokens } from "../../tokens/index.js";
+
+import { Col } from "./Col.js";
+import type { ColProps } from "./Col.js";
 
 export type ScreenContainerProps = Omit<ColProps, "gap"> & {
   /**

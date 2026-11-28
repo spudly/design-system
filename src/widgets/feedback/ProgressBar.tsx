@@ -1,5 +1,6 @@
 import { Progress as TamaguiProgress, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 

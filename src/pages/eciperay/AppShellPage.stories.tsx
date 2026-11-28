@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { Card } from "../../widgets/layout/Card.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
-import { AppShellPage, type AppShellPageNavItem } from "./AppShellPage.js";
 import { eciperayFooterFixture } from "../shared/fixtures.js";
+
+import { AppShellPage, type AppShellPageNavItem } from "./AppShellPage.js";
 
 /**
  * Stories for AppShellPage (#437) — the routed app shell

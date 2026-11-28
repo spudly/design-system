@@ -46,12 +46,13 @@
  * loading-state landmark test does not carry over.
  */
 import "./registerSvgStub.js";
-import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+
+import { loadInternalDist } from "./internalDist.js";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")
@@ -328,14 +329,14 @@ const publicRecipeReadyFixture = {
   ctas: {
     variant: "signedOut",
   },
-  onSignUpPress: () => undefined,
-  onClonePress: () => undefined,
-  onGetAppPress: () => undefined,
+  onSignUpPress: () => {},
+  onClonePress: () => {},
+  onGetAppPress: () => {},
   ingredients: {
     servings: 4,
-    onServingsChange: () => undefined,
+    onServingsChange: () => {},
     scaleValue: "1",
-    onScaleChange: () => undefined,
+    onScaleChange: () => {},
     ingredients: [
       {
         id: "salt",
@@ -344,7 +345,7 @@ const publicRecipeReadyFixture = {
         isMissing: false,
       },
     ],
-    onIngredientPress: () => undefined,
+    onIngredientPress: () => {},
     substitutions: [],
   },
   instructions: {

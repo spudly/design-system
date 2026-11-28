@@ -1,4 +1,5 @@
 import { Anchor } from "tamagui";
+
 import {
   platformAccessibilityProps,
   type TranslatableAccessibilityProps,

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { VerseText } from "./VerseText.js";
 
 const meta: Meta<typeof VerseText> = {

@@ -1,10 +1,11 @@
 import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import test from "node:test";
+
+import { loadInternalDist } from "../../test/internalDist.js";
 
 // #278 Phase 2: the skeleton loading system — BoxSkeleton /
 // CircleSkeleton / TextSkeleton primitives on the shared

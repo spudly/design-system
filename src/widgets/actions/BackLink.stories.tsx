@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { BackLink } from "./BackLink.js";
 
 const meta: Meta<typeof BackLink> = {
@@ -15,14 +16,14 @@ type Story = StoryObj<typeof BackLink>;
 export const Default: Story = {
   args: {
     label: "Back",
-    onPress: () => undefined,
+    onPress: () => {},
   },
 };
 
 export const CustomLabel: Story = {
   args: {
     label: "Back to recipes",
-    onPress: () => undefined,
+    onPress: () => {},
   },
 };
 

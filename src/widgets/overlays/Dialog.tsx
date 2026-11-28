@@ -1,9 +1,10 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Dialog as TamaguiDialog, isWeb, styled } from "tamagui";
+import type { TamaguiElement } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
-import type { TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import {
   ModalLayerContext,

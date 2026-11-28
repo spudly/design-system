@@ -3,8 +3,9 @@ import type { TagColorName } from "../../themes/tagColors.js";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Badge } from "./Badge.js";
 import { SkeletonBone } from "../feedback/SkeletonClock.js";
+
+import { Badge } from "./Badge.js";
 
 type TagListTag = {
   /** Stable key for the tag. */

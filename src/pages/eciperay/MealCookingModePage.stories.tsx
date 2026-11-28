@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { mealCookingFixture } from "../shared/fixtures.js";
+
 import { MealCookingModePage } from "./MealCookingModePage.js";
 
 /**
@@ -35,7 +37,7 @@ function Cooking({ initialStep }: { initialStep: number }) {
       onNext={() => {
         setStepIndex((current) => Math.min(steps.length - 1, current + 1));
       }}
-      onDone={() => undefined}
+      onDone={() => {}}
     />
   );
 }
@@ -59,9 +61,9 @@ export const NoFooter: Story = {
       mealTitle={mealCookingFixture.mealTitle}
       steps={mealCookingFixture.steps}
       stepIndex={1}
-      onPrev={() => undefined}
-      onNext={() => undefined}
-      onDone={() => undefined}
+      onPrev={() => {}}
+      onNext={() => {}}
+      onDone={() => {}}
     />
   ),
 };
@@ -97,7 +99,7 @@ export const LoadError: Story = {
       <MealCookingModePage
         state="error"
         mealTitle={mealCookingFixture.mealTitle}
-        onDone={() => undefined}
+        onDone={() => {}}
       />
     </>
   ),
@@ -132,9 +134,9 @@ export const LongBody: Story = {
         mealTitle={mealCookingFixture.mealTitle}
         steps={LONG_BODY_STEPS}
         stepIndex={0}
-        onPrev={() => undefined}
-        onNext={() => undefined}
-        onDone={() => undefined}
+        onPrev={() => {}}
+        onNext={() => {}}
+        onDone={() => {}}
       />
     </>
   ),

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ChunkErrorBoundary } from "./ChunkErrorBoundary.js";
+
 import { Text } from "../../widgets/data/Text.js";
+
+import { ChunkErrorBoundary } from "./ChunkErrorBoundary.js";
 
 const meta: Meta<typeof ChunkErrorBoundary> = {
   title: "Views/Shared/ChunkErrorBoundary",

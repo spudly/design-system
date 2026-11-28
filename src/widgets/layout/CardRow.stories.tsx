@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { CardRow } from "./CardRow.js";
+
 import { Text } from "../data/Text.js";
+
+import { CardRow } from "./CardRow.js";
 
 const meta: Meta<typeof CardRow> = {
   title: "Widgets/Layout & Structure/CardRow",

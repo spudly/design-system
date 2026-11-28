@@ -1,7 +1,8 @@
-import { AuthFormSubmit } from "./AuthFormSubmit.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { PasswordField } from "../../widgets/form/PasswordField.js";
 import { useVoice } from "../../voice/index.js";
+
+import { AuthFormSubmit } from "./AuthFormSubmit.js";
 
 /**
  * ResetPasswordForm (#119): the new-password form — the field

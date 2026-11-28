@@ -1,12 +1,14 @@
 import { Anchor, isWeb } from "tamagui";
+
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LinkOverlay } from "../linkOverlay.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
+
 import { RowSubtitleText } from "./RowTextContent.js";
 import { Text } from "./Text.js";
-import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 type ListItemOwnProps = {
   /** Optional caller-supplied lead-in rendered in the title line

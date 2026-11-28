@@ -1,5 +1,7 @@
-import { memorizeFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { memorizeFooterFixture } from "../shared/fixtures.js";
+
 import { MyVersesPage, type MyVersesPageItem } from "./MyVersesPage.js";
 
 /**
@@ -65,7 +67,7 @@ export const Default: Story = {
       <MyVersesPage
         footer={memorizeFooterFixture}
         verses={verseItems}
-        onRemoveVerse={() => undefined}
+        onRemoveVerse={() => {}}
       />
     </>
   ),
@@ -77,7 +79,7 @@ export const Loading: Story = {
       <MyVersesPage
         footer={memorizeFooterFixture}
         verses={[]}
-        onRemoveVerse={() => undefined}
+        onRemoveVerse={() => {}}
         loading
       />
     </>
@@ -90,7 +92,7 @@ export const Empty: Story = {
       <MyVersesPage
         footer={memorizeFooterFixture}
         verses={[]}
-        onRemoveVerse={() => undefined}
+        onRemoveVerse={() => {}}
         searchHref="/search"
       />
     </>

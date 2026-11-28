@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import {
   RecipeIngredientsPanel,
   type RecipeIngredientsPanelView,
@@ -67,7 +68,7 @@ export const Default: Story = {
             { id: "cream", label: "1 cup heavy cream", isMissing: true },
             { id: "parmesan", label: "1/2 cup Parmesan cheese, grated", isOptional: true },
           ],
-          onIngredientPress: () => undefined,
+          onIngredientPress: () => {},
           substitutions: [
             {
               ingredient: "Heavy cream",

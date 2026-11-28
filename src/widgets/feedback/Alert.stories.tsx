@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { Alert } from "./Alert.js";
+
 import { Text } from "../data/Text.js";
+
+import { Alert } from "./Alert.js";
 
 const meta: Meta<typeof Alert> = {
   title: "Widgets/Feedback & Loading/Alert",

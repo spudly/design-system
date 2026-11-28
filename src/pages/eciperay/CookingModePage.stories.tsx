@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { CookingModePage } from "./CookingModePage.js";
 
 const meta: Meta<typeof CookingModePage> = {
@@ -32,9 +33,9 @@ export const WithIngredientsPanel: Story = {
             "1 tsp smoked paprika",
           ],
         }}
-        onPrev={() => undefined}
-        onNext={() => undefined}
-        onDone={() => undefined}
+        onPrev={() => {}}
+        onNext={() => {}}
+        onDone={() => {}}
       />
     </>
   ),
@@ -61,9 +62,9 @@ export const NoFooter: Story = {
             "1 tsp smoked paprika",
           ],
         }}
-        onPrev={() => undefined}
-        onNext={() => undefined}
-        onDone={() => undefined}
+        onPrev={() => {}}
+        onNext={() => {}}
+        onDone={() => {}}
       />
     </>
   ),
@@ -76,9 +77,9 @@ export const Loading: Story = {
         recipeTitle="Skillet Chicken"
         steps={[]}
         stepIndex={0}
-        onPrev={() => undefined}
-        onNext={() => undefined}
-        onDone={() => undefined}
+        onPrev={() => {}}
+        onNext={() => {}}
+        onDone={() => {}}
         loading
       />
     </>
@@ -92,9 +93,9 @@ export const FirstStep: Story = {
         recipeTitle="Skillet Chicken"
         steps={steps}
         stepIndex={0}
-        onPrev={() => undefined}
-        onNext={() => undefined}
-        onDone={() => undefined}
+        onPrev={() => {}}
+        onNext={() => {}}
+        onDone={() => {}}
       />
     </>
   ),
@@ -114,13 +115,13 @@ export const CookLogFormOpen: Story = {
         steps={steps}
         stepIndex={1}
         cookLogForm={{
-          onSubmit: () => undefined,
-          onSkip: () => undefined,
+          onSubmit: () => {},
+          onSkip: () => {},
           isPending: false,
         }}
-        onPrev={() => undefined}
-        onNext={() => undefined}
-        onDone={() => undefined}
+        onPrev={() => {}}
+        onNext={() => {}}
+        onDone={() => {}}
       />
     </>
   ),
@@ -133,9 +134,9 @@ export const LastStep: Story = {
         recipeTitle="Skillet Chicken"
         steps={steps}
         stepIndex={2}
-        onPrev={() => undefined}
-        onNext={() => undefined}
-        onDone={() => undefined}
+        onPrev={() => {}}
+        onNext={() => {}}
+        onDone={() => {}}
       />
     </>
   ),

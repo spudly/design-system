@@ -2,6 +2,7 @@ import { useId, useRef, useState } from "react";
 import type { ComponentProps, Ref } from "react";
 import { isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import type { RowProps } from "../layout/Row.js";
 import { Spacer } from "../layout/Spacer.js";
@@ -9,8 +10,9 @@ import { tokens } from "../../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
 import { Text } from "../data/Text.js";
-import { TextField } from "./TextField.js";
 import { Col } from "../layout/Col.js";
+
+import { TextField } from "./TextField.js";
 import { FieldError } from "./FieldError.js";
 
 export type PresetValueOption = {

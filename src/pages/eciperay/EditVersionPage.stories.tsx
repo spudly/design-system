@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { recipeFormFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { EditVersionPage } from "./EditVersionPage.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
@@ -30,7 +32,7 @@ function useFormProps(): RecipeFormPageProps {
   const [cookTimeMin, setCookTimeMin] = useState(fixture.cookTimeMin);
   const [sourceUrl, setSourceUrl] = useState(fixture.sourceUrl);
   const [tagIds, setTagIds] = useState<string[]>(fixture.tagIds);
-  const noop = () => undefined;
+  const noop = () => {};
   return {
     title,
     onTitleChange: setTitle,

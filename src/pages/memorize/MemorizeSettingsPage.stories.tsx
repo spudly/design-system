@@ -1,5 +1,7 @@
-import { memorizeFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { memorizeFooterFixture } from "../shared/fixtures.js";
+
 import { MemorizeSettingsPage } from "./MemorizeSettingsPage.js";
 
 /**

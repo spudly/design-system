@@ -1,7 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
+
 import { storyImageSquare } from "../../storyFixtures.js";
+import { Col } from "../layout/Col.js";
+
 import { Avatar } from "./Avatar.js";
 import { Badge } from "./Badge.js";
 import { BulletList } from "./BulletList.js";
@@ -19,7 +22,6 @@ import { StepList } from "./StepList.js";
 import { TagList } from "./TagList.js";
 import { Text } from "./Text.js";
 import { Thumbnail } from "./Thumbnail.js";
-import { Col } from "../layout/Col.js";
 
 /**
  * Composite story (#711): every data-display widget rendered

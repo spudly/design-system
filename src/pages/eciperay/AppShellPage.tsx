@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Row } from "../../widgets/layout/Row.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";

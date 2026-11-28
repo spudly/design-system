@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { ChangedListBanner } from "./ChangedListBanner.js";
+
 import { Text } from "../data/Text.js";
+
+import { ChangedListBanner } from "./ChangedListBanner.js";
 
 const meta: Meta<typeof ChangedListBanner> = {
   title: "Widgets/Feedback & Loading/ChangedListBanner",

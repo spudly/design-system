@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { RatingForm } from "./RatingForm.js";
+
 import { StoryFrame } from "../../views/shared/storyFrame.js";
+
+import { RatingForm } from "./RatingForm.js";
 
 const meta: Meta<typeof RatingForm> = {
   title: "Widgets/Form/RatingForm",
@@ -14,7 +16,7 @@ type Story = StoryObj<typeof RatingForm>;
 export const Dark: Story = {
   render: () => (
     <StoryFrame variant="overlayPanel">
-      <RatingForm onSubmit={() => undefined} onSkip={() => undefined} isPending={false} />
+      <RatingForm onSubmit={() => {}} onSkip={() => {}} isPending={false} />
     </StoryFrame>
   ),
 };
@@ -24,8 +26,8 @@ export const Light: Story = {
     <StoryFrame variant="panel">
       <RatingForm
         variant="light"
-        onSubmit={() => undefined}
-        onSkip={() => undefined}
+        onSubmit={() => {}}
+        onSkip={() => {}}
         isPending={false}
       />
     </StoryFrame>
@@ -35,7 +37,7 @@ export const Light: Story = {
 export const Pending: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <RatingForm variant="light" onSubmit={() => undefined} onSkip={() => undefined} isPending />
+      <RatingForm variant="light" onSubmit={() => {}} onSkip={() => {}} isPending />
     </StoryFrame>
   ),
 };
@@ -48,8 +50,8 @@ export const CustomLabels: Story = {
         title="Rate this recipe"
         notesPlaceholder="Notes from this cook (optional)"
         secondaryLabel="Cancel"
-        onSubmit={() => undefined}
-        onSkip={() => undefined}
+        onSubmit={() => {}}
+        onSkip={() => {}}
         isPending={false}
       />
     </StoryFrame>

@@ -1,10 +1,12 @@
 import { useId } from "react";
 import { Adapt, Label, Select as TamaguiSelect, Sheet, styled } from "tamagui";
+
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
-import { FieldError } from "./FieldError.js";
 import { useVoice } from "../../voice/index.js";
+
+import { FieldError } from "./FieldError.js";
 
 const StyledTrigger = styled(TamaguiSelect.Trigger, {
   name: "SelectFieldTrigger",

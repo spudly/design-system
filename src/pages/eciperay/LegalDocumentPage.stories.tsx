@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { legalPrivacyFixture, legalTermsFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { LegalDocumentPage } from "./LegalDocumentPage.js";
 
 /**

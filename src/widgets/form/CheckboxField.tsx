@@ -2,11 +2,13 @@ import { useId } from "react";
 import type { ReactNode } from "react";
 import { Checkbox as TamaguiCheckbox, Label, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
+
 import { FieldError } from "./FieldError.js";
 
 /**

@@ -1,5 +1,7 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { RouteErrorPage } from "./RouteErrorPage.js";
 
 const meta: Meta<typeof RouteErrorPage> = {

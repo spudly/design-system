@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
+
 import "../../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../../test/internalDist.js";
 describe("badgeBorder", () => {

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
 import { AppTopBar } from "./AppTopBar.js";
 
 /**

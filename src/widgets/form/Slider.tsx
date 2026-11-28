@@ -1,9 +1,11 @@
 import { useId } from "react";
 import { Label, Slider as TamaguiSlider, View, isWeb, styled } from "tamagui";
+
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
+
 import { FieldError } from "./FieldError.js";
 
 const StyledTrack = styled(TamaguiSlider.Track, {

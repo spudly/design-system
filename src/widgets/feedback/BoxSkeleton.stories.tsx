@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { BoxSkeleton } from "./BoxSkeleton.js";
 
 const meta: Meta<typeof BoxSkeleton> = {

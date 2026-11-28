@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { storyImageSquare } from "../../storyFixtures.js";
+
 import { Avatar } from "./Avatar.js";
 
 const meta: Meta<typeof Avatar> = {

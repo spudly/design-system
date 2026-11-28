@@ -156,7 +156,7 @@ export function AccessTokensPanel({
                         ? () => {
                             onRevoke(token.id);
                           }
-                        : () => undefined,
+                        : () => {},
                   })}
             />
           ))}

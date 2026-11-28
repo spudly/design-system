@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { SignUpForm } from "./SignUpForm.js";
+
 import { Text } from "../../widgets/data/Text.js";
+
+import { SignUpForm } from "./SignUpForm.js";
 
 
 const meta: Meta<typeof SignUpForm> = {

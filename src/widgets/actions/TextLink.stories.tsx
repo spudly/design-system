@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { TextLink } from "./TextLink.js";
+
 import { Text } from "../data/Text.js";
+
+import { TextLink } from "./TextLink.js";
 
 const meta: Meta<typeof TextLink> = {
   title: "Widgets/Actions & Navigation/TextLink",
@@ -17,7 +19,7 @@ type Story = StoryObj<typeof TextLink>;
 export const Default: Story = {
   args: {
     children: "Forgot your password?",
-    onPress: () => undefined,
+    onPress: () => {},
   },
 };
 
@@ -26,9 +28,9 @@ export const InProse: Story = {
     <YStack maxWidth={420}>
       <Text variant="body">
         By continuing you agree to the{" "}
-        <TextLink onPress={() => undefined}>Terms of Service</TextLink> and{" "}
-        <TextLink onPress={() => undefined}>Privacy Policy</TextLink>. Questions?{" "}
-        <TextLink onPress={() => undefined}>Contact support</TextLink>.
+        <TextLink onPress={() => {}}>Terms of Service</TextLink> and{" "}
+        <TextLink onPress={() => {}}>Privacy Policy</TextLink>. Questions?{" "}
+        <TextLink onPress={() => {}}>Contact support</TextLink>.
       </Text>
     </YStack>
   ),
@@ -39,7 +41,7 @@ export const InHintText: Story = {
     <YStack maxWidth={420}>
       <Text variant="hint">
         Tokens let scripts act on your behalf.{" "}
-        <TextLink onPress={() => undefined} fontSize={14}>
+        <TextLink onPress={() => {}} fontSize={14}>
           Learn how tokens work
         </TextLink>
       </Text>

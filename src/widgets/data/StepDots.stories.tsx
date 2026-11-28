@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { StepDots } from "./StepDots.js";
 
 const meta: Meta<typeof StepDots> = {

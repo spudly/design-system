@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { AccessTokensPanel } from "./AccessTokensPanel.js";
+
 import { accessTokensFixture } from "../../pages/shared/fixtures.js";
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { AccessTokensPanel } from "./AccessTokensPanel.js";
 
 const meta: Meta<typeof AccessTokensPanel> = {
   title: "Views/Eciperay/AccessTokensPanel",
@@ -19,11 +21,11 @@ export const WithTokens: Story = {
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName="Kitchen tablet"
-        onTokenNameChange={() => undefined}
-        onCreate={() => undefined}
+        onTokenNameChange={() => {}}
+        onCreate={() => {}}
         createdSecret={null}
-        onDismissSecret={() => undefined}
-        onRevoke={() => undefined}
+        onDismissSecret={() => {}}
+        onRevoke={() => {}}
       />
     </StoryFrame>
   ),
@@ -36,11 +38,11 @@ export const Loading: Story = {
         tokens={accessTokensFixture.tokens}
         loading
         tokenName=""
-        onTokenNameChange={() => undefined}
-        onCreate={() => undefined}
+        onTokenNameChange={() => {}}
+        onCreate={() => {}}
         createdSecret={null}
-        onDismissSecret={() => undefined}
-        onRevoke={() => undefined}
+        onDismissSecret={() => {}}
+        onRevoke={() => {}}
       />
     </StoryFrame>
   ),
@@ -54,11 +56,11 @@ export const LoadingOverlay: Story = {
         <AccessTokensPanel
           tokens={accessTokensFixture.tokens}
           tokenName="Kitchen tablet"
-          onTokenNameChange={() => undefined}
-          onCreate={() => undefined}
+          onTokenNameChange={() => {}}
+          onCreate={() => {}}
           createdSecret={null}
-          onDismissSecret={() => undefined}
-          onRevoke={() => undefined}
+          onDismissSecret={() => {}}
+          onRevoke={() => {}}
         />
         <YStack
           position="absolute"
@@ -73,11 +75,11 @@ export const LoadingOverlay: Story = {
             tokens={accessTokensFixture.tokens}
             loading
             tokenName="Kitchen tablet"
-            onTokenNameChange={() => undefined}
-            onCreate={() => undefined}
+            onTokenNameChange={() => {}}
+            onCreate={() => {}}
             createdSecret={null}
-            onDismissSecret={() => undefined}
-            onRevoke={() => undefined}
+            onDismissSecret={() => {}}
+            onRevoke={() => {}}
           />
         </YStack>
       </YStack>
@@ -91,11 +93,11 @@ export const SecretJustCreated: Story = {
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName=""
-        onTokenNameChange={() => undefined}
-        onCreate={() => undefined}
+        onTokenNameChange={() => {}}
+        onCreate={() => {}}
         createdSecret={accessTokensFixture.createdSecret}
-        onDismissSecret={() => undefined}
-        onRevoke={() => undefined}
+        onDismissSecret={() => {}}
+        onRevoke={() => {}}
       />
     </StoryFrame>
   ),
@@ -107,11 +109,11 @@ export const PlanNotice: Story = {
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens.slice(0, 1)}
         tokenName=""
-        onTokenNameChange={() => undefined}
-        onCreate={() => undefined}
+        onTokenNameChange={() => {}}
+        onCreate={() => {}}
         createdSecret={null}
-        onDismissSecret={() => undefined}
-        onRevoke={() => undefined}
+        onDismissSecret={() => {}}
+        onRevoke={() => {}}
         planNotice="API access tokens are a Power plan feature. Upgrade to create tokens."
       />
     </StoryFrame>

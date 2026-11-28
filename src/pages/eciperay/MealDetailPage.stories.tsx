@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { mealDetailFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { MealDetailPage } from "./MealDetailPage.js";
 
 /**

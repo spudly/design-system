@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+
 import { TextSkeleton } from "./TextSkeleton.js";
 
 const meta: Meta<typeof TextSkeleton> = {

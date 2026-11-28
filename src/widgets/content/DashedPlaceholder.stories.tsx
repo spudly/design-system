@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { Text } from "../data/Text.js";
+
 import { DashedPlaceholder } from "./DashedPlaceholder.js";
 
 const meta: Meta<typeof DashedPlaceholder> = {

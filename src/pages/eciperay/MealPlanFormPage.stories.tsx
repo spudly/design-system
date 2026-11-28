@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { mealPlanFormFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import {
   MealPlanFormPage,
   type MealPlanFormPageEntryOption,
@@ -119,7 +121,7 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     onDayChange: (key, day) => {
       setDayByKey((current) => ({ ...current, [key]: day }));
     },
-    onSubmit: restOverrides.onSubmit ?? (() => undefined),
+    onSubmit: restOverrides.onSubmit ?? (() => {}),
   };
 }
 
@@ -174,14 +176,14 @@ export const DetailsOnly: Story = {
     <MealPlanFormPage
       footer={eciperayFooterFixture}
       title="New plan"
-      onTitleChange={() => undefined}
+      onTitleChange={() => {}}
       notes=""
-      onNotesChange={() => undefined}
+      onNotesChange={() => {}}
       startsOn="2026-10-19"
-      onStartsOnChange={() => undefined}
+      onStartsOnChange={() => {}}
       endsOn="2026-10-25"
-      onEndsOnChange={() => undefined}
-      onSubmit={() => undefined}
+      onEndsOnChange={() => {}}
+      onSubmit={() => {}}
     />
   ),
 };

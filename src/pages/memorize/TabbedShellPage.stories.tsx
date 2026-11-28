@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { Card } from "../../widgets/layout/Card.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
+
 import { TabbedShellPage, type TabbedShellPageTab } from "./TabbedShellPage.js";
 
 /**

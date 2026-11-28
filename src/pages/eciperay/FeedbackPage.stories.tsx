@@ -1,5 +1,7 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { FeedbackPage } from "./FeedbackPage.js";
 
 const meta: Meta<typeof FeedbackPage> = {
@@ -17,12 +19,12 @@ export const Form: Story = {
       <FeedbackPage
         footer={eciperayFooterFixture}
         message="The shopping list didn't keep my checks after I closed the app."
-        onMessageChange={() => undefined}
+        onMessageChange={() => {}}
         replyEmail="cook@example.com"
-        onReplyEmailChange={() => undefined}
+        onReplyEmailChange={() => {}}
         isBug
-        onIsBugChange={() => undefined}
-        onSubmit={() => undefined}
+        onIsBugChange={() => {}}
+        onSubmit={() => {}}
       />
     </>
   ),
@@ -34,14 +36,14 @@ export const Submitted: Story = {
       <FeedbackPage
         footer={eciperayFooterFixture}
         message=""
-        onMessageChange={() => undefined}
+        onMessageChange={() => {}}
         replyEmail=""
-        onReplyEmailChange={() => undefined}
+        onReplyEmailChange={() => {}}
         isBug={false}
-        onIsBugChange={() => undefined}
+        onIsBugChange={() => {}}
         submitted
-        onSubmit={() => undefined}
-        onResetPress={() => undefined}
+        onSubmit={() => {}}
+        onResetPress={() => {}}
       />
     </>
   ),
@@ -53,13 +55,13 @@ export const FormWithCancel: Story = {
       <FeedbackPage
         footer={eciperayFooterFixture}
         message="The shopping list didn't keep my checks after I closed the app."
-        onMessageChange={() => undefined}
+        onMessageChange={() => {}}
         replyEmail="cook@example.com"
-        onReplyEmailChange={() => undefined}
+        onReplyEmailChange={() => {}}
         isBug
-        onIsBugChange={() => undefined}
-        onSubmit={() => undefined}
-        onCancel={() => undefined}
+        onIsBugChange={() => {}}
+        onSubmit={() => {}}
+        onCancel={() => {}}
       />
     </>
   ),

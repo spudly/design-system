@@ -46,12 +46,13 @@
  * import react-native).
  */
 import "../../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+
+import { loadInternalDist } from "../../../test/internalDist.js";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 // Collect, in document order, every element in a tree whose

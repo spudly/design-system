@@ -25,9 +25,10 @@
  *    vertical pair. There are no single-side padding props.
  */
 import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "../../test/internalDist.js";
 
 const dist: Record<string, any> = await loadInternalDist();
 const resolve = dist.resolveLayoutStyle as (

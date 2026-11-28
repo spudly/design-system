@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { LoadingListItem } from "./LoadingListItem.js";
 import { Col } from "../layout/Col.js";
+
+import { LoadingListItem } from "./LoadingListItem.js";
 
 const meta: Meta<typeof LoadingListItem> = {
   title: "Widgets/Feedback & Loading/LoadingListItem",

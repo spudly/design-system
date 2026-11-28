@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { landingFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+
 import { LandingPage } from "./LandingPage.js";
 
 const meta: Meta<typeof LandingPage> = {

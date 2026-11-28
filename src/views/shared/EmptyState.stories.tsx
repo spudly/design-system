@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { EmptyState } from "./EmptyState.js";
 
 const meta: Meta<typeof EmptyState> = {
@@ -48,6 +49,6 @@ export const WithIconAndCallbackAction: Story = {
     body: "Try a different word or reference.",
     icon: "help",
     actionLabel: "Clear search",
-    onAction: () => undefined,
+    onAction: () => {},
   },
 };

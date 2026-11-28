@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { AccountDataView } from "./AccountDataView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { AccountDataView } from "./AccountDataView.js";
 
 const meta: Meta<typeof AccountDataView> = {
   title: "Views/Eciperay/AccountDataView",
@@ -15,7 +17,7 @@ type Story = StoryObj<typeof AccountDataView>;
 export const Default: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} />
+      <AccountDataView onExportData={() => {}} onDeleteAccount={() => {}} />
     </StoryFrame>
   ),
 };
@@ -24,8 +26,8 @@ export const WithError: Story = {
   render: () => (
     <StoryFrame variant="panel">
       <AccountDataView
-        onExportData={() => undefined}
-        onDeleteAccount={() => undefined}
+        onExportData={() => {}}
+        onDeleteAccount={() => {}}
         error="We couldn't prepare your download. Try again."
       />
     </StoryFrame>
@@ -35,7 +37,7 @@ export const WithError: Story = {
 export const Loading: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} loading />
+      <AccountDataView onExportData={() => {}} onDeleteAccount={() => {}} loading />
     </StoryFrame>
   ),
 };
@@ -45,7 +47,7 @@ export const LoadingOverlay: Story = {
   render: () => (
     <StoryFrame variant="panel">
       <View position="relative">
-        <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} />
+        <AccountDataView onExportData={() => {}} onDeleteAccount={() => {}} />
         <View
           position="absolute"
           top={0}
@@ -56,8 +58,8 @@ export const LoadingOverlay: Story = {
           pointerEvents="none"
         >
           <AccountDataView
-            onExportData={() => undefined}
-            onDeleteAccount={() => undefined}
+            onExportData={() => {}}
+            onDeleteAccount={() => {}}
             loading
           />
         </View>

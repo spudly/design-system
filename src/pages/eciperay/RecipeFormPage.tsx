@@ -1,5 +1,6 @@
-import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import type { ReactNode } from "react";
+
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ChangedListBanner } from "../../widgets/feedback/ChangedListBanner.js";

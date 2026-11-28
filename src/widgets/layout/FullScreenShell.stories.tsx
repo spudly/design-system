@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { FullScreenShell } from "./FullScreenShell.js";
+
 import { Text } from "../data/Text.js";
+
+import { FullScreenShell } from "./FullScreenShell.js";
 
 const meta: Meta<typeof FullScreenShell> = {
   title: "Widgets/Layout & Structure/FullScreenShell",

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import { FixedActionBanner } from "./FixedActionBanner.js";
 
 const meta: Meta<typeof FixedActionBanner> = {

@@ -32,9 +32,10 @@
  * pinned by the SSR tests below.
  */
 import "../../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
+
+import { loadInternalDist } from "../../../test/internalDist.js";
 test("the view ships in the built views barrel and stays off the built package root", async () => {
   const distRuntime = await loadInternalDist();
   assert.equal(typeof distRuntime.RecipeImageView, "function");

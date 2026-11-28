@@ -1,5 +1,7 @@
-import { memorizeFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { memorizeFooterFixture } from "../shared/fixtures.js";
+
 import { VerseSearchPage, type VerseSearchPageItem } from "./VerseSearchPage.js";
 
 /**
@@ -62,13 +64,13 @@ export const Default: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
-        onQueryChange={() => undefined}
-        onSearch={() => undefined}
+        onQueryChange={() => {}}
+        onSearch={() => {}}
         isSearching={false}
         usingDemo={false}
         errorMessage={null}
         results={charityResults}
-        onAddVerse={() => undefined}
+        onAddVerse={() => {}}
       />
     </>
   ),
@@ -83,15 +85,15 @@ export const WithAddedResult: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
-        onQueryChange={() => undefined}
-        onSearch={() => undefined}
+        onQueryChange={() => {}}
+        onSearch={() => {}}
         isSearching={false}
         usingDemo={false}
         errorMessage={null}
         results={charityResults.map((verse, index) =>
           index === 0 ? { ...verse, added: true } : verse,
         )}
-        onAddVerse={() => undefined}
+        onAddVerse={() => {}}
       />
     </>
   ),
@@ -105,13 +107,13 @@ export const DemoMode: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query=""
-        onQueryChange={() => undefined}
-        onSearch={() => undefined}
+        onQueryChange={() => {}}
+        onSearch={() => {}}
         isSearching={false}
         usingDemo
         errorMessage={null}
         results={[]}
-        onAddVerse={() => undefined}
+        onAddVerse={() => {}}
       />
     </>
   ),
@@ -125,13 +127,13 @@ export const Searching: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="Ether 12:27"
-        onQueryChange={() => undefined}
-        onSearch={() => undefined}
+        onQueryChange={() => {}}
+        onSearch={() => {}}
         isSearching
         usingDemo={false}
         errorMessage={null}
         results={etherResult}
-        onAddVerse={() => undefined}
+        onAddVerse={() => {}}
       />
     </>
   ),
@@ -145,13 +147,13 @@ export const Error: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
-        onQueryChange={() => undefined}
-        onSearch={() => undefined}
+        onQueryChange={() => {}}
+        onSearch={() => {}}
         isSearching={false}
         usingDemo={false}
         errorMessage="Search failed"
         results={[]}
-        onAddVerse={() => undefined}
+        onAddVerse={() => {}}
       />
     </>
   ),
@@ -166,14 +168,14 @@ export const NoResults: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="xyz"
-        onQueryChange={() => undefined}
-        onSearch={() => undefined}
+        onQueryChange={() => {}}
+        onSearch={() => {}}
         isSearching={false}
         usingDemo={false}
         errorMessage={null}
         results={[]}
         hasSearched
-        onAddVerse={() => undefined}
+        onAddVerse={() => {}}
       />
     </>
   ),

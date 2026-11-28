@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+
 import { Button } from "../actions/Button.js";
-import { PreviewCard } from "./PreviewCard.js";
 import { Text } from "../data/Text.js";
+
+import { PreviewCard } from "./PreviewCard.js";
 
 const meta: Meta<typeof PreviewCard> = {
   title: "Widgets/Content/PreviewCard",

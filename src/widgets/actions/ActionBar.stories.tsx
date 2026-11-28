@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, XStack } from "tamagui";
+
+import { Text } from "../data/Text.js";
+
 import { ActionBar } from "./ActionBar.js";
 import { Button } from "./Button.js";
-import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof ActionBar> = {
   title: "Widgets/Actions & Navigation/ActionBar",

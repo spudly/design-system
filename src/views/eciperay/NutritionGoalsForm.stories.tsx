@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { NutritionGoalsForm } from "./NutritionGoalsForm.js";
+
 import { nutritionGoalsFixture } from "../../pages/shared/fixtures.js";
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { NutritionGoalsForm } from "./NutritionGoalsForm.js";
 
 const meta: Meta<typeof NutritionGoalsForm> = {
   title: "Views/Eciperay/NutritionGoalsForm",
@@ -18,8 +20,8 @@ export const Filled: Story = {
     <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
-        onChange={() => undefined}
-        onSave={() => undefined}
+        onChange={() => {}}
+        onSave={() => {}}
       />
     </StoryFrame>
   ),
@@ -30,9 +32,9 @@ export const WithError: Story = {
     <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
-        onChange={() => undefined}
+        onChange={() => {}}
         error="Could not save your goals. Try again."
-        onSave={() => undefined}
+        onSave={() => {}}
       />
     </StoryFrame>
   ),
@@ -43,8 +45,8 @@ export const Loading: Story = {
     <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
-        onChange={() => undefined}
-        onSave={() => undefined}
+        onChange={() => {}}
+        onSave={() => {}}
         loading
       />
     </StoryFrame>
@@ -58,8 +60,8 @@ export const LoadingOverlay: Story = {
       <YStack position="relative">
         <NutritionGoalsForm
           goals={nutritionGoalsFixture}
-          onChange={() => undefined}
-          onSave={() => undefined}
+          onChange={() => {}}
+          onSave={() => {}}
         />
         <YStack
           position="absolute"
@@ -72,8 +74,8 @@ export const LoadingOverlay: Story = {
         >
           <NutritionGoalsForm
             goals={nutritionGoalsFixture}
-            onChange={() => undefined}
-            onSave={() => undefined}
+            onChange={() => {}}
+            onSave={() => {}}
             loading
           />
         </YStack>

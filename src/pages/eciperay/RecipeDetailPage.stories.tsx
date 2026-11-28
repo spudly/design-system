@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "../../widgets/data/Text.js";
 import { View } from "tamagui";
-import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
+
+import { Text } from "../../widgets/data/Text.js";
 import { tagColorNameForHex } from "../../themes/tagColors.js";
 import { recipeDetailFixture, eciperayFooterFixture } from "../shared/fixtures.js";
 import {
@@ -10,6 +10,8 @@ import {
   storyImagePortrait,
   storyImageRecipeHero,
 } from "../../storyFixtures.js";
+
+import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
 
 /**
  * Stories for the real RecipeDetailPage component (#49) — not a
@@ -159,14 +161,14 @@ function RecipeDetailPageDemo({
       ? {
           activationConfirmation: {
             open: true,
-            onOpenChange: () => undefined,
+            onOpenChange: () => {},
             title: "Activate this version?",
             description:
               "v4: Add the spinach at the very end becomes the active version. Meal plans, shopping lists, and API reads will serve it.",
             confirmLabel: "Activate",
             confirmTone: "primary" as const,
             cancelLabel: "Cancel",
-            onConfirm: () => undefined,
+            onConfirm: () => {},
           },
         }
       : {}),
@@ -191,23 +193,23 @@ function RecipeDetailPageDemo({
         : {}),
       servingsLabel: String(servings),
       cookingHref: "/recipes/1/cook",
-      onPrintPress: () => undefined,
-      onSharePress: () => undefined,
+      onPrintPress: () => {},
+      onSharePress: () => {},
       editHref: "/recipes/1/edit",
       ...(isFull && !createDraft ? { editDraftHref: "/recipes/1/edit-draft" } : {}),
-      ...(createDraft ? { onCreateDraftPress: () => undefined } : {}),
-      onDeletePress: () => undefined,
+      ...(createDraft ? { onCreateDraftPress: () => {} } : {}),
+      onDeletePress: () => {},
       lifecycle: isFull
         ? {
             isEditable: true,
             candidates: [{ id: "version-4", label: "v4: Add the spinach at the very end" }],
           }
         : null,
-      onTweakManuallyPress: () => undefined,
+      onTweakManuallyPress: () => {},
       tweakAiHref: "/recipes/1/tweak-ai",
-      onMarkPerfectedPress: () => undefined,
-      onAbandonPress: () => undefined,
-      onActivateCandidatePress: () => undefined,
+      onMarkPerfectedPress: () => {},
+      onAbandonPress: () => {},
+      onActivateCandidatePress: () => {},
       // Tag colors are names at the prop boundary (#207): stored
       // hexes convert through `tagColorNameForHex`, as the host's
       // data layer does — the two hex stand-ins below are legacy
@@ -241,12 +243,12 @@ function RecipeDetailPageDemo({
                 { value: "public", label: "Public", description: "Anyone can find and view it." },
               ],
               value: "unlisted",
-              onValueChange: () => undefined,
-              onSave: () => undefined,
+              onValueChange: () => {},
+              onSave: () => {},
               shareLinkUrl: "https://example.com/s/abc123",
-              onRotateShareLink: () => undefined,
+              onRotateShareLink: () => {},
               rotateShareLinkLabel: "Rotate share link",
-              onCopyShareLink: () => undefined,
+              onCopyShareLink: () => {},
             },
             comments: {
               comments: [
@@ -266,8 +268,8 @@ function RecipeDetailPageDemo({
               ],
               staleHintLabel: "Based on an older version",
               draft: "",
-              onDraftChange: () => undefined,
-              onPost: () => undefined,
+              onDraftChange: () => {},
+              onPost: () => {},
             },
           }
         : {}),
@@ -331,7 +333,7 @@ function RecipeDetailPageDemo({
       onLogCookPress: () => {
         setFormOpen(true);
       },
-      onDeleteCookLogPress: () => undefined,
+      onDeleteCookLogPress: () => {},
       ...(formOpen
         ? {
             // The cook-log form renders from data (#687): the
@@ -376,9 +378,9 @@ function RecipeDetailPageDemo({
           },
           disclaimer:
             "Estimated from the ingredient list with AI; values are approximate and not a substitute for professional nutrition advice.",
-          onRefreshPress: () => undefined,
+          onRefreshPress: () => {},
         }
-      : { state: "unavailable", onEstimatePress: () => undefined },
+      : { state: "unavailable", onEstimatePress: () => {} },
   };
 
   return (
@@ -563,9 +565,9 @@ function RecipeDetailGuestDemo({
     ctas: signedIn
       ? { variant: "signedIn", isClonePending: clonePending }
       : { variant: "signedOut" },
-    onSignUpPress: () => undefined,
-    onClonePress: () => undefined,
-    onGetAppPress: () => undefined,
+    onSignUpPress: () => {},
+    onClonePress: () => {},
+    onGetAppPress: () => {},
     ingredients: {
       servings,
       onServingsChange: setServings,

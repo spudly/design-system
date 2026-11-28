@@ -1,5 +1,7 @@
-import { memorizeFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
+
+import { memorizeFooterFixture } from "../shared/fixtures.js";
+
 import { MemorizeReviewPage, type MemorizeReviewPageVerse } from "./MemorizeReviewPage.js";
 
 /**
@@ -56,8 +58,8 @@ export const Default: Story = {
       <MemorizeReviewPage
         footer={memorizeFooterFixture}
         verses={dueVerses}
-        onRememberedPress={() => undefined}
-        onForgotPress={() => undefined}
+        onRememberedPress={() => {}}
+        onForgotPress={() => {}}
       />
     </>
   ),
@@ -69,8 +71,8 @@ export const Empty: Story = {
       <MemorizeReviewPage
         footer={memorizeFooterFixture}
         verses={[]}
-        onRememberedPress={() => undefined}
-        onForgotPress={() => undefined}
+        onRememberedPress={() => {}}
+        onForgotPress={() => {}}
         browseHref="/verses"
       />
     </>

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { TransferRecipesView } from "./TransferRecipesView.js";
+
 import { StoryFrame } from "../shared/storyFrame.js";
+
+import { TransferRecipesView } from "./TransferRecipesView.js";
 
 const meta: Meta<typeof TransferRecipesView> = {
   title: "Views/Eciperay/TransferRecipesView",
@@ -14,16 +16,16 @@ type Story = StoryObj<typeof TransferRecipesView>;
 
 const exportPicker = {
   search: "",
-  onSearchChange: () => undefined,
+  onSearchChange: () => {},
   items: [
     { id: "r1", label: "Skillet Chicken" },
     { id: "r2", label: "First Soup" },
   ],
   selectedIds: ["r1"],
-  onToggle: () => undefined,
-  onSelectAll: () => undefined,
-  onClearSelection: () => undefined,
-  onExport: () => undefined,
+  onToggle: () => {},
+  onSelectAll: () => {},
+  onClearSelection: () => {},
+  onExport: () => {},
   exportLabel: "Export selected (1)",
 };
 
@@ -32,7 +34,7 @@ export const Default: Story = {
     <StoryFrame variant="panel">
       <TransferRecipesView
         exportPicker={exportPicker}
-        onImportPress={() => undefined}
+        onImportPress={() => {}}
         importSummary="Imported 3 recipes."
       />
     </StoryFrame>
@@ -42,7 +44,7 @@ export const Default: Story = {
 export const Loading: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <TransferRecipesView exportPicker={exportPicker} onImportPress={() => undefined} loading />
+      <TransferRecipesView exportPicker={exportPicker} onImportPress={() => {}} loading />
     </StoryFrame>
   ),
 };
@@ -54,7 +56,7 @@ export const LoadingOverlay: Story = {
       <YStack position="relative">
         <TransferRecipesView
           exportPicker={exportPicker}
-          onImportPress={() => undefined}
+          onImportPress={() => {}}
           importSummary="Imported 3 recipes."
         />
         <YStack
@@ -68,7 +70,7 @@ export const LoadingOverlay: Story = {
         >
           <TransferRecipesView
             exportPicker={exportPicker}
-            onImportPress={() => undefined}
+            onImportPress={() => {}}
             loading
           />
         </YStack>

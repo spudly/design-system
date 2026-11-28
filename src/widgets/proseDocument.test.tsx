@@ -16,16 +16,17 @@
  * built page rendered at runtime.
  */
 import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
-import {
-  loadLegalDocumentRuntime,
-  renderLegalDocumentToHtml,
-} from "../../test/legalDocumentSsr.js";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+
+import {
+  loadLegalDocumentRuntime,
+  renderLegalDocumentToHtml,
+} from "../../test/legalDocumentSsr.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
 const source = readFileSync(

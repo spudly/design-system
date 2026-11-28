@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
+
 import { Badge } from "../../widgets/data/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
@@ -43,7 +44,7 @@ function RecipeDetailDemo() {
   );
   return (
     <PageFrame>
-      <TextLink onPress={() => undefined}>Back to recipes</TextLink>
+      <TextLink onPress={() => {}}>Back to recipes</TextLink>
       <Text variant="heading">{recipeDetailFixture.title}</Text>
       <Text variant="hint">{recipeDetailFixture.meta}</Text>
       <XStack gap={tokens.spacing[2]} flexWrap="wrap">
