@@ -141,7 +141,7 @@ test("the slot renders only the active tab's content, keyed by the active surfac
     onTabSelect,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
-  const [title, tabBar, , slot] = tree.props.children.props.children;
+  const [, title, tabBar, , slot] = tree.props.children.props.children;
   // #437: the header is the shared AppTopBar view, with the
   // shell's title as its brand (no href — the title navigates
   // nowhere).
@@ -183,7 +183,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     onTabSelect: () => {},
     children: override,
   });
-  const [, tabBar, , slot] = tree.props.children.props.children;
+  const [, , tabBar, , slot] = tree.props.children.props.children;
   assert.equal(tabBar.props.value, "", "no tab is selected while the override shows");
   assert.equal(slot.key, "override");
   assert.equal(slot.props.children, override);

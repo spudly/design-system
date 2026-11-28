@@ -183,7 +183,7 @@ test("the slot renders the page content, keyed by the active nav item; contentKe
     children: surface,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
-  const [topBarEl, , slot] = tree.props.children.props.children;
+  const [, topBarEl, , slot] = tree.props.children.props.children;
   assert.equal(topBarEl.type, distWidgets.AppTopBar, "the header is the shared top-bar widget");
   assert.deepEqual(topBarEl.props.brand, {
     label: "Eciperay",
@@ -268,7 +268,7 @@ test("search data forwards from the page to the top bar; SSR renders the landmar
     search,
     children: <span>PAGE SURFACE</span>,
   });
-  const [topBarEl] = tree.props.children.props.children;
+  const [, topBarEl] = tree.props.children.props.children;
   assert.deepEqual(topBarEl.props.search, search, "the page forwards search data to the bar");
   const bare = AppShellPage({
     brand: {
