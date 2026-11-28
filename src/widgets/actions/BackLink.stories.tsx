@@ -16,14 +16,14 @@ type Story = StoryObj<typeof BackLink>;
 export const Default: Story = {
   args: {
     label: "Back",
-    onPress: () => {},
+    onPress: () => { /* noop */ },
   },
 };
 
 export const CustomLabel: Story = {
   args: {
     label: "Back to recipes",
-    onPress: () => {},
+    onPress: () => { /* noop */ },
   },
 };
 

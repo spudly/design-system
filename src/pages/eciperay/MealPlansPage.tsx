@@ -174,13 +174,13 @@ export function MealPlansPage({
                 key={key}
                 title="Meal plan"
                 subtitle="Meal plan details"
-                onPress={() => {}}
+                onPress={() => { /* noop */ }}
                 loading
                 {...(onPlanDelete
                   ? {
                       actionLabel: "Delete",
                       actionTone: "danger" as const,
-                      onActionPress: () => {},
+                      onActionPress: () => { /* noop */ },
                     }
                   : {})}
               />

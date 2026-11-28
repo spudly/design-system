@@ -1107,7 +1107,7 @@ function HistoryPanel({
             loading
             {...(history.onDeleteCookLogPress
               ? {
-                  onDeletePress: () => {},
+                  onDeletePress: () => { /* noop */ },
                   deleteAccessibilityLabel: `Delete cook log ${index + 1}`,
                 }
               : {})}

@@ -69,9 +69,9 @@ function readyProps(overrides: Record<string, any> = {}) {
     roundCount: 3,
     words: WORDS,
     isFinalRound: false,
-    onBack: () => {},
-    onBlankReveal: (_i: number) => {},
-    onAdvance: () => {},
+    onBack: () => { /* noop */ },
+    onBlankReveal: (_i: number) => { /* noop */ },
+    onAdvance: () => { /* noop */ },
     ...overrides,
   };
 }

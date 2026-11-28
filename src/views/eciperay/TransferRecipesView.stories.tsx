@@ -16,16 +16,16 @@ type Story = StoryObj<typeof TransferRecipesView>;
 
 const exportPicker = {
   search: "",
-  onSearchChange: () => {},
+  onSearchChange: () => { /* noop */ },
   items: [
     { id: "r1", label: "Skillet Chicken" },
     { id: "r2", label: "First Soup" },
   ],
   selectedIds: ["r1"],
-  onToggle: () => {},
-  onSelectAll: () => {},
-  onClearSelection: () => {},
-  onExport: () => {},
+  onToggle: () => { /* noop */ },
+  onSelectAll: () => { /* noop */ },
+  onClearSelection: () => { /* noop */ },
+  onExport: () => { /* noop */ },
   exportLabel: "Export selected (1)",
 };
 
@@ -34,7 +34,7 @@ export const Default: Story = {
     <StoryFrame variant="panel">
       <TransferRecipesView
         exportPicker={exportPicker}
-        onImportPress={() => {}}
+        onImportPress={() => { /* noop */ }}
         importSummary="Imported 3 recipes."
       />
     </StoryFrame>
@@ -44,7 +44,7 @@ export const Default: Story = {
 export const Loading: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <TransferRecipesView exportPicker={exportPicker} onImportPress={() => {}} loading />
+      <TransferRecipesView exportPicker={exportPicker} onImportPress={() => { /* noop */ }} loading />
     </StoryFrame>
   ),
 };
@@ -56,7 +56,7 @@ export const LoadingOverlay: Story = {
       <YStack position="relative">
         <TransferRecipesView
           exportPicker={exportPicker}
-          onImportPress={() => {}}
+          onImportPress={() => { /* noop */ }}
           importSummary="Imported 3 recipes."
         />
         <YStack
@@ -70,7 +70,7 @@ export const LoadingOverlay: Story = {
         >
           <TransferRecipesView
             exportPicker={exportPicker}
-            onImportPress={() => {}}
+            onImportPress={() => { /* noop */ }}
             loading
           />
         </YStack>

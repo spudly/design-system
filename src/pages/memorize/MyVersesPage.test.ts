@@ -81,7 +81,7 @@ const VERSES = [
 ];
 
 function baseProps(overrides: Record<string, any> = {}) {
-  return { verses: VERSES, onRemoveVerse: (_id: string) => {}, ...overrides };
+  return { verses: VERSES, onRemoveVerse: (_id: string) => { /* noop */ }, ...overrides };
 }
 
 function renderRow(tree: any, item: any) {

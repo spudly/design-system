@@ -60,7 +60,7 @@ async function renderWithVoice(element: any): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 test("RecipeCommentsView renders its defaults from the voice object", async () => {
   const { h, RecipeCommentsView, fixtureVoice } = await loadRuntime();

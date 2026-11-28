@@ -65,7 +65,7 @@ async function renderWithoutVoice(element: any): Promise<string> {
   return renderToString(h(TamaguiProvider, { config, defaultTheme: "light" }, element));
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 test("SignInForm renders its copy from the voice object", async () => {
   const { h, SignInForm, fixtureVoice } = await loadRuntime();

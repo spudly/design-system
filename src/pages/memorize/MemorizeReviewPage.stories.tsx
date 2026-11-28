@@ -58,8 +58,8 @@ export const Default: Story = {
       <MemorizeReviewPage
         footer={memorizeFooterFixture}
         verses={dueVerses}
-        onRememberedPress={() => {}}
-        onForgotPress={() => {}}
+        onRememberedPress={() => { /* noop */ }}
+        onForgotPress={() => { /* noop */ }}
       />
     </>
   ),
@@ -71,8 +71,8 @@ export const Empty: Story = {
       <MemorizeReviewPage
         footer={memorizeFooterFixture}
         verses={[]}
-        onRememberedPress={() => {}}
-        onForgotPress={() => {}}
+        onRememberedPress={() => { /* noop */ }}
+        onForgotPress={() => { /* noop */ }}
         browseHref="/verses"
       />
     </>

@@ -69,7 +69,7 @@ export const Default: Story = {
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => {}}
+        onPlanDelete={() => { /* noop */ }}
       />
     </>
   ),
@@ -86,7 +86,7 @@ export const WithLeadImage: Story = {
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => {}}
+        onPlanDelete={() => { /* noop */ }}
       />
     </>
   ),
@@ -100,7 +100,7 @@ export const Empty: Story = {
         plans={[]}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => {}}
+        onPlanDelete={() => { /* noop */ }}
       />
     </>
   ),
@@ -133,7 +133,7 @@ export const LoadingOverlay: Story = {
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"
-        onPlanDelete={() => {}}
+        onPlanDelete={() => { /* noop */ }}
       />
       <View
         position="absolute"
@@ -149,7 +149,7 @@ export const LoadingOverlay: Story = {
           plans={planItems}
           loading
           createHref="/meal-plans/new"
-          onPlanDelete={() => {}}
+          onPlanDelete={() => { /* noop */ }}
         />
       </View>
     </View>

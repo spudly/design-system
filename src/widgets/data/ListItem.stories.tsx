@@ -45,7 +45,7 @@ export const Plain: Story = {
   ),
   args: {
     title: "Garlic cream chicken",
-    onPress: () => {},
+    onPress: () => { /* noop */ },
   },
 };
 
@@ -61,7 +61,7 @@ export const Disabled: Story = {
     titleSuffix: " (unavailable)",
     subtitle: "Serves 6",
     isDisabled: true,
-    onPress: () => {},
+    onPress: () => { /* noop */ },
   },
 };
 
@@ -75,7 +75,7 @@ export const Loading: Story = {
     prefix: "Meal · ",
     title: "Taco Tuesday",
     subtitle: "Serves 4 · 2,150 cal",
-    onPress: () => {},
+    onPress: () => { /* noop */ },
     loading: true,
   },
 };
@@ -88,7 +88,7 @@ export const LoadingOverlay: Story = {
         prefix="Meal · "
         title="Taco Tuesday"
         subtitle="Serves 4 · 2,150 cal"
-        onPress={() => {}}
+        onPress={() => { /* noop */ }}
       />
       <YStack
         position="absolute"
@@ -103,7 +103,7 @@ export const LoadingOverlay: Story = {
           prefix="Meal · "
           title="Taco Tuesday"
           subtitle="Serves 4 · 2,150 cal"
-          onPress={() => {}}
+          onPress={() => { /* noop */ }}
           loading
         />
       </YStack>

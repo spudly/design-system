@@ -136,7 +136,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
           },
         }
       : {}),
-    onSubmit: restOverrides.onSubmit ?? (() => {}),
+    onSubmit: restOverrides.onSubmit ?? (() => { /* noop */ }),
   };
 }
 

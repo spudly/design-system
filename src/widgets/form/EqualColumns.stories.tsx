@@ -22,7 +22,7 @@ export const Default: Story = {
             accessibilityLabel="Servings"
             keyboardType="number-pad"
             value="4"
-            onChangeText={() => {}}
+            onChangeText={() => { /* noop */ }}
           />
         </LabeledField>
         <LabeledField label="Prep (min)">
@@ -30,7 +30,7 @@ export const Default: Story = {
             accessibilityLabel="Prep (min)"
             keyboardType="number-pad"
             value="15"
-            onChangeText={() => {}}
+            onChangeText={() => { /* noop */ }}
           />
         </LabeledField>
         <LabeledField label="Cook (min)">
@@ -38,7 +38,7 @@ export const Default: Story = {
             accessibilityLabel="Cook (min)"
             keyboardType="number-pad"
             value="30"
-            onChangeText={() => {}}
+            onChangeText={() => { /* noop */ }}
           />
         </LabeledField>
       </EqualColumns>

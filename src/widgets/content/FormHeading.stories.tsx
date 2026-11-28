@@ -17,7 +17,7 @@ export const Default: Story = {
   render: () => (
     <FormScreenLayout>
       <FormHeading>Meal plan</FormHeading>
-      <TextField label="Title" value="" onChangeText={() => {}} placeholder="Plan title" />
+      <TextField label="Title" value="" onChangeText={() => { /* noop */ }} placeholder="Plan title" />
     </FormScreenLayout>
   ),
 };
@@ -26,7 +26,7 @@ export const WithSubtitle: Story = {
   render: () => (
     <FormScreenLayout>
       <FormHeading subtitle="Import a recipe from any web page">Import from URL</FormHeading>
-      <TextField label="Recipe URL" value="" onChangeText={() => {}} placeholder="https://" />
+      <TextField label="Recipe URL" value="" onChangeText={() => { /* noop */ }} placeholder="https://" />
     </FormScreenLayout>
   ),
 };

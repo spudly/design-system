@@ -83,7 +83,7 @@ export const Compact: Story = {
 export const Loading: Story = {
   render: () => (
     <Card loading style={{ maxWidth: 430 }}>
-      <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
+      <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => { /* noop */ }} />
     </Card>
   ),
 };
@@ -93,7 +93,7 @@ export const LoadingOverlay: Story = {
   render: () => (
     <YStack position="relative" maxWidth={430}>
       <Card style={{ maxWidth: 430 }}>
-        <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
+        <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => { /* noop */ }} />
       </Card>
       <YStack
         position="absolute"
@@ -105,7 +105,7 @@ export const LoadingOverlay: Story = {
         pointerEvents="none"
       >
         <Card loading style={{ maxWidth: 430 }}>
-          <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
+          <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => { /* noop */ }} />
         </Card>
       </YStack>
     </YStack>

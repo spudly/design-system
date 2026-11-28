@@ -15,7 +15,7 @@ const meta: Meta<typeof HomePage> = {
 export default meta;
 type Story = StoryObj<typeof HomePage>;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 /**
  * Rows are the shared recipe rows (#657): the page renders them

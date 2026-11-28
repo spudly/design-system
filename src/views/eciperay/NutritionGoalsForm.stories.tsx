@@ -20,8 +20,8 @@ export const Filled: Story = {
     <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
-        onChange={() => {}}
-        onSave={() => {}}
+        onChange={() => { /* noop */ }}
+        onSave={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -32,9 +32,9 @@ export const WithError: Story = {
     <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
-        onChange={() => {}}
+        onChange={() => { /* noop */ }}
         error="Could not save your goals. Try again."
-        onSave={() => {}}
+        onSave={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -45,8 +45,8 @@ export const Loading: Story = {
     <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
-        onChange={() => {}}
-        onSave={() => {}}
+        onChange={() => { /* noop */ }}
+        onSave={() => { /* noop */ }}
         loading
       />
     </StoryFrame>
@@ -60,8 +60,8 @@ export const LoadingOverlay: Story = {
       <YStack position="relative">
         <NutritionGoalsForm
           goals={nutritionGoalsFixture}
-          onChange={() => {}}
-          onSave={() => {}}
+          onChange={() => { /* noop */ }}
+          onSave={() => { /* noop */ }}
         />
         <YStack
           position="absolute"
@@ -74,8 +74,8 @@ export const LoadingOverlay: Story = {
         >
           <NutritionGoalsForm
             goals={nutritionGoalsFixture}
-            onChange={() => {}}
-            onSave={() => {}}
+            onChange={() => { /* noop */ }}
+            onSave={() => { /* noop */ }}
             loading
           />
         </YStack>

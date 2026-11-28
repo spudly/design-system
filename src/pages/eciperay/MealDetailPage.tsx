@@ -149,8 +149,8 @@ export function MealDetailPage({
               <TextSkeleton size="2xl" lines={1} />
               <TextSkeleton size="sm" lines={2} />
               <ButtonRow>
-                <Button onPress={() => {}}>Cook meal</Button>
-                <Button variant="secondary" onPress={() => {}}>
+                <Button onPress={() => { /* noop */ }}>Cook meal</Button>
+                <Button variant="secondary" onPress={() => { /* noop */ }}>
                   Edit
                 </Button>
               </ButtonRow>
@@ -161,7 +161,7 @@ export function MealDetailPage({
                       key={key}
                       title="Recipe"
                       subtitle="Recipe details"
-                      onPress={() => {}}
+                      onPress={() => { /* noop */ }}
                       loading
                     />
                   ))}

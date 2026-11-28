@@ -16,7 +16,7 @@ type Story = StoryObj<typeof ImportTextPage>;
 export const Empty: Story = {
   render: () => (
     <>
-      <ImportTextPage footer={eciperayFooterFixture} onSubmit={() => {}} />
+      <ImportTextPage footer={eciperayFooterFixture} onSubmit={() => { /* noop */ }} />
     </>
   ),
 };
@@ -27,7 +27,7 @@ export const WithError: Story = {
       <ImportTextPage
         footer={eciperayFooterFixture}
         error="We couldn't find a recipe in that text. Check it and try again."
-        onSubmit={() => {}}
+        onSubmit={() => { /* noop */ }}
       />
     </>
   ),

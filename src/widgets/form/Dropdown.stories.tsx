@@ -108,8 +108,8 @@ export const IconOnlyTrigger: Story = {
       trigger={<DropdownButton icon="profile" accessibilityLabel="Account menu" />}
     >
       <YStack>
-        <MenuRow label="Profile" onAction={() => {}} />
-        <MenuRow label="Sign out" onAction={() => {}} />
+        <MenuRow label="Profile" onAction={() => { /* noop */ }} />
+        <MenuRow label="Sign out" onAction={() => { /* noop */ }} />
       </YStack>
     </Dropdown>
   ),
@@ -124,8 +124,8 @@ export const AlignEnd: Story = {
         align="end"
       >
         <YStack>
-          <MenuRow label="Open" onAction={() => {}} />
-          <MenuRow label="Remove from board" destructive onAction={() => {}} />
+          <MenuRow label="Open" onAction={() => { /* noop */ }} />
+          <MenuRow label="Remove from board" destructive onAction={() => { /* noop */ }} />
         </YStack>
       </Dropdown>
     </XStack>
@@ -141,8 +141,8 @@ export const SideTop: Story = {
         side="top"
       >
         <YStack>
-          <MenuRow label="First row" onAction={() => {}} />
-          <MenuRow label="Second row" onAction={() => {}} />
+          <MenuRow label="First row" onAction={() => { /* noop */ }} />
+          <MenuRow label="Second row" onAction={() => { /* noop */ }} />
         </YStack>
       </Dropdown>
     </YStack>
@@ -157,9 +157,9 @@ export const InitiallyOpen: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow icon="print" label="Print recipe" onAction={() => {}} />
-        <MenuRow icon="share" label="Share recipe" onAction={() => {}} />
-        <MenuRow label="Delete recipe" destructive onAction={() => {}} />
+        <MenuRow icon="print" label="Print recipe" onAction={() => { /* noop */ }} />
+        <MenuRow icon="share" label="Share recipe" onAction={() => { /* noop */ }} />
+        <MenuRow label="Delete recipe" destructive onAction={() => { /* noop */ }} />
       </YStack>
     </Dropdown>
   ),
@@ -176,7 +176,7 @@ function ControlledMenu() {
         onOpenChange={setOpen}
       >
         <YStack>
-          <MenuRow label="Only row" onAction={() => {}} />
+          <MenuRow label="Only row" onAction={() => { /* noop */ }} />
         </YStack>
       </Dropdown>
       <Text variant="hint">Menu is {open ? "open" : "closed"}</Text>
@@ -206,8 +206,8 @@ export const WidePanelShortButton: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow label="Move this recipe to another collection" onAction={() => {}} />
-        <MenuRow label="Remove from this week's meal plan" onAction={() => {}} />
+        <MenuRow label="Move this recipe to another collection" onAction={() => { /* noop */ }} />
+        <MenuRow label="Remove from this week's meal plan" onAction={() => { /* noop */ }} />
       </YStack>
     </Dropdown>
   ),
@@ -229,8 +229,8 @@ export const WideButtonShortPanel: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow label="Open" onAction={() => {}} />
-        <MenuRow label="Print" onAction={() => {}} />
+        <MenuRow label="Open" onAction={() => { /* noop */ }} />
+        <MenuRow label="Print" onAction={() => { /* noop */ }} />
       </YStack>
     </Dropdown>
   ),
@@ -314,8 +314,8 @@ export const EqualWidthButtonAndPanel: Story = {
       defaultOpen
     >
       <YStack>
-        <MatchedWidthRow label="Add recipe to a collection" onAction={() => {}} />
-        <MenuRow label="Print recipe" onAction={() => {}} />
+        <MatchedWidthRow label="Add recipe to a collection" onAction={() => { /* noop */ }} />
+        <MenuRow label="Print recipe" onAction={() => { /* noop */ }} />
       </YStack>
     </Dropdown>
   ),
@@ -338,8 +338,8 @@ export const ButtonWiderThanPanel: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow label="Open" onAction={() => {}} />
-        <MenuRow label="Print" onAction={() => {}} />
+        <MenuRow label="Open" onAction={() => { /* noop */ }} />
+        <MenuRow label="Print" onAction={() => { /* noop */ }} />
       </YStack>
     </Dropdown>
   ),

@@ -34,7 +34,7 @@ export const Revealed: Story = {
     revealed: true,
     index: 0,
     total: 3,
-    onReveal: () => {},
+    onReveal: () => { /* noop */ },
   },
 };
 

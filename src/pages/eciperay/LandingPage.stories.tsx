@@ -43,8 +43,8 @@ const consentBannerFixture = {
   linkLabel: "privacy policy",
   linkHref: "/privacy",
   messageAfterLink: ".",
-  onAccept: () => {},
-  onDecline: () => {},
+  onAccept: () => { /* noop */ },
+  onDecline: () => { /* noop */ },
 };
 
 /** Install banner data (#879): the mobile-app prompt as the host passes it. */
@@ -54,7 +54,7 @@ const installBannerFixture = {
     { label: "Download on the App Store", href: "/get-the-app" },
     { label: "Get it on Google Play", href: "/get-the-app" },
   ],
-  onDismiss: () => {},
+  onDismiss: () => { /* noop */ },
 };
 
 /** Consent outstanding on the signed-out surface (#879): the page renders the bottom-pinned consent banner itself. */

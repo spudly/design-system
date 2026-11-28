@@ -44,7 +44,7 @@ function RecipeDetailDemo() {
   );
   return (
     <PageFrame>
-      <TextLink onPress={() => {}}>Back to recipes</TextLink>
+      <TextLink onPress={() => { /* noop */ }}>Back to recipes</TextLink>
       <Text variant="heading">{recipeDetailFixture.title}</Text>
       <Text variant="hint">{recipeDetailFixture.meta}</Text>
       <XStack gap={tokens.spacing[2]} flexWrap="wrap">

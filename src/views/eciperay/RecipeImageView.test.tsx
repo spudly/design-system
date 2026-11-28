@@ -80,10 +80,10 @@ function buttonAttrs(html: string, label: string): string {
   return html.slice(start, end);
 }
 const baseProps = {
-  onPickImageRequest: () => {},
-  onTakePhotoRequest: () => {},
-  onGenerateImageRequest: () => {},
-  onRemoveImage: () => {},
+  onPickImageRequest: () => { /* noop */ },
+  onTakePhotoRequest: () => { /* noop */ },
+  onGenerateImageRequest: () => { /* noop */ },
+  onRemoveImage: () => { /* noop */ },
 };
 test("empty state: pick / take-photo / generate render, remove does not", async () => {
   const html = await renderView({
@@ -107,8 +107,8 @@ test("with a preview: the image and the remove action render", async () => {
 });
 test("optional intents: no take-photo or generate handler, no such actions", async () => {
   const html = await renderView({
-    onPickImageRequest: () => {},
-    onRemoveImage: () => {},
+    onPickImageRequest: () => { /* noop */ },
+    onRemoveImage: () => { /* noop */ },
   });
   assert.ok(!html.includes("Take photo"), "no take-photo action without its intent");
   assert.ok(!html.includes("Generate with AI"), "no generate action without its intent");

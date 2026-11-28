@@ -59,7 +59,7 @@ async function render(element: any, withVoice = true): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 test("RecipeImageView renders its defaults and chrome from the voice object", async () => {
   const { h, RecipeImageView, fixtureVoice } = await loadRuntime();

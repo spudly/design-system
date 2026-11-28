@@ -18,7 +18,7 @@ export const Default: Story = {
         dateLabel="Oct 12, 2026"
         starRating={4}
         notes="Kids asked for seconds. Needed a pinch more salt."
-        onDeletePress={() => {}}
+        onDeletePress={() => { /* noop */ }}
         deleteAccessibilityLabel="Delete cook log 1 from Oct 12, 2026"
       />
     </YStack>
@@ -40,7 +40,7 @@ export const Loading: Story = {
         dateLabel="Oct 12, 2026"
         starRating={4}
         notes="Kids asked for seconds. Needed a pinch more salt."
-        onDeletePress={() => {}}
+        onDeletePress={() => { /* noop */ }}
         deleteAccessibilityLabel="Delete cook log 1 from Oct 12, 2026"
         loading
       />
@@ -56,7 +56,7 @@ export const LoadingOverlay: Story = {
         dateLabel="Oct 12, 2026"
         starRating={4}
         notes="Kids asked for seconds. Needed a pinch more salt."
-        onDeletePress={() => {}}
+        onDeletePress={() => { /* noop */ }}
         deleteAccessibilityLabel="Delete cook log 1 from Oct 12, 2026"
       />
       <YStack
@@ -72,7 +72,7 @@ export const LoadingOverlay: Story = {
           dateLabel="Oct 12, 2026"
           starRating={4}
           notes="Kids asked for seconds. Needed a pinch more salt."
-          onDeletePress={() => {}}
+          onDeletePress={() => { /* noop */ }}
           deleteAccessibilityLabel="Delete cook log 1 from Oct 12, 2026"
           loading
         />

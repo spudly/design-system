@@ -133,7 +133,7 @@ export function useDropdownContext(): DropdownContextValue | null {
  */
 export function useDropdownClose(): () => void {
   const context = useContext(DropdownContext);
-  return context?.close ?? (() => {});
+  return context?.close ?? (() => { /* noop */ });
 }
 
 const StyledContent = styled(Popover.Content, {

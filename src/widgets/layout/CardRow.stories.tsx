@@ -98,7 +98,7 @@ export const TitleOnly: Story = {
   ),
   args: {
     title: "Empty plan",
-    onPress: () => {},
+    onPress: () => { /* noop */ },
   },
 };
 
@@ -108,7 +108,7 @@ export const Loading: Story = {
       <XStack gap="$3">
         {rows.map((row) => (
           <YStack key={row.title} flex={1}>
-            <CardRow {...row} onPress={() => {}} loading />
+            <CardRow {...row} onPress={() => { /* noop */ }} loading />
           </YStack>
         ))}
       </XStack>
@@ -125,10 +125,10 @@ export const LoadingOverlay: Story = {
           <YStack key={row.title} flex={1}>
             <CardRow
               {...row}
-              onPress={() => {}}
+              onPress={() => { /* noop */ }}
               actionLabel="Delete"
               actionTone="danger"
-              onActionPress={() => {}}
+              onActionPress={() => { /* noop */ }}
             />
           </YStack>
         ))}
@@ -147,10 +147,10 @@ export const LoadingOverlay: Story = {
             <YStack key={row.title} flex={1}>
               <CardRow
                 {...row}
-                onPress={() => {}}
+                onPress={() => { /* noop */ }}
                 actionLabel="Delete"
                 actionTone="danger"
-                onActionPress={() => {}}
+                onActionPress={() => { /* noop */ }}
                 loading
               />
             </YStack>

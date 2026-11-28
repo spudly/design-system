@@ -22,8 +22,8 @@ export const Filled: Story = {
       <ImportUrlPage
         footer={eciperayFooterFixture}
         url="https://example.com/recipes/mushroom-stroganoff"
-        onUrlChange={() => {}}
-        onSubmit={() => {}}
+        onUrlChange={() => { /* noop */ }}
+        onSubmit={() => { /* noop */ }}
       />
     </>
   ),

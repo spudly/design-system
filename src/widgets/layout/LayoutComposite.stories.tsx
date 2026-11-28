@@ -138,11 +138,11 @@ export const StacksAndCards: Story = {
           <CardRow
             title="Weeknight favorites"
             subtitle="4 entries · 12,400 cal"
-            onPress={() => {}}
+            onPress={() => { /* noop */ }}
           />
         </YStack>
         <YStack flex={1}>
-          <CardRow title="Slow Sundays" subtitle="3 entries · 9,850 cal" onPress={() => {}} />
+          <CardRow title="Slow Sundays" subtitle="3 entries · 9,850 cal" onPress={() => { /* noop */ }} />
         </YStack>
       </Row>
       <CardGrid>
@@ -179,7 +179,7 @@ export const ScreenShell: Story = {
         ]}
         navLabel="Eciperay sections"
         activeItemId="recipes"
-        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }]}
       />
       <YStack height={300} borderWidth={1} borderColor="#ccc" borderStyle="dashed">
         <ScreenContainer>

@@ -20,8 +20,8 @@ export const Default: Story = {
         linkLabel="Privacy Policy"
         linkHref="/privacy"
         messageAfterLink=" for details."
-        onAccept={() => {}}
-        onDecline={() => {}}
+        onAccept={() => { /* noop */ }}
+        onDecline={() => { /* noop */ }}
       />
     </StoryFrame>
   ),

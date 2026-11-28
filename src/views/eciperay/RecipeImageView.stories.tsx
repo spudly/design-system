@@ -15,7 +15,7 @@ const meta: Meta<typeof RecipeImageView> = {
 export default meta;
 type Story = StoryObj<typeof RecipeImageView>;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 /** No image yet: the dashed empty frame, pick / take-photo /
  * generate actions, and no remove action. */

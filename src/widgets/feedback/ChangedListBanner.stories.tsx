@@ -46,7 +46,7 @@ export const Loading: Story = {
     <YStack maxWidth={430}>
       <ChangedListBanner
         label="Ingredients differ from the parent version (2 changed)."
-        onRevert={() => {}}
+        onRevert={() => { /* noop */ }}
         loading
       />
     </YStack>
@@ -59,7 +59,7 @@ export const LoadingOverlay: Story = {
     <YStack position="relative" maxWidth={430}>
       <ChangedListBanner
         label="Ingredients differ from the parent version (2 changed)."
-        onRevert={() => {}}
+        onRevert={() => { /* noop */ }}
       />
       <YStack
         position="absolute"
@@ -72,7 +72,7 @@ export const LoadingOverlay: Story = {
       >
         <ChangedListBanner
           label="Ingredients differ from the parent version (2 changed)."
-          onRevert={() => {}}
+          onRevert={() => { /* noop */ }}
           loading
         />
       </YStack>

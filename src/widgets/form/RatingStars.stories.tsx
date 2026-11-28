@@ -34,7 +34,7 @@ export const Pressable: Story = {
       <RatingStars
         rating={3}
         accessibilityLabel="Log a cook, rated 3 out of 5 stars"
-        onPress={() => {}}
+        onPress={() => { /* noop */ }}
       />
     </YStack>
   ),

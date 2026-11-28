@@ -25,13 +25,13 @@ export const WithSelection: Story = {
     <StoryFrame variant="panel">
       <RecipeExportPickerView
         search=""
-        onSearchChange={() => {}}
+        onSearchChange={() => { /* noop */ }}
         items={items}
         selectedIds={["r1", "r3"]}
-        onToggle={() => {}}
-        onSelectAll={() => {}}
-        onClearSelection={() => {}}
-        onExport={() => {}}
+        onToggle={() => { /* noop */ }}
+        onSelectAll={() => { /* noop */ }}
+        onClearSelection={() => { /* noop */ }}
+        onExport={() => { /* noop */ }}
         exportLabel="Export selected (2)"
       />
     </StoryFrame>
@@ -43,14 +43,14 @@ export const Loading: Story = {
     <StoryFrame variant="panel">
       <RecipeExportPickerView
         search=""
-        onSearchChange={() => {}}
+        onSearchChange={() => { /* noop */ }}
         items={[]}
         selectedIds={[]}
-        onToggle={() => {}}
-        onSelectAll={() => {}}
-        onClearSelection={() => {}}
+        onToggle={() => { /* noop */ }}
+        onSelectAll={() => { /* noop */ }}
+        onClearSelection={() => { /* noop */ }}
         loading
-        onExport={() => {}}
+        onExport={() => { /* noop */ }}
         exportLabel="Export selected (0)"
       />
     </StoryFrame>
@@ -64,13 +64,13 @@ export const LoadingOverlay: Story = {
       <YStack position="relative">
         <RecipeExportPickerView
           search=""
-          onSearchChange={() => {}}
+          onSearchChange={() => { /* noop */ }}
           items={items}
           selectedIds={["r1", "r3"]}
-          onToggle={() => {}}
-          onSelectAll={() => {}}
-          onClearSelection={() => {}}
-          onExport={() => {}}
+          onToggle={() => { /* noop */ }}
+          onSelectAll={() => { /* noop */ }}
+          onClearSelection={() => { /* noop */ }}
+          onExport={() => { /* noop */ }}
           exportLabel="Export selected (2)"
         />
         <YStack
@@ -84,14 +84,14 @@ export const LoadingOverlay: Story = {
         >
           <RecipeExportPickerView
             search=""
-            onSearchChange={() => {}}
+            onSearchChange={() => { /* noop */ }}
             items={items}
             selectedIds={["r1", "r3"]}
-            onToggle={() => {}}
-            onSelectAll={() => {}}
-            onClearSelection={() => {}}
+            onToggle={() => { /* noop */ }}
+            onSelectAll={() => { /* noop */ }}
+            onClearSelection={() => { /* noop */ }}
             loading
-            onExport={() => {}}
+            onExport={() => { /* noop */ }}
             exportLabel="Export selected (2)"
           />
         </YStack>

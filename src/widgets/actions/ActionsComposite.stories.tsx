@@ -38,7 +38,7 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 const RECIPE_TABS = [
   { value: "overview", label: "Overview" },
@@ -200,7 +200,7 @@ export const AllButtons: Story = {
             { value: "v2", label: "v2" },
             { value: "v1", label: "v1" },
           ]}
-          onValueChange={() => {}}
+          onValueChange={() => { /* noop */ }}
           grow
         />
       </Toolbar>

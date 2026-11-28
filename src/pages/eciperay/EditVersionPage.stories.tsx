@@ -32,7 +32,7 @@ function useFormProps(): RecipeFormPageProps {
   const [cookTimeMin, setCookTimeMin] = useState(fixture.cookTimeMin);
   const [sourceUrl, setSourceUrl] = useState(fixture.sourceUrl);
   const [tagIds, setTagIds] = useState<string[]>(fixture.tagIds);
-  const noop = () => {};
+  const noop = () => { /* noop */ };
   return {
     title,
     onTitleChange: setTitle,

@@ -75,8 +75,8 @@ export const PassageView: Story = {
       <PrevNextNav
         backLabel="Previous passage"
         nextLabel="Next passage"
-        onBack={() => {}}
-        onNext={() => {}}
+        onBack={() => { /* noop */ }}
+        onNext={() => { /* noop */ }}
       />
       <Button>Start memorization</Button>
     </PageFrame>

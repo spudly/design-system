@@ -18,8 +18,8 @@ export const Idle: Story = {
     <>
       <ImportImagePage
         footer={eciperayFooterFixture}
-        onPickCamera={() => {}}
-        onPickLibrary={() => {}}
+        onPickCamera={() => { /* noop */ }}
+        onPickLibrary={() => { /* noop */ }}
       />
     </>
   ),

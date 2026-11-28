@@ -14,9 +14,9 @@ export default meta;
 type Story = StoryObj<typeof ConsentPreferencesPage>;
 
 const actions = {
-  onAccept: () => {},
-  onDecline: () => {},
-  onWithdraw: () => {},
+  onAccept: () => { /* noop */ },
+  onDecline: () => { /* noop */ },
+  onWithdraw: () => { /* noop */ },
 };
 
 export const Accepted: Story = {

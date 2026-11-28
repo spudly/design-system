@@ -68,7 +68,7 @@ export const Default: Story = {
             { id: "cream", label: "1 cup heavy cream", isMissing: true },
             { id: "parmesan", label: "1/2 cup Parmesan cheese, grated", isOptional: true },
           ],
-          onIngredientPress: () => {},
+          onIngredientPress: () => { /* noop */ },
           substitutions: [
             {
               ingredient: "Heavy cream",
@@ -83,16 +83,16 @@ export const Default: Story = {
 
 const LOADING_VIEW: RecipeIngredientsPanelView = {
   servings: 4,
-  onServingsChange: () => {},
+  onServingsChange: () => { /* noop */ },
   scaleValue: "1",
-  onScaleChange: () => {},
+  onScaleChange: () => { /* noop */ },
   ingredients: [
     { id: "chicken", label: "1 1/2 lb chicken breasts, sliced" },
     { id: "garlic", label: "4 garlic cloves, minced" },
     { id: "cream", label: "1 cup heavy cream", isMissing: true },
     { id: "parmesan", label: "1/2 cup Parmesan cheese, grated", isOptional: true },
   ],
-  onIngredientPress: () => {},
+  onIngredientPress: () => { /* noop */ },
   substitutions: [
     {
       ingredient: "Heavy cream",

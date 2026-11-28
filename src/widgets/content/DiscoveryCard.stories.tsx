@@ -59,8 +59,8 @@ export const WithActions: Story = {
     subtitle: "By Maria · ★ 4.5 · Satiety 60",
     href: "/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken",
     actions: [
-      { id: "hide", label: "Hide this recipe", onSelect: () => {} },
-      { id: "show-less", label: "Show less like this", onSelect: () => {} },
+      { id: "hide", label: "Hide this recipe", onSelect: () => { /* noop */ } },
+      { id: "show-less", label: "Show less like this", onSelect: () => { /* noop */ } },
     ],
   },
 };

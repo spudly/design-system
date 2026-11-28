@@ -15,7 +15,7 @@ const meta: Meta<typeof TrailingActionsRow> = {
 export default meta;
 type Story = StoryObj<typeof TrailingActionsRow>;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 export const FieldAndAction: Story = {
   render: () => (

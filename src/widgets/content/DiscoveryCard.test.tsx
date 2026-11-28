@@ -65,8 +65,8 @@ describe("discoveryCardActions", () => {
       <DiscoveryCard
         {...cardProps}
         actions={[
-          { id: "hide", label: "Hide this recipe", onSelect: () => {} },
-          { id: "show-less", label: "Show less like this", onSelect: () => {} },
+          { id: "hide", label: "Hide this recipe", onSelect: () => { /* noop */ } },
+          { id: "show-less", label: "Show less like this", onSelect: () => { /* noop */ } },
         ]}
       />,
     );
@@ -87,7 +87,7 @@ describe("discoveryCardActions", () => {
     const html = await renderToHtml(
       <DiscoveryCard
         {...cardProps}
-        actions={[{ id: "hide", label: "Hide this recipe", onSelect: () => {} }]}
+        actions={[{ id: "hide", label: "Hide this recipe", onSelect: () => { /* noop */ } }]}
       />,
     );
     const anchorStart = html.indexOf("<a ");

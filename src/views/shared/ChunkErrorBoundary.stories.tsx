@@ -28,7 +28,7 @@ export const FailedToLoad: Story = {
     // The reload action is a no-op in Storybook so the story's
     // fallback stays on screen for inspection instead of reloading
     // the Storybook page itself.
-    onReload: () => {},
+    onReload: () => { /* noop */ },
     children: <FailingChild />,
   },
 };

@@ -56,7 +56,7 @@ async function loadRow() {
 
 test("HomePage renders the shared RecipeRow for each recipe, forwarding items and the log-cook callback (#657)", async () => {
   const { HomePage, RecipeRow } = await loadRow();
-  const onLogCookPress = () => {};
+  const onLogCookPress = () => { /* noop */ };
   const tree = HomePage({
     title: "Home",
     subtitle: "Welcome back",
@@ -101,7 +101,7 @@ test("the shared row wires the stars to onLogCookPress with the item id (#657)",
   );
   stars.props.onPress();
   assert.deepEqual(logged, ["r1"], "pressing the stars logs a cook for the item's id");
-  const unrated = RecipeRow({ item: RECIPES[1], onLogCookPress: () => {} });
+  const unrated = RecipeRow({ item: RECIPES[1], onLogCookPress: () => { /* noop */ } });
   assert.equal(
     unrated.props.subtitleAction.props.accessibilityLabel,
     "Log a cook of Fudgy Brownies",
@@ -117,7 +117,7 @@ test("the shared row renders no log-cook control when the host omits the callbac
     "no callback — no control",
   );
   assert.equal(
-    RecipeRow({ item: { ...RECIPES[0], canLogCook: false }, onLogCookPress: () => {} }).props
+    RecipeRow({ item: { ...RECIPES[0], canLogCook: false }, onLogCookPress: () => { /* noop */ } }).props
       .subtitleAction,
     undefined,
     "canLogCook false — no control",
@@ -196,7 +196,7 @@ const RECIPES = [
 ];
 
 test("SSR: rows render title, subtitle and rating from the items (#657)", async () => {
-  const html = await renderHome({ recipes: RECIPES, onLogCookPress: () => {} });
+  const html = await renderHome({ recipes: RECIPES, onLogCookPress: () => { /* noop */ } });
   assert.ok(html.includes("Tuscan Chicken"), "rated row title renders");
   assert.ok(html.includes("4 servings · 45 min"), "rated row subtitle renders");
   assert.ok(html.includes("Fudgy Brownies"), "unrated row title renders");
@@ -211,7 +211,7 @@ test("SSR: rows render title, subtitle and rating from the items (#657)", async 
 });
 
 test("SSR: no Delete and no Log cook text button exists in the rows (#657)", async () => {
-  const html = await renderHome({ recipes: RECIPES, onLogCookPress: () => {} });
+  const html = await renderHome({ recipes: RECIPES, onLogCookPress: () => { /* noop */ } });
   assert.doesNotMatch(html, />Delete</);
   assert.doesNotMatch(html, />Log cook</);
 });

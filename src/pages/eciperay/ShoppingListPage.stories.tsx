@@ -54,7 +54,7 @@ export const Loading: Story = {
         footer={eciperayFooterFixture}
         lines={[]}
         loading
-        onToggleLine={() => {}}
+        onToggleLine={() => { /* noop */ }}
       />
     </>
   ),
@@ -63,7 +63,7 @@ export const Loading: Story = {
 export const Empty: Story = {
   render: () => (
     <>
-      <ShoppingListPage footer={eciperayFooterFixture} lines={[]} onToggleLine={() => {}} />
+      <ShoppingListPage footer={eciperayFooterFixture} lines={[]} onToggleLine={() => { /* noop */ }} />
     </>
   ),
 };
@@ -75,7 +75,7 @@ export const LoadingOverlay: Story = {
       <ShoppingListPage
         footer={eciperayFooterFixture}
         lines={shoppingListFixture.lines}
-        onToggleLine={() => {}}
+        onToggleLine={() => { /* noop */ }}
       />
       <View
         position="absolute"
@@ -90,7 +90,7 @@ export const LoadingOverlay: Story = {
           footer={eciperayFooterFixture}
           lines={shoppingListFixture.lines}
           loading
-          onToggleLine={() => {}}
+          onToggleLine={() => { /* noop */ }}
         />
       </View>
     </View>

@@ -17,7 +17,7 @@ export const Default: Story = {
       secret="sk-example-secret-value"
       hint="Copy it now — it won't be shown again."
       doneLabel="Done"
-      onDismiss={() => {}}
+      onDismiss={() => { /* noop */ }}
     />
   ),
 };

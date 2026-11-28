@@ -126,7 +126,7 @@ test("action (#765): the Button forwards the host label + callback, and the call
 });
 
 test("SSR: with an action, its label renders as a button beside the home link", async () => {
-  const html = await renderRouteError({ action: { label: "Try again", onPress: () => {} } });
+  const html = await renderRouteError({ action: { label: "Try again", onPress: () => { /* noop */ } } });
   assert.match(html, /Try again/, "the action label renders");
   assert.match(html, /<button/, "the action renders as a button element (callback form)");
   assert.match(html, /href="\//, "the home link still renders");

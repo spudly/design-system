@@ -30,7 +30,7 @@ function PublicWithConsentDemo() {
       <RecipeSharingView
         options={options}
         value="public"
-        onValueChange={() => {}}
+        onValueChange={() => { /* noop */ }}
         publicWarning="Public recipes can be discovered by anyone. Make sure you're happy to share this recipe before saving."
         consentDescription={[
           { type: "text", text: "I agree to publish this recipe under the " },
@@ -40,13 +40,13 @@ function PublicWithConsentDemo() {
         consentChecked={consentChecked}
         onConsentCheckedChange={setConsentChecked}
         consentRequired
-        onSave={() => {}}
+        onSave={() => { /* noop */ }}
         shareLinkUrl="https://example.com/s/abc123"
-        onRotateShareLink={() => {}}
+        onRotateShareLink={() => { /* noop */ }}
         rotateShareLinkLabel="Rotate share link"
-        onCopyShareLink={() => {}}
+        onCopyShareLink={() => { /* noop */ }}
         permalinkUrl="https://example.com/recipes/skillet-chicken"
-        onCopyPermalink={() => {}}
+        onCopyPermalink={() => { /* noop */ }}
       />
     </StoryFrame>
   );
@@ -62,9 +62,9 @@ export const Private: Story = {
       <RecipeSharingView
         options={options}
         value="private"
-        onValueChange={() => {}}
-        onSave={() => {}}
-        onRotateShareLink={() => {}}
+        onValueChange={() => { /* noop */ }}
+        onSave={() => { /* noop */ }}
+        onRotateShareLink={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -76,9 +76,9 @@ export const Loading: Story = {
       <RecipeSharingView
         options={options}
         value="private"
-        onValueChange={() => {}}
-        onSave={() => {}}
-        onRotateShareLink={() => {}}
+        onValueChange={() => { /* noop */ }}
+        onSave={() => { /* noop */ }}
+        onRotateShareLink={() => { /* noop */ }}
         loading
       />
     </StoryFrame>
@@ -93,9 +93,9 @@ export const LoadingOverlay: Story = {
         <RecipeSharingView
           options={options}
           value="private"
-          onValueChange={() => {}}
-          onSave={() => {}}
-          onRotateShareLink={() => {}}
+          onValueChange={() => { /* noop */ }}
+          onSave={() => { /* noop */ }}
+          onRotateShareLink={() => { /* noop */ }}
         />
         <YStack
           position="absolute"
@@ -109,9 +109,9 @@ export const LoadingOverlay: Story = {
           <RecipeSharingView
             options={options}
             value="private"
-            onValueChange={() => {}}
-            onSave={() => {}}
-            onRotateShareLink={() => {}}
+            onValueChange={() => { /* noop */ }}
+            onSave={() => { /* noop */ }}
+            onRotateShareLink={() => { /* noop */ }}
             loading
           />
         </YStack>

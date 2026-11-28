@@ -40,7 +40,7 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 /** A browse page: section headings over discovery cards and
  * action rows — the catalog surface where the card family's

@@ -450,8 +450,8 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                 <TextSkeleton size="sm" lines={3} />
               </SectionCard>
               <ButtonRow>
-                <Button onPress={() => {}}>Shopping list</Button>
-                <Button variant="secondary" onPress={() => {}}>
+                <Button onPress={() => { /* noop */ }}>Shopping list</Button>
+                <Button variant="secondary" onPress={() => { /* noop */ }}>
                   Edit
                 </Button>
               </ButtonRow>
@@ -462,7 +462,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                       key={key}
                       title="Entry"
                       subtitle="Entry details"
-                      onPress={() => {}}
+                      onPress={() => { /* noop */ }}
                       loading
                     />
                   ))}

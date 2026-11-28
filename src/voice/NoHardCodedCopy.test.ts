@@ -88,7 +88,7 @@ async function renderWithVoice(element: any, voice: any): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 test("rendered surfaces carry the supplied voice's copy, not hard-coded copy", async () => {
   const { h, SignInPage, FeedbackPage, Alert, fixtureVoice } = await loadRuntime();

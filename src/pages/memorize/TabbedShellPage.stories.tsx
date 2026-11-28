@@ -130,7 +130,7 @@ export const IconTabs: Story = {
 
 /** A child that suspends the way a pending lazy chunk does. */
 function PendingContent(): never {
-  throw new Promise(() => {});
+  throw new Promise(() => { /* noop */ });
 }
 
 /** The active tab's chunk is still loading: the slot shows the DS loading state. */
@@ -147,7 +147,7 @@ export const LoadingTabContent: Story = {
           { id: "settings", label: "Settings", content: <SettingsContent /> },
         ]}
         activeTabId="search"
-        onTabSelect={() => {}}
+        onTabSelect={() => { /* noop */ }}
       />
     </>
   ),
@@ -176,10 +176,10 @@ export const ChunkFailedTabContent: Story = {
           { id: "settings", label: "Settings", content: <SettingsContent /> },
         ]}
         activeTabId="search"
-        onTabSelect={() => {}}
+        onTabSelect={() => { /* noop */ }}
         // A no-op reload in Storybook so the fallback stays on
         // screen for inspection instead of reloading the page.
-        onReload={() => {}}
+        onReload={() => { /* noop */ }}
       />
     </>
   ),
@@ -197,7 +197,7 @@ export const DrillOpen: Story = {
         tabsLabel="Memorize sections"
         tabs={memorizeTabs}
         activeTabId={null}
-        onTabSelect={() => {}}
+        onTabSelect={() => { /* noop */ }}
       >
         <SectionCard title="Drill — Alma 37:37">
           <Text variant="verse">
@@ -218,7 +218,7 @@ export const WithNotice: Story = {
         tabsLabel="Memorize sections"
         tabs={memorizeTabs}
         activeTabId="verses"
-        onTabSelect={() => {}}
+        onTabSelect={() => { /* noop */ }}
         notice={{ message: "Your verses could not be refreshed." }}
       />
     </>
@@ -234,10 +234,10 @@ export const WithNoticeAction: Story = {
         tabsLabel="Memorize sections"
         tabs={memorizeTabs}
         activeTabId="verses"
-        onTabSelect={() => {}}
+        onTabSelect={() => { /* noop */ }}
         notice={{
           message: "Your verses could not be refreshed.",
-          action: { label: "Try again", onPress: () => {} },
+          action: { label: "Try again", onPress: () => { /* noop */ } },
         }}
       />
     </>
@@ -250,8 +250,8 @@ const consentBannerFixture = {
   linkLabel: "privacy policy",
   linkHref: "/privacy",
   messageAfterLink: ".",
-  onAccept: () => {},
-  onDecline: () => {},
+  onAccept: () => { /* noop */ },
+  onDecline: () => { /* noop */ },
 };
 
 /** Install banner data (#879): the mobile-app prompt as the host passes it. */
@@ -261,7 +261,7 @@ const installBannerFixture = {
     { label: "Download on the App Store", href: "/get-the-app" },
     { label: "Get it on Google Play", href: "/get-the-app" },
   ],
-  onDismiss: () => {},
+  onDismiss: () => { /* noop */ },
 };
 
 /** Consent outstanding (#879): the shell renders the bottom-pinned consent banner itself. */
@@ -273,7 +273,7 @@ export const WithConsentBanner: Story = {
         tabsLabel="Memorize sections"
         tabs={memorizeTabs}
         activeTabId="verses"
-        onTabSelect={() => {}}
+        onTabSelect={() => { /* noop */ }}
         consentBanner={consentBannerFixture}
       />
     </>
@@ -289,7 +289,7 @@ export const WithInstallBanner: Story = {
         tabsLabel="Memorize sections"
         tabs={memorizeTabs}
         activeTabId="verses"
-        onTabSelect={() => {}}
+        onTabSelect={() => { /* noop */ }}
         installBanner={installBannerFixture}
       />
     </>

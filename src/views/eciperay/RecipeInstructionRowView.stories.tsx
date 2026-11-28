@@ -14,13 +14,13 @@ const meta: Meta<typeof RecipeInstructionRowView> = {
 export default meta;
 type Story = StoryObj<typeof RecipeInstructionRowView>;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 /** The host-bound drag handle stand-in: in the apps this node
  * is the drag container's activator (dnd-kit / DraggableFlatList). */
 function DragHandle() {
   return (
-    <Button variant="secondary" size="sm" accessibilityLabel="Reorder step 1" onPress={() => {}}>
+    <Button variant="secondary" size="sm" accessibilityLabel="Reorder step 1" onPress={() => { /* noop */ }}>
       Drag
     </Button>
   );

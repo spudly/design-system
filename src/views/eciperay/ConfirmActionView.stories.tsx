@@ -18,12 +18,12 @@ export const DeleteConfirmation: Story = {
     <StoryFrame variant="dialog">
       <ConfirmActionView
         open
-        onOpenChange={() => {}}
+        onOpenChange={() => { /* noop */ }}
         title="Delete this recipe?"
         description="This permanently deletes the recipe and its cook history."
         confirmLabel="Delete recipe"
         confirmPendingLabel="Deleting…"
-        onConfirm={() => {}}
+        onConfirm={() => { /* noop */ }}
         cancelLabel="Cancel"
       />
     </StoryFrame>
@@ -35,12 +35,12 @@ export const WithError: Story = {
     <StoryFrame variant="dialog">
       <ConfirmActionView
         open
-        onOpenChange={() => {}}
+        onOpenChange={() => { /* noop */ }}
         title="Delete this recipe?"
         description="This permanently deletes the recipe and its cook history."
         error="We couldn't delete this recipe. Try again."
         confirmLabel="Delete recipe"
-        onConfirm={() => {}}
+        onConfirm={() => { /* noop */ }}
         cancelLabel="Cancel"
       />
     </StoryFrame>
@@ -52,12 +52,12 @@ export const Notice: Story = {
     <StoryFrame variant="dialog">
       <ConfirmActionView
         open
-        onOpenChange={() => {}}
+        onOpenChange={() => { /* noop */ }}
         title="Nutrition unavailable"
         description="Nutrition couldn't be calculated for this version."
         confirmLabel="OK"
         confirmTone="primary"
-        onConfirm={() => {}}
+        onConfirm={() => { /* noop */ }}
       />
     </StoryFrame>
   ),

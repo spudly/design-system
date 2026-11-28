@@ -32,10 +32,10 @@ export const WithComposer: Story = {
         comments={comments}
         staleHintLabel="Based on an older version"
         draft=""
-        onDraftChange={() => {}}
-        onPost={() => {}}
-        onStartEdit={() => {}}
-        onDeleteComment={() => {}}
+        onDraftChange={() => { /* noop */ }}
+        onPost={() => { /* noop */ }}
+        onStartEdit={() => { /* noop */ }}
+        onDeleteComment={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -48,9 +48,9 @@ export const Editing: Story = {
         comments={comments}
         editingCommentId="c1"
         editDraft="Doubled the paprika and added garlic."
-        onEditDraftChange={() => {}}
-        onCancelEdit={() => {}}
-        onSaveEdit={() => {}}
+        onEditDraftChange={() => { /* noop */ }}
+        onCancelEdit={() => { /* noop */ }}
+        onSaveEdit={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -62,8 +62,8 @@ export const Empty: Story = {
       <RecipeCommentsView
         comments={[]}
         draft=""
-        onDraftChange={() => {}}
-        onPost={() => {}}
+        onDraftChange={() => { /* noop */ }}
+        onPost={() => { /* noop */ }}
       />
     </StoryFrame>
   ),
@@ -86,10 +86,10 @@ export const LoadingOverlay: Story = {
           comments={comments}
           staleHintLabel="Based on an older version"
           draft=""
-          onDraftChange={() => {}}
-          onPost={() => {}}
-          onStartEdit={() => {}}
-          onDeleteComment={() => {}}
+          onDraftChange={() => { /* noop */ }}
+          onPost={() => { /* noop */ }}
+          onStartEdit={() => { /* noop */ }}
+          onDeleteComment={() => { /* noop */ }}
         />
         <YStack
           position="absolute"
@@ -105,10 +105,10 @@ export const LoadingOverlay: Story = {
             loading
             staleHintLabel="Based on an older version"
             draft=""
-            onDraftChange={() => {}}
-            onPost={() => {}}
-            onStartEdit={() => {}}
-            onDeleteComment={() => {}}
+            onDraftChange={() => { /* noop */ }}
+            onPost={() => { /* noop */ }}
+            onStartEdit={() => { /* noop */ }}
+            onDeleteComment={() => { /* noop */ }}
           />
         </YStack>
       </YStack>

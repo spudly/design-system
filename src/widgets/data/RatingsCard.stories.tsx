@@ -37,7 +37,7 @@ export const Loading: Story = {
           community: { stars: "★★★★☆", label: "4.6 (9)" },
           viewer: { value: 4 },
         }}
-        onViewerRatingChange={() => {}}
+        onViewerRatingChange={() => { /* noop */ }}
         loading
       />
     </YStack>
@@ -53,7 +53,7 @@ export const LoadingOverlay: Story = {
           community: { stars: "★★★★☆", label: "4.6 (9)" },
           viewer: { value: 4 },
         }}
-        onViewerRatingChange={() => {}}
+        onViewerRatingChange={() => { /* noop */ }}
       />
       <YStack
         position="absolute"
@@ -70,7 +70,7 @@ export const LoadingOverlay: Story = {
             community: { stars: "★★★★☆", label: "4.6 (9)" },
             viewer: { value: 4 },
           }}
-          onViewerRatingChange={() => {}}
+          onViewerRatingChange={() => { /* noop */ }}
           loading
         />
       </YStack>

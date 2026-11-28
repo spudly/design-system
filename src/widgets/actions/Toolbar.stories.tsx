@@ -27,7 +27,7 @@ export const Default: Story = {
             { value: "v2", label: "v2" },
             { value: "v1", label: "v1" },
           ]}
-          onValueChange={() => {}}
+          onValueChange={() => { /* noop */ }}
           grow
         />
       </Toolbar>

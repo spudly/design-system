@@ -161,14 +161,14 @@ function RecipeDetailPageDemo({
       ? {
           activationConfirmation: {
             open: true,
-            onOpenChange: () => {},
+            onOpenChange: () => { /* noop */ },
             title: "Activate this version?",
             description:
               "v4: Add the spinach at the very end becomes the active version. Meal plans, shopping lists, and API reads will serve it.",
             confirmLabel: "Activate",
             confirmTone: "primary" as const,
             cancelLabel: "Cancel",
-            onConfirm: () => {},
+            onConfirm: () => { /* noop */ },
           },
         }
       : {}),
@@ -193,23 +193,23 @@ function RecipeDetailPageDemo({
         : {}),
       servingsLabel: String(servings),
       cookingHref: "/recipes/1/cook",
-      onPrintPress: () => {},
-      onSharePress: () => {},
+      onPrintPress: () => { /* noop */ },
+      onSharePress: () => { /* noop */ },
       editHref: "/recipes/1/edit",
       ...(isFull && !createDraft ? { editDraftHref: "/recipes/1/edit-draft" } : {}),
-      ...(createDraft ? { onCreateDraftPress: () => {} } : {}),
-      onDeletePress: () => {},
+      ...(createDraft ? { onCreateDraftPress: () => { /* noop */ } } : {}),
+      onDeletePress: () => { /* noop */ },
       lifecycle: isFull
         ? {
             isEditable: true,
             candidates: [{ id: "version-4", label: "v4: Add the spinach at the very end" }],
           }
         : null,
-      onTweakManuallyPress: () => {},
+      onTweakManuallyPress: () => { /* noop */ },
       tweakAiHref: "/recipes/1/tweak-ai",
-      onMarkPerfectedPress: () => {},
-      onAbandonPress: () => {},
-      onActivateCandidatePress: () => {},
+      onMarkPerfectedPress: () => { /* noop */ },
+      onAbandonPress: () => { /* noop */ },
+      onActivateCandidatePress: () => { /* noop */ },
       // Tag colors are names at the prop boundary (#207): stored
       // hexes convert through `tagColorNameForHex`, as the host's
       // data layer does — the two hex stand-ins below are legacy
@@ -243,12 +243,12 @@ function RecipeDetailPageDemo({
                 { value: "public", label: "Public", description: "Anyone can find and view it." },
               ],
               value: "unlisted",
-              onValueChange: () => {},
-              onSave: () => {},
+              onValueChange: () => { /* noop */ },
+              onSave: () => { /* noop */ },
               shareLinkUrl: "https://example.com/s/abc123",
-              onRotateShareLink: () => {},
+              onRotateShareLink: () => { /* noop */ },
               rotateShareLinkLabel: "Rotate share link",
-              onCopyShareLink: () => {},
+              onCopyShareLink: () => { /* noop */ },
             },
             comments: {
               comments: [
@@ -268,8 +268,8 @@ function RecipeDetailPageDemo({
               ],
               staleHintLabel: "Based on an older version",
               draft: "",
-              onDraftChange: () => {},
-              onPost: () => {},
+              onDraftChange: () => { /* noop */ },
+              onPost: () => { /* noop */ },
             },
           }
         : {}),
@@ -333,7 +333,7 @@ function RecipeDetailPageDemo({
       onLogCookPress: () => {
         setFormOpen(true);
       },
-      onDeleteCookLogPress: () => {},
+      onDeleteCookLogPress: () => { /* noop */ },
       ...(formOpen
         ? {
             // The cook-log form renders from data (#687): the
@@ -378,9 +378,9 @@ function RecipeDetailPageDemo({
           },
           disclaimer:
             "Estimated from the ingredient list with AI; values are approximate and not a substitute for professional nutrition advice.",
-          onRefreshPress: () => {},
+          onRefreshPress: () => { /* noop */ },
         }
-      : { state: "unavailable", onEstimatePress: () => {} },
+      : { state: "unavailable", onEstimatePress: () => { /* noop */ } },
   };
 
   return (
@@ -565,9 +565,9 @@ function RecipeDetailGuestDemo({
     ctas: signedIn
       ? { variant: "signedIn", isClonePending: clonePending }
       : { variant: "signedOut" },
-    onSignUpPress: () => {},
-    onClonePress: () => {},
-    onGetAppPress: () => {},
+    onSignUpPress: () => { /* noop */ },
+    onClonePress: () => { /* noop */ },
+    onGetAppPress: () => { /* noop */ },
     ingredients: {
       servings,
       onServingsChange: setServings,

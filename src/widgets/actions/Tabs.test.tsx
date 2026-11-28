@@ -75,7 +75,7 @@ describe("tabsAriaControls", () => {
           },
         ]}
         value="overview"
-        onValueChange={() => {}}
+        onValueChange={() => { /* noop */ }}
         label="Recipe sections"
       />,
     );
@@ -192,7 +192,7 @@ describe("tabsIcon", () => {
           },
         ]}
         value="home"
-        onValueChange={() => {}}
+        onValueChange={() => { /* noop */ }}
         label="App sections"
       />,
     );

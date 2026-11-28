@@ -37,7 +37,7 @@ export const Default: Story = {
     navItems: eciperayNav,
     navLabel: "Eciperay sections",
     activeItemId: "recipes",
-    actions: [{ id: "sign-out", label: "Sign out", onPress: () => {} }],
+    actions: [{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }],
   },
 };
 
@@ -52,10 +52,10 @@ export const WithSearch: Story = {
       label: "Search recipes",
       placeholder: "Search recipes",
       value: "soup",
-      onValueChange: () => {},
-      onSubmit: () => {},
+      onValueChange: () => { /* noop */ },
+      onSubmit: () => { /* noop */ },
     },
-    actions: [{ id: "sign-out", label: "Sign out", onPress: () => {} }],
+    actions: [{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }],
   },
 };
 
@@ -106,7 +106,7 @@ const phoneWidthArgs = {
   navItems: phoneNav,
   navLabel: "Eciperay sections",
   activeItemId: "recipes",
-  actions: [{ id: "sign-out", label: "Sign out", onPress: () => {} }],
+  actions: [{ id: "sign-out", label: "Sign out", onPress: () => { /* noop */ } }],
 };
 
 /**

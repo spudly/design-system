@@ -75,7 +75,7 @@ async function renderWithVoice(element: any, voice: any): Promise<string> {
   return html.replaceAll("&#x27;", "'");
 }
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 const paySentinels = {
   title: "SENT pay title",

@@ -15,10 +15,10 @@ export default meta;
 type Story = StoryObj<typeof FeedbackPreferenceView>;
 
 const actions = {
-  onShortcutEnabledChange: () => {},
-  onAcceptConsent: () => {},
-  onDeclineConsent: () => {},
-  onWithdrawConsent: () => {},
+  onShortcutEnabledChange: () => { /* noop */ },
+  onAcceptConsent: () => { /* noop */ },
+  onDeclineConsent: () => { /* noop */ },
+  onWithdrawConsent: () => { /* noop */ },
   choicesHref: "/privacy/consent",
 };
 
@@ -116,7 +116,7 @@ export const NoConsent: Story = {
     <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled
-        onShortcutEnabledChange={() => {}}
+        onShortcutEnabledChange={() => { /* noop */ }}
         choicesHref="/privacy/consent"
       />
     </StoryFrame>

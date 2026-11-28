@@ -16,7 +16,7 @@ type Story = StoryObj<typeof RatingForm>;
 export const Dark: Story = {
   render: () => (
     <StoryFrame variant="overlayPanel">
-      <RatingForm onSubmit={() => {}} onSkip={() => {}} isPending={false} />
+      <RatingForm onSubmit={() => { /* noop */ }} onSkip={() => { /* noop */ }} isPending={false} />
     </StoryFrame>
   ),
 };
@@ -26,8 +26,8 @@ export const Light: Story = {
     <StoryFrame variant="panel">
       <RatingForm
         variant="light"
-        onSubmit={() => {}}
-        onSkip={() => {}}
+        onSubmit={() => { /* noop */ }}
+        onSkip={() => { /* noop */ }}
         isPending={false}
       />
     </StoryFrame>
@@ -37,7 +37,7 @@ export const Light: Story = {
 export const Pending: Story = {
   render: () => (
     <StoryFrame variant="panel">
-      <RatingForm variant="light" onSubmit={() => {}} onSkip={() => {}} isPending />
+      <RatingForm variant="light" onSubmit={() => { /* noop */ }} onSkip={() => { /* noop */ }} isPending />
     </StoryFrame>
   ),
 };
@@ -50,8 +50,8 @@ export const CustomLabels: Story = {
         title="Rate this recipe"
         notesPlaceholder="Notes from this cook (optional)"
         secondaryLabel="Cancel"
-        onSubmit={() => {}}
-        onSkip={() => {}}
+        onSubmit={() => { /* noop */ }}
+        onSkip={() => { /* noop */ }}
         isPending={false}
       />
     </StoryFrame>

@@ -135,7 +135,7 @@ test("the catalog slots and handlers are passed through only when given", async 
     assert.ok(!(prop in bare.props), `${prop} must not reach the FlatList when not given`);
   }
   const header = () => null;
-  const onEndReached = () => {};
+  const onEndReached = () => { /* noop */ };
   const full = BoundedList({
     data: DATA,
     keyExtractor,
@@ -192,27 +192,27 @@ test("the three fixed-shell list pages render BoundedList", async () => {
     await import("../../../dist/pages/memorize/VerseSearchPage.js");
   const searchTree = verseSearch.VerseSearchPage({
     query: "weakness",
-    onQueryChange: () => {},
-    onSearch: () => {},
+    onQueryChange: () => { /* noop */ },
+    onSearch: () => { /* noop */ },
     isSearching: false,
     usingDemo: false,
     errorMessage: null,
     results: verses,
-    onAddVerse: () => {},
+    onAddVerse: () => { /* noop */ },
   });
   assert.ok(findByType(searchTree, BoundedList), "VerseSearchPage must render BoundedList");
   const review: Record<string, any> =
     await import("../../../dist/pages/memorize/MemorizeReviewPage.js");
   const reviewTree = review.MemorizeReviewPage({
     verses,
-    onRememberedPress: () => {},
-    onForgotPress: () => {},
+    onRememberedPress: () => { /* noop */ },
+    onForgotPress: () => { /* noop */ },
   });
   assert.ok(findByType(reviewTree, BoundedList), "MemorizeReviewPage must render BoundedList");
   const mine: Record<string, any> = await import("../../../dist/pages/memorize/MyVersesPage.js");
   const mineTree = mine.MyVersesPage({
     verses: verses.map((v) => ({ ...v, drillHref: `/drill/${v.id}`, status: "learning" })),
-    onRemoveVerse: () => {},
+    onRemoveVerse: () => { /* noop */ },
   });
   assert.ok(findByType(mineTree, BoundedList), "MyVersesPage must render BoundedList");
 });

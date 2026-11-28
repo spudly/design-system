@@ -64,13 +64,13 @@ export const Default: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
-        onQueryChange={() => {}}
-        onSearch={() => {}}
+        onQueryChange={() => { /* noop */ }}
+        onSearch={() => { /* noop */ }}
         isSearching={false}
         usingDemo={false}
         errorMessage={null}
         results={charityResults}
-        onAddVerse={() => {}}
+        onAddVerse={() => { /* noop */ }}
       />
     </>
   ),
@@ -85,15 +85,15 @@ export const WithAddedResult: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
-        onQueryChange={() => {}}
-        onSearch={() => {}}
+        onQueryChange={() => { /* noop */ }}
+        onSearch={() => { /* noop */ }}
         isSearching={false}
         usingDemo={false}
         errorMessage={null}
         results={charityResults.map((verse, index) =>
           index === 0 ? { ...verse, added: true } : verse,
         )}
-        onAddVerse={() => {}}
+        onAddVerse={() => { /* noop */ }}
       />
     </>
   ),
@@ -107,13 +107,13 @@ export const DemoMode: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query=""
-        onQueryChange={() => {}}
-        onSearch={() => {}}
+        onQueryChange={() => { /* noop */ }}
+        onSearch={() => { /* noop */ }}
         isSearching={false}
         usingDemo
         errorMessage={null}
         results={[]}
-        onAddVerse={() => {}}
+        onAddVerse={() => { /* noop */ }}
       />
     </>
   ),
@@ -127,13 +127,13 @@ export const Searching: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="Ether 12:27"
-        onQueryChange={() => {}}
-        onSearch={() => {}}
+        onQueryChange={() => { /* noop */ }}
+        onSearch={() => { /* noop */ }}
         isSearching
         usingDemo={false}
         errorMessage={null}
         results={etherResult}
-        onAddVerse={() => {}}
+        onAddVerse={() => { /* noop */ }}
       />
     </>
   ),
@@ -147,13 +147,13 @@ export const Error: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
-        onQueryChange={() => {}}
-        onSearch={() => {}}
+        onQueryChange={() => { /* noop */ }}
+        onSearch={() => { /* noop */ }}
         isSearching={false}
         usingDemo={false}
         errorMessage="Search failed"
         results={[]}
-        onAddVerse={() => {}}
+        onAddVerse={() => { /* noop */ }}
       />
     </>
   ),
@@ -168,14 +168,14 @@ export const NoResults: Story = {
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="xyz"
-        onQueryChange={() => {}}
-        onSearch={() => {}}
+        onQueryChange={() => { /* noop */ }}
+        onSearch={() => { /* noop */ }}
         isSearching={false}
         usingDemo={false}
         errorMessage={null}
         results={[]}
         hasSearched
-        onAddVerse={() => {}}
+        onAddVerse={() => { /* noop */ }}
       />
     </>
   ),

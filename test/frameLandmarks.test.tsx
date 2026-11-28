@@ -329,14 +329,14 @@ const publicRecipeReadyFixture = {
   ctas: {
     variant: "signedOut",
   },
-  onSignUpPress: () => {},
-  onClonePress: () => {},
-  onGetAppPress: () => {},
+  onSignUpPress: () => { /* noop */ },
+  onClonePress: () => { /* noop */ },
+  onGetAppPress: () => { /* noop */ },
   ingredients: {
     servings: 4,
-    onServingsChange: () => {},
+    onServingsChange: () => { /* noop */ },
     scaleValue: "1",
-    onScaleChange: () => {},
+    onScaleChange: () => { /* noop */ },
     ingredients: [
       {
         id: "salt",
@@ -345,7 +345,7 @@ const publicRecipeReadyFixture = {
         isMissing: false,
       },
     ],
-    onIngredientPress: () => {},
+    onIngredientPress: () => { /* noop */ },
     substitutions: [],
   },
   instructions: {

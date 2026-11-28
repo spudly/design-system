@@ -34,7 +34,7 @@ export const Associated: Story = {
           id="field-label-title"
           accessibilityLabel="Title"
           value="Tuscan chicken"
-          onChangeText={() => {}}
+          onChangeText={() => { /* noop */ }}
         />
         <Text variant="hint">
           With `htmlFor` the web rendering is a real label element naming the field; clicking it

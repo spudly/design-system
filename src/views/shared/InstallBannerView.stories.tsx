@@ -21,7 +21,7 @@ export const Default: Story = {
           { label: "App Store", href: "https://example.com/app-store" },
           { label: "Google Play", href: "https://example.com/google-play" },
         ]}
-        onDismiss={() => {}}
+        onDismiss={() => { /* noop */ }}
       />
     </StoryFrame>
   ),

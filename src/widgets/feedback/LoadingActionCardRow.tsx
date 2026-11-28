@@ -31,7 +31,7 @@ export function LoadingActionCardRow({ accessibilityLabel, children }: LoadingAc
         <TextSkeleton size="md" lines={1} />
         <TextSkeleton size="sm" lines={1} />
       </Col>
-      <Button ghost size="sm" accessibilityLabel={accessibilityLabel} onPress={() => {}}>
+      <Button ghost size="sm" accessibilityLabel={accessibilityLabel} onPress={() => { /* noop */ }}>
         {children}
       </Button>
     </Card>

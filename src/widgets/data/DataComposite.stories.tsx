@@ -41,7 +41,7 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-const noop = () => {};
+const noop = () => { /* noop */ };
 
 const TAGS = [
   { id: "t1", name: "Weeknight", color: "red" },

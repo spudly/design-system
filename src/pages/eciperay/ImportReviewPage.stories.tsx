@@ -35,8 +35,8 @@ export const Ready: Story = {
         busy={false}
         acceptPending={false}
         editsPending={false}
-        onAccept={() => {}}
-        onStartEdits={() => {}}
+        onAccept={() => { /* noop */ }}
+        onStartEdits={() => { /* noop */ }}
       />
     </>
   ),
@@ -64,8 +64,8 @@ export const WithImage: Story = {
         busy={false}
         acceptPending={false}
         editsPending={false}
-        onAccept={() => {}}
-        onStartEdits={() => {}}
+        onAccept={() => { /* noop */ }}
+        onStartEdits={() => { /* noop */ }}
       />
     </>
   ),

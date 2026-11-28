@@ -20,8 +20,8 @@ export const Default: Story = {
         onSearchChange={setSearch}
         selectedCount={1}
         filteredCount={3}
-        onSelectAll={() => {}}
-        onClearSelection={() => {}}
+        onSelectAll={() => { /* noop */ }}
+        onClearSelection={() => { /* noop */ }}
       />
     );
   },
@@ -36,8 +36,8 @@ export const NothingFiltered: Story = {
         onSearchChange={setSearch}
         selectedCount={0}
         filteredCount={0}
-        onSelectAll={() => {}}
-        onClearSelection={() => {}}
+        onSelectAll={() => { /* noop */ }}
+        onClearSelection={() => { /* noop */ }}
       />
     );
   },

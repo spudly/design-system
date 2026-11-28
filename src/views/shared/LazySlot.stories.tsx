@@ -16,7 +16,7 @@ type Story = StoryObj<typeof LazySlot>;
 
 /** A child that suspends the way a pending lazy chunk does. */
 function PendingChild(): never {
-  throw new Promise(() => {});
+  throw new Promise(() => { /* noop */ });
 }
 
 /** A child that fails the way a rejected lazy chunk import does. */
@@ -69,7 +69,7 @@ export const FailedToLoad: Story = {
     // The reload action is a no-op in Storybook so the story's
     // fallback stays on screen for inspection instead of reloading
     // the Storybook page itself.
-    onReload: () => {},
+    onReload: () => { /* noop */ },
     children: <FailingChild />,
   },
 };
