@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single declarative configuration object; splitting it would fragment one config definition (#902 T4) */
 import { useEffect, useMemo, useState } from "react";
 import { Linking as RNLinking, LogBox, View } from "react-native";
 import { useFonts } from "expo-font";

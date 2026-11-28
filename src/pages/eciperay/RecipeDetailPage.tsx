@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive page component (hero, ingredients, instructions, nutrition, and sharing sections driven by one recipe state); splitting it would scatter one page across files (#902 T4) */
 import { useMemo, type ReactNode } from "react";
 
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive comment component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { Spacer } from "../../widgets/layout/Spacer.js";

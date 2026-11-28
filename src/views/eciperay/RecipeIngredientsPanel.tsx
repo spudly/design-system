@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive panel component (ingredient groups, scaling, and render in one definition); splitting it would scatter one panel across files (#902 T4) */
 import { View, isWeb } from "tamagui";
 
 import { Row } from "../../widgets/layout/Row.js";

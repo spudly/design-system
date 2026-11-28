@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single component's story catalog is one cohesive demo unit; splitting it across files would scatter the stories Chromatic and reviewers browse together (#902 T4) */
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Card } from "../../widgets/layout/Card.js";

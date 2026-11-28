@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive form component whose fields share one form state; splitting it would fragment the form definition (#902 T4) */
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";

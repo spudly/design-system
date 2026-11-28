@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive slider component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useId } from "react";
 import { Label, Slider as TamaguiSlider, View, isWeb, styled } from "tamagui";
 

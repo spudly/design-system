@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive component (link columns and legal block in one definition); splitting it would scatter one component across files (#902 T4) */
 import type { ReactNode } from "react";
 import { Anchor, ScrollView, isWeb, styled, useTheme } from "tamagui";
 

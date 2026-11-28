@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive overlay component (portal, focus handling, and render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Dialog as TamaguiDialog, isWeb, styled } from "tamagui";

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive page form whose fields share one form state; splitting it would fragment the form definition (#902 T4) */
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";

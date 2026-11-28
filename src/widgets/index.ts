@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- barrel re-export index; its length is the package surface itself, not logic (#902 T4) */
 export { Accordion, type AccordionItem, type AccordionProps } from "./overlays/Accordion.js";
 export { AccordionSection, type AccordionSectionProps } from "./overlays/AccordionSection.js";
 export { Alert, type AlertProps } from "./feedback/Alert.js";

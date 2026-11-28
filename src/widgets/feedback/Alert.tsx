@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive alert component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import type { ReactNode } from "react";
 import { isWeb, useTheme } from "tamagui";
 

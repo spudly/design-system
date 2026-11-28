@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single declarative configuration object; splitting it would fragment one config definition (#902 T4) */
 import { createAnimations } from "@tamagui/animations-css/extras";
 // Platform constants come from Tamagui's own constants package: the
 // `tamagui` entry re-exports `isWeb` but not `isAndroid`/`isIos`.

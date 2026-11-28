@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- shared fixture data set; a single declarative data table consumed as one unit (#902 T4) */
 import { tagColorNames, type TagColorName } from "../../themes/tagColors.js";
 import type { BigFooterData } from "../../widgets/content/BigFooter.js";
 import type { LegalDocumentPageProps } from "../eciperay/LegalDocumentPage.js";

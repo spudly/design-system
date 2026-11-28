@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive component (macro rows and totals computed from one nutrition object); splitting it would scatter one component across files (#902 T4) */
 import { View } from "tamagui";
 
 import { Row } from "../layout/Row.js";

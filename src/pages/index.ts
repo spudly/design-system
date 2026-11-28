@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- barrel re-export index; its length is the package surface itself, not logic (#902 T4) */
 /**
  * Page components (#49): full-page, props-controlled views for the
  * apps' screens. The package root re-exports this barrel and,

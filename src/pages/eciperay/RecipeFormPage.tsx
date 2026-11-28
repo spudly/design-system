@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive page form whose fields share one form state; splitting it would fragment the form definition (#902 T4) */
 import type { ReactNode } from "react";
 
 import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";

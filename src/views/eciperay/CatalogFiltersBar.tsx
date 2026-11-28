@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive view component (filter groups share one filter state); splitting it would fragment the filter bar definition (#902 T4) */
 import { useState } from "react";
 
 import { useLoadingScope } from "../../contexts/LoadingScope.js";

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- one test suite per module; its cases share fixtures and helpers and read as a single spec (#902 T4) */
 /**
  * Contract test for the shared catalog pagination pattern
  * (spudly/design-system#285): useCatalogPagination, used by both

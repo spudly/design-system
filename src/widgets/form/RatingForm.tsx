@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive form component (props, styles, render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useState } from "react";
 import { TextArea as TamaguiTextArea, styled } from "tamagui";
 

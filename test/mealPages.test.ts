@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- one test suite per module; its cases share fixtures and helpers and read as a single spec (#902 T4) */
 /**
  * Contract tests for the B3b meals / meal-planning / shopping
  * pages (design-system #125): MealFormPage, MealPlanFormPage,

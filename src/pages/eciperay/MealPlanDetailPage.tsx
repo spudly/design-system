@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive page component (week view, day detail, and nutrition sections driven by one plan state); splitting it would scatter one page across files (#902 T4) */
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";

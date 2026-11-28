@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- one test suite per module; its cases share fixtures and helpers and read as a single spec (#902 T4) */
 /**
  * Landmark test for the legal page
  * (spudly/design-system#366; frame components retired by #473).
