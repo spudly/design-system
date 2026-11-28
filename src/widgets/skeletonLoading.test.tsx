@@ -1373,7 +1373,7 @@ function loadPages() {
   return pagesPromise;
 }
 test("T4 SSR: loading MealPlansPage and HomePage render skeleton rows, frames intact", async () => {
-  const {} = await loadRuntime();
+  await loadRuntime();
   const { MealPlansPage, HomePage } = await loadPages();
   const noop = () => { /* noop */ };
   const plans = await renderToHtml(
@@ -1440,7 +1440,7 @@ test("T4 SSR: loading MealPlansPage and HomePage render skeleton rows, frames in
   assert.ok(home.includes("Recently viewed"), "the section heading stays rendered while loading");
 });
 test("T4 SSR: loading MealsHubPage and ShoppingListPage render skeleton rows", async () => {
-  const {} = await loadRuntime();
+  await loadRuntime();
   const { MealsHubPage, ShoppingListPage } = await loadPages();
   const noop = () => { /* noop */ };
   const hub = await renderToHtml(
@@ -1505,7 +1505,7 @@ test("T4 SSR: loading MealsHubPage and ShoppingListPage render skeleton rows", a
   assert.ok(listIdle.includes("Secret item"), "a non-loading ShoppingListPage renders its lines");
 });
 test("T4 SSR: loading TagsPage renders skeleton rows, the create form stays live", async () => {
-  const {} = await loadRuntime();
+  await loadRuntime();
   const { TagsPage } = await loadPages();
   const noop = () => { /* noop */ };
   const tags = await renderToHtml(
@@ -1538,7 +1538,7 @@ test("T4 SSR: loading TagsPage renders skeleton rows, the create form stays live
   assert.ok(tags.includes("Tags"), "the page title stays rendered while loading");
 });
 test("T4 SSR: the union pages' loading states render their skeleton compositions", async () => {
-  const {} = await loadRuntime();
+  await loadRuntime();
   const { MealPlanDetailPage, RecipeDetailPage } = await loadPages();
   const plan = await renderToHtml(<MealPlanDetailPage state="loading" />);
   assert.equal(

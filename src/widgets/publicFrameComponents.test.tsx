@@ -120,7 +120,7 @@ test("SSR: BrandLink renders as a real anchor carrying the given href", async ()
   assert.ok(!/<button/.test(html), "the wordmark must not render as a button");
 });
 test("SSR: BigFooter renders exactly the caller's links, in order", async () => {
-  const {} = await loadRuntime();
+  await loadRuntime();
   const { BigFooter }: Record<string, any> =
     await import("../../dist/widgets/content/BigFooter.js");
   const html = await renderToHtml(
