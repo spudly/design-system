@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive overlay component (step state and render in one definition); splitting it would scatter one component across files (#902 T4) */
 import { useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { ScrollView, isWeb } from "tamagui";

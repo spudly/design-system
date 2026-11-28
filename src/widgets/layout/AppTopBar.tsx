@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive layout component (brand, search, and actions in one definition); splitting it would scatter one component across files (#902 T4) */
 import { Anchor, isWeb, styled, useTheme } from "tamagui";
 
 import { BrandMark, type BrandMarkName } from "../../icons/BrandMark.js";

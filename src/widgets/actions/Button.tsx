@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive component (variants, sizes, and states in one definition); splitting it would scatter one component across files (#902 T4) */
 import { Children, forwardRef } from "react";
 import type { ReactNode, Ref } from "react";
 import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive voice catalog module (every page's copy constants in one registry); splitting it would fragment the voice registry (#902 T4) */
 import { createContext, useContext, type ReactNode } from "react";
 
 /**

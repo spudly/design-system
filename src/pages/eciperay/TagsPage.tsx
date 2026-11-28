@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive page component (tag list, editing, and save state in one definition); splitting it would scatter one page across files (#902 T4) */
 import { useState } from "react";
 
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";

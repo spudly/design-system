@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive page component (session state, plan preview, and render in one definition); splitting it would scatter one page across files (#902 T4) */
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";

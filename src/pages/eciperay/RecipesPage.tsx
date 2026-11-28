@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- single cohesive page component (own list, discovery, and filter state in one definition); splitting it would scatter one page across files (#902 T4) */
 import { Fragment, useEffect, useRef } from "react";
 import type { LayoutChangeEvent } from "react-native";
 
