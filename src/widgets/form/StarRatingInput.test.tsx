@@ -116,7 +116,7 @@ function loadRuntime() {
   return runtimePromise;
 }
 async function renderToHtml(element: any) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
+  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(

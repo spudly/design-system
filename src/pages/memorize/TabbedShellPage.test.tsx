@@ -120,7 +120,7 @@ async function renderToHtml(element: any) {
   const styleEnd = html.lastIndexOf("</style>");
   return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
 }
-const sentinelTabs = (React: any) => [
+const sentinelTabs = (_React: any) => [
   {
     id: "verses",
     label: "My verses",

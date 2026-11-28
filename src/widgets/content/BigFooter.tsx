@@ -186,7 +186,6 @@ export type BigFooterProps = {
  * config defines no width breakpoints (the LandingPage
  * precedent): the geometry holds on both targets as written.
  */
-const BIG_FOOTER_STACK_BREAKPOINT = 640;
 const BIG_FOOTER_COLUMN_BASIS = 300;
 
 /** The official badge artwork per store (#466): bundled in the DS, never host-supplied. */

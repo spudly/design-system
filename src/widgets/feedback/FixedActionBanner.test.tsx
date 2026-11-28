@@ -136,7 +136,6 @@ function loadRuntime() {
 }
 async function renderSsr(element) {
   const {
-    React,
     renderToString,
     TamaguiProvider,
     createTamaguiConfig,

@@ -147,7 +147,6 @@ function loadRuntime() {
 }
 async function renderToHtml(element: any) {
   const {
-    React,
     renderToString,
     TamaguiProvider,
     createTamaguiConfig,
@@ -564,7 +563,6 @@ describe("autocompletePickerReview", () => {
   }
   async function renderToHtml(element: any) {
     const {
-      React,
       renderToString,
       TamaguiProvider,
       createTamaguiConfig,

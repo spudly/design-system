@@ -36,7 +36,7 @@ function loadRuntime() {
 }
 
 async function renderRow(props: Record<string, any>) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, LabelRow } =
+  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, LabelRow } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(

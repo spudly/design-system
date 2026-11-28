@@ -529,7 +529,6 @@ test("SSR: BigFooter renders brand, columns, store and social links as anchors",
 });
 test("SSR: an exported page renders its footer from the footer prop", async () => {
   const {
-    React,
     renderToString,
     TamaguiProvider,
     createTamaguiConfig,

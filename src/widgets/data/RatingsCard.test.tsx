@@ -24,8 +24,6 @@ const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "Ra
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("RatingsCard is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  const voiceFixtures: Record<string, any> = await import("../../../dist/voice/fixtures.js");
-  const voiceModule: Record<string, any> = await import("../../../dist/voice/index.js");
   assert.equal(
     typeof dist.RatingsCard,
     "function",
