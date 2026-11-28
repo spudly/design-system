@@ -2,7 +2,6 @@
 import { useState } from "react";
 
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
-import { tokens } from "../../tokens/index.js";
 import { useVoice } from "../../voice/index.js";
 import { politeLiveRegionProps } from "../../widgets/accessibility.js";
 import { Button } from "../../widgets/actions/Button.js";

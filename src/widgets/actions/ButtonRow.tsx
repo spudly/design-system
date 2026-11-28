@@ -3,7 +3,6 @@ import type { ReactElement, ReactNode } from "react";
 
 import { Row } from "../layout/Row.js";
 import type { RowProps } from "../layout/Row.js";
-import { tokens } from "../../tokens/index.js";
 
 export type ButtonRowProps = Omit<RowProps, "gap" | "top" | "wrap"> & {
   /**

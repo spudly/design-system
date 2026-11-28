@@ -1,6 +1,5 @@
 import { Col } from "../layout/Col.js";
 import { Spacer } from "../layout/Spacer.js";
-import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
 
 export type FormHeadingProps = {

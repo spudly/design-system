@@ -19,7 +19,6 @@ import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import type { SelectOption } from "../../widgets/form/SelectField.js";
 import { LoadingMediaRow } from "../../widgets/feedback/LoadingMediaRow.js";
 import { ScrollSentinel } from "../../widgets/layout/ScrollSentinel.js";
-import { Text } from "../../widgets/data/Text.js";
 import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 import { RatingForm } from "../../widgets/form/RatingForm.js";
 import { BoundedList } from "../shared/BoundedList.js";

@@ -3,7 +3,6 @@ import { useId, useRef } from "react";
 import { XStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 
-import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";

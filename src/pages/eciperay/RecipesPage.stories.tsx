@@ -5,7 +5,6 @@ import { View } from "tamagui";
 
 import { eciperayFooterFixture } from "../shared/fixtures.js";
 import { storyImageWide } from "../../storyFixtures.js";
-import { Text } from "../../widgets/data/Text.js";
 
 
 import {
