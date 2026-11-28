@@ -165,11 +165,7 @@ export function SelectField({
             {options.map((option) => (
               <TamaguiSelect.Item key={option.value} value={option.value}>
                 <StyledItemText fontFamily="body">{option.label}</StyledItemText>
-                {/* #209 exemption: the auto left margin aligns the check
-                    indicator at the end of the item row — alignment
-                    within a row, not space between items — so it stays
-                    a margin by design. */}
-                {/* eslint-disable-next-line design-system/no-margin-spacing */}
+                {/* eslint-disable-next-line design-system/no-margin-spacing -- #209 exemption: the auto left margin aligns the check indicator at the end of the item row — alignment within a row, not space between items — so it stays a margin by design. */}
                 <TamaguiSelect.ItemIndicator marginLeft="auto">
                   <Text style={{ color: "$primary" }}>✓</Text>
                 </TamaguiSelect.ItemIndicator>

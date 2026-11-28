@@ -73,8 +73,7 @@ const config: StorybookConfig = {
     name: "@storybook/react-vite",
     options: {},
   },
-  // viteFinal is async-shaped for Storybook's config type; the body is synchronous.
-  // eslint-disable-next-line @typescript-eslint/require-await
+  // eslint-disable-next-line @typescript-eslint/require-await -- viteFinal is async-shaped for Storybook's config type; the body is synchronous.
   viteFinal: async (config) => {
     const tamaguiDefine = Object.fromEntries(
       tamaguiEnvVars.map((name) => [`process.env.${name}`, JSON.stringify("")]),

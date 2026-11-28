@@ -262,11 +262,11 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
     };
     const handler = (payload?: { storyId?: string }) => {
       if (payload?.storyId === undefined || payload.storyId === storyId) {
-        setTimeout(run, 650);
+        setTimeout(() => { void run(); }, 650);
       }
     };
     view._channel.on(STORY_RENDERED, handler);
-    const fallback = setTimeout(run, 6000);
+    const fallback = setTimeout(() => { void run(); }, 6000);
     return () => {
       cancelled = true;
       view._channel.off(STORY_RENDERED, handler);
